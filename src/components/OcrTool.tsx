@@ -19,6 +19,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, downloadFile, sanitizeForWinAnsi } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
+import { getTesseractOptions, ocrFontUrl } from '../lib/ocrAssets';
 
 interface OcrToolProps {
   onBack: () => void;
@@ -390,6 +391,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
           imgDataUrl,
           selectedLang,
           {
+            ...getTesseractOptions(),
             logger: (m) => {
               if (m.status === 'loading tesseract core') {
                 setCurrentStep(`Loading Tesseract Module Core...`);
@@ -879,7 +881,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       let boldFont: any = null;
       let isCustomFont = false;
 
-      const fontUrl = FONT_PRESETS[selectedLang];
+      const fontUrl = FONT_PRESETS[selectedLang] ? ocrFontUrl(FONT_PRESETS[selectedLang]) : undefined;
       if (fontUrl) {
         try {
           setCurrentStep(`Downloading language-specific font pack for [${selectedLang.toUpperCase()}]...`);

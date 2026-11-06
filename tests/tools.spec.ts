@@ -100,3 +100,18 @@ test('Unlock reports a wrong password', async ({ page }) => {
   await page.getByRole('button', { name: /Unlock PDF File/ }).click();
   await expect(page.getByText('Incorrect password')).toBeVisible();
 });
+
+test('OCR recognizes text using the self-hosted Tesseract engine', async ({ page }) => {
+  test.slow(); // downloads the English language model (~3 MB) on first run
+  const engine: string[] = [];
+  page.on('request', (req) => {
+    if (/tesseract.*\.js$/.test(req.url())) engine.push(new URL(req.url()).host);
+  });
+  await openTool(page, 'Optical Character Scanning (OCR)');
+  await page.locator('input[type=file]').first().setInputFiles(threePages);
+  await page.getByRole('button', { name: /Start Optical Scan/ }).click();
+  await expect(page.getByText('characters recognized')).toHaveCount(3, { timeout: 120_000 });
+  // Worker and WASM engine must come from the app, not a CDN
+  expect(engine.length).toBeGreaterThan(0);
+  expect(new Set(engine)).toEqual(new Set([new URL(page.url()).host]));
+});

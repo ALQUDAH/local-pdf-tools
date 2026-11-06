@@ -53,7 +53,7 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 | **Browser tools** (31 of 40) | 100% in your browser | Files are never transmitted. Works on the static demo. |
 | **Office / HTML / PDF/A / Translate** (9 of 40) | On the Node.js server **you** run | Clearly labeled "Self-Hosted Server Tool". On the static demo they're disabled and nothing is sent. Translate calls Google Gemini only if you configure an API key. |
 
-A few browser tools download open-source **assets** (never your documents) the first time you use them: Tesseract OCR language models and the OCR engine, plus handwriting-style signature fonts. These come from public CDNs (jsDelivr, Google Fonts) and are cached by your browser.
+A few browser tools download open-source **assets** (never your documents) the first time you use them: OCR language models and fonts for non-Latin searchable PDFs (jsDelivr), and handwriting-style signature fonts (Google Fonts). The OCR engine itself and the PDF engine are bundled with the app. Self-hosters can serve the OCR assets themselves too; see [Configuration](#configuration).
 
 ## Quick start
 
@@ -124,6 +124,14 @@ All optional, and only used by the Node server. See [`.env.example`](.env.exampl
 | `HOST` | `0.0.0.0` | Interface to bind |
 | `GEMINI_API_KEY` | (none) | Enables the AI **Translate PDF** tool |
 | `GEMINI_MODEL` | `gemini-3.5-flash` | Gemini model used for translation |
+
+Build-time options for the browser app (set when running `npm run build` / `build:client`):
+
+| Variable | Purpose |
+|---|---|
+| `BASE_PATH` | Serve from a sub-path, e.g. `/local-pdf-tools/` |
+| `VITE_TESSDATA_URL` | Folder with OCR language models (`eng.traineddata.gz`, ...) to avoid the jsDelivr CDN, e.g. `/tessdata`. Get files from [`@tesseract.js-data`](https://www.npmjs.com/search?q=%40tesseract.js-data) (`4.0.0_best_int`). |
+| `VITE_OCR_FONT_URL` | Folder with the `.ttf` fonts used for non-Latin searchable PDFs (same file names as in `OcrTool.tsx`) |
 
 ## Tech stack
 
