@@ -1,23 +1,71 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import multer from "multer";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdfParser = require("pdf-parse");
-const pdf = typeof pdfParser === "function" ? pdfParser : (pdfParser.default || pdfParser);
+import { PDFParse } from "pdf-parse";
+import dns from "dns/promises";
+import net from "net";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import exceljs from "exceljs";
 import pptxgen from "pptxgenjs";
 import mammoth from "mammoth";
 import JSZip from "jszip";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import fs from "fs";
 
 // Initialize express app
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+
+// Header-safe base filename (Content-Disposition only accepts a limited charset)
+function safeBaseName(name: string): string {
+  return name.replace(/\.\w+$/, "").replace(/[^\w.\- ]+/g, "_").slice(0, 120) || "document";
+}
+
+// Extract plain text (whole document + per page) from a PDF buffer
+async function extractPdfText(buffer: Buffer): Promise<{ text: string; pages: string[] }> {
+  const parser = new PDFParse({ data: new Uint8Array(buffer) });
+  try {
+    const result = await parser.getText();
+    return { text: result.text || "", pages: result.pages.map((p) => p.text || "") };
+  } finally {
+    await parser.destroy();
+  }
+}
+
+// Reject URLs that point at loopback / private / link-local networks (SSRF guard)
+function isPrivateAddress(ip: string): boolean {
+  if (net.isIPv4(ip)) {
+    const [a, b] = ip.split(".").map(Number);
+    return a === 10 || a === 127 || a === 0 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      a >= 224;
+  }
+  const lower = ip.toLowerCase();
+  if (lower.startsWith("::ffff:")) return isPrivateAddress(lower.slice(7));
+  return lower === "::1" || lower === "::" || lower.startsWith("fc") || lower.startsWith("fd") || lower.startsWith("fe80");
+}
+
+async function assertPublicUrl(raw: string): Promise<URL> {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error("Invalid URL");
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error("Only http(s) URLs are allowed");
+  }
+  const addresses = await dns.lookup(url.hostname, { all: true });
+  if (addresses.length === 0 || addresses.some((a) => isPrivateAddress(a.address))) {
+    throw new Error("URLs pointing to private or local networks are not allowed");
+  }
+  return url;
+}
 
 // Configure multer file upload
 const upload = multer({
@@ -64,8 +112,7 @@ app.post("/api/convert/pdf-to-word", upload.single("file"), async (req, res) => 
     }
     
     // Parse PDF text page-by-page
-    const data = await pdf(req.file.buffer);
-    const text = data.text || "";
+    const { text } = await extractPdfText(req.file.buffer);
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
     
     const doc = new Document({
@@ -80,7 +127,7 @@ app.post("/api/convert/pdf-to-word", upload.single("file"), async (req, res) => 
     const wordBuffer = await Packer.toBuffer(doc);
     
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.docx"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.docx"`);
     res.send(wordBuffer);
   } catch (error: any) {
     console.error("PDF to Word conversion error:", error);
@@ -96,16 +143,8 @@ app.post("/api/convert/pdf-to-powerpoint", upload.single("file"), async (req, re
     }
     
     // Read PDF page by page
-    const pages: string[] = [];
-    await pdf(req.file.buffer, {
-      pagerender: (pageData) => {
-        return pageData.getTextContent().then((textContent: any) => {
-          const text = textContent.items.map((it: any) => it.str).join(" ");
-          pages.push(text);
-          return text;
-        });
-      }
-    });
+    const { pages: rawPages } = await extractPdfText(req.file.buffer);
+    const pages = rawPages.map((p) => p.replace(/\s+/g, " ").trim());
     
     const pptx = new pptxgen();
     
@@ -142,7 +181,7 @@ app.post("/api/convert/pdf-to-powerpoint", upload.single("file"), async (req, re
     const pptxBuffer = await pptx.write({ outputType: "nodebuffer" }) as Buffer;
     
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.pptx"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.pptx"`);
     res.send(pptxBuffer);
   } catch (error: any) {
     console.error("PDF to PPTX conversion error:", error);
@@ -157,8 +196,7 @@ app.post("/api/convert/pdf-to-excel", upload.single("file"), async (req, res) =>
       return res.status(400).json({ error: "No file received" });
     }
     
-    const data = await pdf(req.file.buffer);
-    const text = data.text || "";
+    const { text } = await extractPdfText(req.file.buffer);
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
     
     const workbook = new exceljs.Workbook();
@@ -180,7 +218,7 @@ app.post("/api/convert/pdf-to-excel", upload.single("file"), async (req, res) =>
     const excelBuffer = await workbook.xlsx.writeBuffer() as Buffer;
     
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.xlsx"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.xlsx"`);
     res.send(excelBuffer);
   } catch (error: any) {
     console.error("PDF to Excel error:", error);
@@ -248,7 +286,7 @@ app.post("/api/convert/word-to-pdf", upload.single("file"), async (req, res) => 
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("Word to PDF structure error:", error);
@@ -329,7 +367,7 @@ app.post("/api/convert/powerpoint-to-pdf", upload.single("file"), async (req, re
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("PPTX to PDF error:", error);
@@ -399,7 +437,7 @@ app.post("/api/convert/excel-to-pdf", upload.single("file"), async (req, res) =>
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_converted.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("Excel to PDF compilation error:", error);
@@ -414,15 +452,21 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
     let html = htmlInput || "";
     
     if (urlInput) {
+      let safeUrl: URL;
       try {
-        const fetchRes = await fetch(urlInput);
+        safeUrl = await assertPublicUrl(String(urlInput));
+      } catch (err: any) {
+        return res.status(400).json({ error: err.message || "URL not allowed" });
+      }
+      try {
+        const fetchRes = await fetch(safeUrl, { redirect: "error", signal: AbortSignal.timeout(15000) });
         if (fetchRes.ok) {
           html = await fetchRes.text();
         } else {
-          html = `<h1>Header Fail URL Status ${fetchRes.status}</h1><p>${urlInput}</p>`;
+          html = `<h1>Request failed with status ${fetchRes.status}</h1><p>${safeUrl.href}</p>`;
         }
       } catch (err) {
-        html = `<h1>Network Connection Failed</h1><p>Failed to contact: ${urlInput}</p>`;
+        html = `<h1>Network Connection Failed</h1><p>Failed to contact: ${safeUrl.href}</p>`;
       }
     }
     
@@ -521,13 +565,13 @@ app.post("/api/convert/pdf-to-pdfa", upload.single("file"), async (req, res) => 
 </x:xmpmeta>
 <?xpacket end="w"?>`;
 
-    pdfDoc.setTitle(`${req.file.originalname.replace(/\.\w+$/, "")} (ISO PDF/A Compliant)`);
+    pdfDoc.setTitle(`${safeBaseName(req.file.originalname)} (ISO PDF/A Compliant)`);
     pdfDoc.setSubject("Archived Target ISO-19005 series standard compliance");
     
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_pdfa.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_pdfa.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("PDF/A compilation error:", error);
@@ -542,11 +586,10 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
       return res.status(400).json({ error: "Missing target document" });
     }
     
-    const targetLang = req.body.targetLang || "Arabic";
+    const targetLang = String(req.body.targetLang || "Arabic").slice(0, 40);
     
     // Extract text layout
-    const textData = await pdf(req.file.buffer);
-    const text = textData.text || "";
+    const { text } = await extractPdfText(req.file.buffer);
     
     if (!text.trim()) {
       return res.status(400).json({ error: "Could not find extractable physical text in PDF to translate" });
@@ -558,17 +601,12 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
       // Setup the authentic Gemini Client
       const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          }
-        }
       });
       
       const systemInstruction = `You are a high fidelity literal document translator. Map and translate the given document text strictly to the language: ${targetLang}. Keep exact paragraphs, maintain item lists. Do not write any greetings or explanations. Only return the final translated document contents.`;
       
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
         contents: text.slice(0, 8000), // Protect token boundaries safely
         config: {
           systemInstruction
@@ -578,7 +616,7 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
       translatedText = response.text || "";
     } else {
       // Mock / Offline Translation fallback if API Key is not configured
-      translatedText = `*** OFFLINE TRANSLATION PREVIEW (GEMINI KEY MISSING) ***\n\nTarget Language: ${targetLang}\n\n[Original Content Sample]:\n\n${text.slice(0, 1500)}\n\n(Note: To process high-quality Gemini translation, please configure your process.env.GEMINI_API_KEY in Settings > Secrets!)`;
+      translatedText = `*** OFFLINE TRANSLATION PREVIEW (GEMINI KEY MISSING) ***\n\nTarget Language: ${targetLang}\n\n[Original Content Sample]:\n\n${text.slice(0, 1500)}\n\n(Note: To process high-quality Gemini translation, set the GEMINI_API_KEY environment variable on the server.)`;
     }
     
     // Compile into translated PDF document
@@ -631,7 +669,7 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.file.originalname.replace(/\.\w+$/, "")}_translated_${targetLang.toLowerCase()}.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_translated_${safeBaseName(String(targetLang)).toLowerCase()}.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("PDF Translation error:", error);
@@ -651,6 +689,7 @@ app.get("/api/health", (req, res) => {
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     // Development Mode: Mount Vite Middleware
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -667,8 +706,8 @@ async function startServer() {
     console.log("Production static files serving configuration established.");
   }
   
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running successfully on port ${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Local PDF Tools running at http://localhost:${PORT}`);
   });
 }
 

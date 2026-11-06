@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ArrowLeft, 
   FileText, 
@@ -12,7 +12,8 @@ import {
   Loader2, 
   Upload, 
   Settings,
-  ShieldCheck
+  ShieldCheck,
+  Server
 } from 'lucide-react';
 
 interface ConvertToolProps {
@@ -31,6 +32,23 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
   const [success, setSuccess] = useState(false);
   const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [resultFilename, setResultFilename] = useState('');
+  // null = checking, true = companion server reachable, false = static hosting (no server)
+  const [serverAvailable, setServerAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/health')
+      .then(async (res) => {
+        const data = res.ok ? await res.json().catch(() => null) : null;
+        if (!cancelled) setServerAvailable(!!data && data.status === 'healthy');
+      })
+      .catch(() => {
+        if (!cancelled) setServerAvailable(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Define configuration based on the active tool
   let title = '';
@@ -263,10 +281,24 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
           <span>Back to Dashboard</span>
         </button>
         <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 rounded-full font-semibold">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Local Ministry Server Ingress</span>
+          <Server className="w-3.5 h-3.5" />
+          <span>Self-Hosted Server Tool</span>
         </div>
       </div>
+
+      {serverAvailable === false && (
+        <div role="alert" className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-200">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold">This tool needs the companion server, which isn't running here.</p>
+            <p>
+              You're using the static (browser-only) version. {title} relies on Node.js libraries, so it only works when you
+              self-host the app with <code className="font-mono">npm run dev</code> or Docker. Your file has not been sent anywhere.
+              All other tools on the dashboard work fully in your browser.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main Card */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm">
@@ -421,7 +453,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
         {!success && (
           <button
             onClick={handleConvert}
-            disabled={loading}
+            disabled={loading || serverAvailable === false}
             className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white shadow-md transition disabled:opacity-50 cursor-pointer ${
               colorClass === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
               colorClass === 'orange' ? 'bg-orange-600 hover:bg-orange-700' :

@@ -27,6 +27,7 @@ import { fileToArrayBuffer } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import JSZip from 'jszip';
 
 interface BatchConverterToolProps {

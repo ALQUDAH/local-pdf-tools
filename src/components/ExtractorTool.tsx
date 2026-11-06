@@ -26,6 +26,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 
 interface ExtractorToolProps {
   onBack: () => void;

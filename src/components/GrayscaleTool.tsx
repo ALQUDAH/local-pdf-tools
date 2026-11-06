@@ -20,6 +20,7 @@ import { PDFFile } from '../types';
 import Dropzone from './Dropzone';
 import { fileToArrayBuffer, getPdfDetails, downloadFile } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import { PDFDocument } from 'pdf-lib';
 
 interface GrayscaleToolProps {

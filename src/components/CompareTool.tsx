@@ -22,6 +22,7 @@ import {
 import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 
 interface CompareToolProps {
   onBack: () => void;

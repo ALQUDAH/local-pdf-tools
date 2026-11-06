@@ -14,10 +14,8 @@ import {
 } from 'lucide-react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 
-// Configure pdfjs worker
-const pdfjsVersion = pdfjsLib.version || '6.0.227';
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.mjs`;
 
 interface EditPdfToolProps {
   onBack: () => void;

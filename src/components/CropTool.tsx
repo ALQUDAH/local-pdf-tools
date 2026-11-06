@@ -19,6 +19,7 @@ import {
 import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, downloadFile } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import { PDFDocument } from 'pdf-lib';
 import Dropzone from './Dropzone';
 
