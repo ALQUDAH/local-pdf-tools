@@ -48,3 +48,9 @@ Short, imperative subject lines, e.g. `Add PDF to EPUB tool` or `Fix rotation of
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [Apache-2.0 License](LICENSE).
+
+## Releasing (maintainers)
+
+1. Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md` and bump `version` in `package.json`.
+2. Merge to `main`.
+3. Run **Actions → Release → Run workflow** with the version (e.g. `1.1.0`). It tags `main` and publishes a GitHub release using that CHANGELOG section.

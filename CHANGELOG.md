@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [1.0.0] - 2026-11-06
 
-First public release.
+First public release of Local PDF Tools: 30+ PDF tools that run entirely in your browser. Your files never leave your device.
 
 ### Added
 - 40 PDF tools, 31 of which run entirely in the browser.
@@ -23,4 +23,5 @@ First public release.
 - PDF.js worker is bundled locally instead of loaded from a CDN.
 
 ### Changed
+- Updated GitHub Actions and dependencies (React 19.3, Tailwind 4.3, esbuild 0.28, docx, mammoth, Gemini SDK).
 - Every tool is code-split and lazy-loaded; initial JavaScript reduced from ~1.9 MB to ~390 KB.
