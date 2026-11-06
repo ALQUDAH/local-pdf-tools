@@ -35,13 +35,44 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
   const [resultFilename, setResultFilename] = useState('');
   // null = checking, true = companion server reachable, false = static hosting (no server)
   const [serverAvailable, setServerAvailable] = useState<boolean | null>(null);
+  // Desktop app only: optional Gemini API key for Translate PDF
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [keyConfigured, setKeyConfigured] = useState(false);
+  const [keyInput, setKeyInput] = useState('');
+  const [keySaving, setKeySaving] = useState(false);
+  const [keyMessage, setKeyMessage] = useState<string | null>(null);
+
+  const saveGeminiKey = async (key: string) => {
+    setKeySaving(true);
+    setKeyMessage(null);
+    try {
+      const res = await fetch('/api/settings/gemini-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-LPT-Desktop': '1' },
+        body: JSON.stringify({ key }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      setKeyConfigured(!!data.keyConfigured);
+      setKeyInput('');
+      setKeyMessage(data.keyConfigured ? tr("API key saved on this computer.") : tr("API key removed."));
+    } catch {
+      setKeyMessage(tr("Could not save the API key."));
+    } finally {
+      setKeySaving(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
     fetch('/api/health')
       .then(async (res) => {
         const data = res.ok ? await res.json().catch(() => null) : null;
-        if (!cancelled) setServerAvailable(!!data && data.status === 'healthy');
+        if (!cancelled) {
+          setServerAvailable(!!data && data.status === 'healthy');
+          setIsDesktop(!!data?.desktop);
+          setKeyConfigured(!!data?.keyConfigured);
+        }
       })
       .catch(() => {
         if (!cancelled) setServerAvailable(false);
@@ -314,6 +345,53 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
             </p>
           </div>
         </div>
+
+        {/* Desktop app: Gemini API key for AI translation */}
+        {toolId === 'translatepdf' && isDesktop && (
+          <div className="mb-6 bg-violet-50/60 dark:bg-violet-950/20 p-4 rounded-2xl border border-violet-100 dark:border-violet-900/40 space-y-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <label htmlFor="gemini-key" className="block text-xs font-bold text-slate-500 uppercase tracking-widest">
+                {tr("Gemini API key")}
+              </label>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${keyConfigured ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'}`}>
+                {keyConfigured ? tr("Configured") : tr("Not set: you'll get an untranslated preview")}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              {tr("Translation uses Google Gemini, so the document's text is sent to Google when you translate. Get a free key at aistudio.google.com. The key is stored only on this computer.")}
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <input
+                id="gemini-key"
+                type="password"
+                autoComplete="off"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                placeholder={keyConfigured ? tr("Enter a new key to replace it") : tr("Paste your API key")}
+                className="flex-1 min-w-48 px-3 py-2 text-sm bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-violet-500"
+              />
+              <button
+                type="button"
+                onClick={() => saveGeminiKey(keyInput)}
+                disabled={keySaving || !keyInput.trim()}
+                className="px-4 py-2 text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-xl disabled:opacity-50 cursor-pointer"
+              >
+                {tr("Save key")}
+              </button>
+              {keyConfigured && (
+                <button
+                  type="button"
+                  onClick={() => saveGeminiKey('')}
+                  disabled={keySaving}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-xl cursor-pointer"
+                >
+                  {tr("Remove key")}
+                </button>
+              )}
+            </div>
+            {keyMessage && <p role="status" className="text-xs text-slate-600 dark:text-slate-300">{keyMessage}</p>}
+          </div>
+        )}
 
         {/* Translation Language Selection */}
         {toolId === 'translatepdf' && (

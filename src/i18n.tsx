@@ -30,6 +30,9 @@ const en = {
   'hero.title': 'Manipulate PDFs entirely inside your browser.',
   'hero.body':
     'A free, open-source PDF toolkit that processes your documents locally. 30+ tools run in-memory in your browser, so your files never leave your device. The few Office and translation converters are clearly marked and only work with a server you host yourself.',
+  'hero.titleDesktop': 'Manipulate PDFs entirely on your computer.',
+  'hero.bodyDesktop':
+    'A free, open-source PDF toolkit that works offline. All 40 tools, including the Office converters, run on this computer, so your files never leave your device.',
   'search.placeholder': 'Search 40+ PDF tools by name or description... (e.g., merge, compress, protect, ocr)',
   'search.aria': 'Search PDF tools by name or description',
   'search.clear': 'Clear',
@@ -75,6 +78,9 @@ const ar: Partial<Record<MessageKey, string>> = {
   'hero.title': 'عدّل ملفات PDF بالكامل داخل متصفحك.',
   'hero.body':
     'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. أكثر من 30 أداة تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. أدوات تحويل Office والترجمة القليلة مُعلَّمة بوضوح، ولا تعمل إلا مع خادم تستضيفه بنفسك.',
+  'hero.titleDesktop': 'عدّل ملفات PDF بالكامل على جهازك.',
+  'hero.bodyDesktop':
+    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعمل دون إنترنت. جميع الأدوات الأربعين، بما فيها تحويل ملفات Office، تعمل على هذا الجهاز، فلا تغادر ملفاتك جهازك أبدًا.',
   'search.placeholder': 'ابحث في أكثر من 40 أداة PDF بالاسم أو الوصف... (مثل: دمج، ضغط، حماية، OCR)',
   'search.aria': 'ابحث في أدوات PDF بالاسم أو الوصف',
   'search.clear': 'مسح',

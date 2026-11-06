@@ -1081,6 +1081,17 @@ const ar: Record<string, string> = {
   "🔍 Extractor": "🔍 الاستخراج",
   "🗣️ Reader": "🗣️ القارئ",
   "or click to browse your local device. 100% private, files never leave your system.": "أو انقر لاختيار ملف من جهازك. خصوصية تامة: لا تغادر ملفاتك جهازك أبدًا.",
+  "API key saved on this computer.": "تم حفظ مفتاح API على هذا الجهاز.",
+  "API key removed.": "تمت إزالة مفتاح API.",
+  "Could not save the API key.": "تعذّر حفظ مفتاح API.",
+  "Gemini API key": "مفتاح Gemini API",
+  "Configured": "تم الإعداد",
+  "Not set: you'll get an untranslated preview": "غير مُعدّ: ستحصل على معاينة دون ترجمة",
+  "Translation uses Google Gemini, so the document's text is sent to Google when you translate. Get a free key at aistudio.google.com. The key is stored only on this computer.": "تستخدم الترجمة خدمة Google Gemini، لذا يُرسَل نص المستند إلى Google عند الترجمة. احصل على مفتاح مجاني من aistudio.google.com. يُحفظ المفتاح على هذا الجهاز فقط.",
+  "Enter a new key to replace it": "أدخل مفتاحًا جديدًا لاستبداله",
+  "Paste your API key": "الصق مفتاح API",
+  "Save key": "حفظ المفتاح",
+  "Remove key": "إزالة المفتاح",
 };
 
 export default ar;

@@ -545,6 +545,8 @@ const TOOL_GROUPS: ToolGroup[] = [
 
 export default function App() {
   const { t, lang, setLang, toolText, groupText } = useI18n();
+  // Running inside the desktop app (Electron): all tools, including server ones, work locally
+  const isDesktop = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent);
   const [activeTool, setActiveTool] = useState<ActiveTool>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -838,10 +840,10 @@ export default function App() {
               <ShieldCheck className="w-3.5 h-3.5" /> {t('hero.badge')}
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              {t('hero.title')}
+              {t(isDesktop ? 'hero.titleDesktop' : 'hero.title')}
             </h1>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-              {t('hero.body')}
+              {t(isDesktop ? 'hero.bodyDesktop' : 'hero.body')}
             </p>
           </div>
         </div>

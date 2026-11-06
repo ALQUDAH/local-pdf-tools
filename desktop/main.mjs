@@ -12,6 +12,8 @@ const PREFERRED_PORT = 47321;
 
 process.env.LPT_EMBEDDED = '1';
 process.env.NODE_ENV = 'production';
+// Desktop settings (e.g. the optional Gemini API key for Translate PDF) live in the user's app data
+process.env.LPT_SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
 
 let origin = '';
 let mainWindow = null;

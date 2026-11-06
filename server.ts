@@ -12,6 +12,7 @@ import pptxgen from "pptxgenjs";
 import mammoth from "mammoth";
 import JSZip from "jszip";
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs";
 
 // Initialize express app
 const app = express();
@@ -679,8 +680,53 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
 });
 
 // A basic health check route
+// ----------------------------------------------------
+// DESKTOP APP SETTINGS (only when embedded in the Electron app)
+// ----------------------------------------------------
+const isDesktop = () => !!process.env.LPT_EMBEDDED && !!process.env.LPT_SETTINGS_FILE;
+
+function loadDesktopSettings() {
+  if (!isDesktop()) return;
+  try {
+    const saved = JSON.parse(fs.readFileSync(process.env.LPT_SETTINGS_FILE!, "utf8"));
+    if (saved.geminiApiKey && !process.env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = saved.geminiApiKey;
+  } catch {
+    /* no settings yet */
+  }
+}
+
 app.get("/api/health", (req, res) => {
-  res.json({ status: "healthy", keyConfigured: !!process.env.GEMINI_API_KEY });
+  res.json({ status: "healthy", keyConfigured: !!process.env.GEMINI_API_KEY, desktop: isDesktop() });
+});
+
+// Lets the desktop app store a Gemini API key for "Translate PDF".
+// Locked to the app itself: the server only listens on 127.0.0.1, the Host header must match
+// (blocks DNS rebinding), and the custom header forces a CORS preflight that other sites can't pass.
+app.post("/api/settings/gemini-key", (req, res) => {
+  if (!isDesktop()) return res.status(404).json({ error: "Not available" });
+  const host = String(req.headers.host || "");
+  if (!/^(127\.0\.0\.1|localhost):\d+$/.test(host) || req.headers["x-lpt-desktop"] !== "1") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  const key = typeof req.body?.key === "string" ? req.body.key.trim() : "";
+  if (key.length > 200) return res.status(400).json({ error: "Key is too long" });
+  try {
+    const file = process.env.LPT_SETTINGS_FILE!;
+    let settings: Record<string, unknown> = {};
+    try {
+      settings = JSON.parse(fs.readFileSync(file, "utf8"));
+    } catch {
+      /* new file */
+    }
+    if (key) settings.geminiApiKey = key;
+    else delete settings.geminiApiKey;
+    fs.writeFileSync(file, JSON.stringify(settings, null, 2), { mode: 0o600 });
+    if (key) process.env.GEMINI_API_KEY = key;
+    else delete process.env.GEMINI_API_KEY;
+    res.json({ keyConfigured: !!key });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Could not save settings" });
+  }
 });
 
 // ----------------------------------------------------
@@ -698,6 +744,7 @@ export interface StartOptions {
 export async function startServer(options: StartOptions = {}): Promise<{ port: number }> {
   const port = options.port ?? PORT;
   const host = options.host ?? HOST;
+  loadDesktopSettings();
 
   if (process.env.NODE_ENV !== "production") {
     // Development Mode: Mount Vite Middleware

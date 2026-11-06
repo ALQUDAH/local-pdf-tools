@@ -78,7 +78,7 @@ Download the installer for your system from the [**latest release**](https://git
 | macOS, Intel | `Local-PDF-Tools-x.y.z-mac-x64.dmg` |
 | Linux | `Local-PDF-Tools-x.y.z-linux-x86_64.AppImage` or `.deb` |
 
-All 40 tools work offline in the desktop app, including the Office converters. Install and go.
+All 40 tools work offline in the desktop app, including the Office converters. Install and go. (The optional AI **Translate PDF** tool asks for your own free Gemini API key and sends the document's text to Google only when you use it.)
 
 > The installers are not code-signed yet, so your system may warn you the first time:
 > - **Windows:** "Windows protected your PC" → **More info** → **Run anyway**.
