@@ -16,6 +16,7 @@ import {
   Server
 } from 'lucide-react';
 
+import { tr } from '../i18n';
 interface ConvertToolProps {
   toolId: string;
   onBack: () => void;
@@ -168,7 +169,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
   const handleConvert = async () => {
     if (toolId !== 'htmltopdf' || htmlMode === 'file') {
       if (!file) {
-        setError('Please choose a file to convert.');
+        setError(tr("Please choose a file to convert."));
         return;
       }
     }
@@ -186,7 +187,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
       if (toolId === 'htmltopdf') {
         if (htmlMode === 'url') {
           if (!urlInput.trim()) {
-            setError('Please enter a valid website address.');
+            setError(tr("Please enter a valid website address."));
             setLoading(false);
             return;
           }
@@ -197,7 +198,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
           });
         } else if (htmlMode === 'code') {
           if (!htmlCode.trim()) {
-            setError('Please input valid HTML code snippet.');
+            setError(tr("Please input valid HTML code snippet."));
             setLoading(false);
             return;
           }
@@ -209,7 +210,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
         } else {
           // File Mode
           if (!file) {
-            setError('Please select an HTML file to print.');
+            setError(tr("Please select an HTML file to print."));
             setLoading(false);
             return;
           }
@@ -278,11 +279,11 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
           className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back to Dashboard</span>
+          <span>{tr("Back to Dashboard")}</span>
         </button>
         <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 rounded-full font-semibold">
           <Server className="w-3.5 h-3.5" />
-          <span>Self-Hosted Server Tool</span>
+          <span>{tr("Self-Hosted Server Tool")}</span>
         </div>
       </div>
 
@@ -290,11 +291,9 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
         <div role="alert" className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-200">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-semibold">This tool needs the companion server, which isn't running here.</p>
+            <p className="font-semibold">{tr("This tool needs the companion server, which isn't running here.")}</p>
             <p>
-              You're using the static (browser-only) version. {title} relies on Node.js libraries, so it only works when you
-              self-host the app with <code className="font-mono">npm run dev</code> or Docker. Your file has not been sent anywhere.
-              All other tools on the dashboard work fully in your browser.
+              {tr("You're using the static (browser-only) version.")} {title} {tr("relies on Node.js libraries, so it only works when you self-host the app with")} <code className="font-mono">npm run dev</code> {tr("or Docker. Your file has not been sent anywhere. All other tools on the dashboard work fully in your browser.")}
             </p>
           </div>
         </div>
@@ -320,7 +319,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
         {toolId === 'translatepdf' && (
           <div className="mb-6 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-              Select Target Language
+              {tr("Select Target Language")}
             </label>
             <div className="flex flex-wrap gap-2">
               {['Arabic', 'French', 'Spanish', 'German', 'Turkish', 'Chinese', 'Russian'].map((lang) => (
@@ -350,7 +349,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                   htmlMode === 'url' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Web Address (URL)
+                {tr("Web Address (URL)")}
               </button>
               <button
                 onClick={() => setHtmlMode('code')}
@@ -358,7 +357,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                   htmlMode === 'code' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                HTML Editor code
+                {tr("HTML Editor code")}
               </button>
               <button
                 onClick={() => setHtmlMode('file')}
@@ -366,7 +365,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                   htmlMode === 'file' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Plain HTML File Upload
+                {tr("Plain HTML File Upload")}
               </button>
             </div>
 
@@ -374,7 +373,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="https://example.com/page-to-print"
+                  placeholder={tr("https://example.com/page-to-print")}
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -388,7 +387,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                 onChange={(e) => setHtmlCode(e.target.value)}
                 rows={6}
                 className="w-full p-4 font-mono text-xs text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="<h1>Paste raw HTML here</h1>"
+                placeholder={tr("<h1>Paste raw HTML here</h1>")}
               />
             )}
           </div>
@@ -406,7 +405,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                   {inputLabel}
                 </span>
                 <span className="text-xs text-slate-400">
-                  Select or drag and drop file up to 50MB
+                  {tr("Select or drag and drop file up to 50MB")}
                 </span>
                 <input
                   type="file"
@@ -426,7 +425,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                       {file.name}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                      {(file.size / 1024 / 1024).toFixed(2)} {tr("MB")}
                     </p>
                   </div>
                 </div>
@@ -434,7 +433,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                   onClick={() => setFile(null)}
                   className="text-xs text-rose-500 hover:text-rose-700 font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 transition"
                 >
-                  Remove
+                  {tr("Remove")}
                 </button>
               </div>
             )}
@@ -469,10 +468,10 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Running document engine...</span>
+                <span>{tr("Running document engine...")}</span>
               </>
             ) : (
-              <span>Start conversion sequence</span>
+              <span>{tr("Start conversion sequence")}</span>
             )}
           </button>
         )}
@@ -484,10 +483,10 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
               <CheckCircle className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-300 mb-1">
-              Document Processed Successfully!
+              {tr("Document Processed Successfully!")}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 truncate max-w-lg mx-auto">
-              Ready to download: {resultFilename}
+              {tr("Ready to download:")} {resultFilename}
             </p>
             <div className="flex justify-center gap-4">
               <button
@@ -502,14 +501,14 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
                 }}
                 className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-semibold hover:bg-white dark:hover:bg-slate-800 transition shadow-sm"
               >
-                Process another file
+                {tr("Process another file")}
               </button>
               <button
                 onClick={handleDownload}
                 className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md transition"
               >
                 <Download className="w-4 h-4" />
-                <span>Download converted file</span>
+                <span>{tr("Download converted file")}</span>
               </button>
             </div>
           </div>

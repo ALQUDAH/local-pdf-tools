@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { fileToArrayBuffer, imagesToPdf, downloadFile } from '../lib/pdfUtils';
 
+import { tr } from '../i18n';
 interface ImagesToPdfToolProps {
   onBack: () => void;
 }
@@ -70,7 +71,7 @@ function SortableImageItem({ img, index, formatSize, totalLength, onMove, onDele
         {...attributes} 
         {...listeners}
         className="absolute top-2 right-2 p-1.5 bg-slate-900/40 text-white rounded cursor-grab active:cursor-grabbing hover:bg-slate-900/60 transition-colors z-10 focus:outline-none"
-        title="Drag to reorder"
+        title={tr("Drag to reorder")}
       >
         <GripHorizontal className="w-3.5 h-3.5" />
       </div>
@@ -83,7 +84,7 @@ function SortableImageItem({ img, index, formatSize, totalLength, onMove, onDele
           className="w-full h-full object-cover pointer-events-none"
         />
         <div className="absolute top-2 left-2 px-2 py-0.5 bg-slate-900/80 text-white rounded font-mono text-[10px] uppercase font-bold select-none pointer-events-none">
-          Page {index + 1}
+          {tr("Page")} {index + 1}
         </div>
       </div>
 
@@ -100,7 +101,7 @@ function SortableImageItem({ img, index, formatSize, totalLength, onMove, onDele
             disabled={index === 0}
             id={`btn-move-up-${index}`}
             className="p-1 px-1.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Move Page Up"
+            title={tr("Move Page Up")}
           >
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
@@ -109,7 +110,7 @@ function SortableImageItem({ img, index, formatSize, totalLength, onMove, onDele
             disabled={index === totalLength - 1}
             id={`btn-move-down-${index}`}
             className="p-1 px-1.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Move Page Down"
+            title={tr("Move Page Down")}
           >
             <ArrowDown className="w-3.5 h-3.5" />
           </button>
@@ -118,7 +119,7 @@ function SortableImageItem({ img, index, formatSize, totalLength, onMove, onDele
           onClick={() => onDelete(img.id, img.previewUrl)}
           id={`btn-delete-img-${index}`}
           className="p-1.5 hover:bg-rose-500/10 text-rose-500 hover:text-rose-600 rounded transition-colors"
-          title="Remove Image"
+          title={tr("Remove Image")}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -245,7 +246,7 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Error building PDF compiled document.');
+      alert(tr("Error building PDF compiled document."));
     } finally {
       setLoading(false);
     }
@@ -272,19 +273,19 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
           id="btn-imgtopdf-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full font-semibold">
-          JPG / PNG to PDF
+          {tr("JPG / PNG to PDF")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6 flex justify-between items-start flex-wrap gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Convert Images to PDF</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Convert Images to PDF")}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Combine portrait and landscape photos or scanned forms directly into one standard vector PDF. Drag items to reorder.
+              {tr("Combine portrait and landscape photos or scanned forms directly into one standard vector PDF. Drag items to reorder.")}
             </p>
           </div>
         </div>
@@ -315,10 +316,10 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
             <UploadCloud className="w-6 h-6 text-amber-600 dark:text-amber-400" />
           </div>
           <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-            Drag & drop photo assets here
+            {tr("Drag & drop photo assets here")}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 max-w-sm mx-auto">
-            Supports JPEG schemas and lossless PNG scans. Stack them to create continuous page elements.
+            {tr("Supports JPEG schemas and lossless PNG scans. Stack them to create continuous page elements.")}
           </p>
         </div>
 
@@ -326,7 +327,7 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
         {loading && (
           <div className="mt-6 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
-            <span>Embedding, compiling vector maps, and saving document...</span>
+            <span>{tr("Embedding, compiling vector maps, and saving document...")}</span>
           </div>
         )}
 
@@ -336,7 +337,7 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Conversion Complete!</span> Scanned PDF document compiled and downloaded.
+                <span className="font-semibold">{tr("Conversion Complete!")}</span> {tr("Scanned PDF document compiled and downloaded.")}
               </span>
             </div>
             <button
@@ -344,7 +345,7 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
               id="btn-imgtopdf-reset"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -353,14 +354,14 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <span className="text-sm font-bold text-slate-700 dark:text-slate-300 font-mono">
-                {images.length} {images.length === 1 ? 'IMAGE' : 'IMAGES'} ENQUEUED
+                {images.length} {images.length === 1 ? tr("IMAGE") : tr("IMAGES")} {tr("ENQUEUED")}
               </span>
               <button
                 onClick={handleReset}
                 id="btn-imgtopdf-clear-all"
                 className="text-xs text-rose-500 font-semibold hover:text-rose-600 cursor-pointer"
               >
-                Clear All
+                {tr("Clear All")}
               </button>
             </div>
 
@@ -397,7 +398,7 @@ export default function ImagesToPdfTool({ onBack }: ImagesToPdfToolProps) {
                 className="px-6 py-3 bg-amber-600 hover:bg-amber-500 disabled:bg-amber-600/50 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileCode className="w-4 h-4" />}
-                Compile Images into PDF
+                {tr("Compile Images into PDF")}
               </button>
             </div>
           </div>

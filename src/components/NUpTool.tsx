@@ -25,6 +25,7 @@ import { fileToArrayBuffer, getPdfDetails, generateNUpPdf, downloadFile } from '
 import Dropzone from './Dropzone';
 import JSZip from 'jszip';
 
+import { tr } from '../i18n';
 interface NUpToolProps {
   onBack: () => void;
 }
@@ -58,7 +59,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
   const handleFilesSelected = async (newRawFiles: File[]) => {
     if (newRawFiles.length === 0) return;
     setLoading(true);
-    setStatusText('Reading uploaded PDFs...');
+    setStatusText(tr("Reading uploaded PDFs..."));
     setSuccess(false);
 
     try {
@@ -88,7 +89,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
       });
     } catch (err) {
       console.error(err);
-      alert('Error parsing uploaded file details.');
+      alert(tr("Error parsing uploaded file details."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -102,7 +103,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
     // If the PDF page count is higher than loaded thumbnails, load up to 40 for premium detailed preview
     if (targetFile.previews.length < Math.min(targetFile.pageCount, 40)) {
       setLoading(true);
-      setStatusText(`Loading detailed pages for interactive viewer...`);
+      setStatusText(tr("Loading detailed pages for interactive viewer..."));
       try {
         const { previews } = await getPdfDetails(targetFile.arrayBuffer, 40);
         setFiles((prev) =>
@@ -138,7 +139,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
   const handleApplyNUp = async () => {
     if (files.length === 0) return;
     setLoading(true);
-    setStatusText('Formatting grids and stitching layout sheets...');
+    setStatusText(tr("Formatting grids and stitching layout sheets..."));
 
     try {
       if (files.length === 1) {
@@ -162,7 +163,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
         // Batch ZIP package
         const zip = new JSZip();
         for (const file of files) {
-          setStatusText(`Compiling N-Up pages for "${file.name}"...`);
+          setStatusText(tr("Compiling N-Up pages for \"{0}\"...", file.name));
           const bytes = await generateNUpPdf(file.arrayBuffer, {
             rows,
             cols,
@@ -176,7 +177,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
           zip.file(`${file.name.replace(/\.pdf$/i, '')}_${rows}x${cols}_nup.pdf`, bytes);
         }
 
-        setStatusText('Packing finished documents into single ZIP archive...');
+        setStatusText(tr("Packing finished documents into single ZIP archive..."));
         const zipContent = await zip.generateAsync({ type: 'uint8array' });
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         downloadFile(zipContent, `nup_layouts_batch_${timestamp}.zip`, 'application/zip');
@@ -239,23 +240,23 @@ export default function NUpTool({ onBack }: NUpToolProps) {
           id="btn-nup-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full font-semibold">
-            Grid Layout Engine
+            {tr("Grid Layout Engine")}
           </span>
           <span className="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-            100% Client-Side
+            {tr("100% Client-Side")}
           </span>
         </div>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-55 tracking-tight">N-Up Print layouts (Plates Grid)</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-55 tracking-tight">{tr("N-Up Print layouts (Plates Grid)")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Place multiple miniature page thumbnails onto a single sheet of paper (e.g. 2-Up, 4-Up, 9-Up, 16-Up). Invaluable for booklets, printing slides efficiently, and saving paper.
+            {tr("Place multiple miniature page thumbnails onto a single sheet of paper (e.g. 2-Up, 4-Up, 9-Up, 16-Up). Invaluable for booklets, printing slides efficiently, and saving paper.")}
           </p>
         </div>
 
@@ -265,8 +266,8 @@ export default function NUpTool({ onBack }: NUpToolProps) {
             id="nup-dropzone"
             onFilesSelected={handleFilesSelected}
             multiple={true}
-            title={files.length > 0 ? "Add more source PDFs to customize" : "Upload one or many PDFs for N-Up Layout"}
-            description="Processing is executed harmlessly inside your browser sandbox."
+            title={files.length > 0 ? tr("Add more source PDFs to customize") : tr("Upload one or many PDFs for N-Up Layout")}
+            description={tr("Processing is executed harmlessly inside your browser sandbox.")}
           />
         </div>
 
@@ -274,7 +275,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-teal-500/5 border border-teal-500/10 flex items-center gap-4 text-sm text-slate-750 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-teal-605 animate-spin shrink-0" />
-            <span>{statusText || 'Recalculating plates...'}</span>
+            <span>{statusText || tr("Recalculating plates...")}</span>
           </div>
         )}
 
@@ -284,10 +285,10 @@ export default function NUpTool({ onBack }: NUpToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold font-sans">Document Layout Applied Successfully!</span>{' '}
+                <span className="font-semibold font-sans">{tr("Document Layout Applied Successfully!")}</span>{' '}
                 {files.length > 1
-                  ? 'Your processed batch zip package has been built and downloaded.'
-                  : 'Your configured N-Up layout document has been compiled and downloaded.'}
+                  ? tr("Your processed batch zip package has been built and downloaded.")
+                  : tr("Your configured N-Up layout document has been compiled and downloaded.")}
               </span>
             </div>
             <button
@@ -295,7 +296,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
               id="btn-nup-reset-success"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Reset workspace
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Reset workspace")}
             </button>
           </div>
         )}
@@ -311,9 +312,9 @@ export default function NUpTool({ onBack }: NUpToolProps) {
               {files.length > 1 && (
                 <div className="space-y-2">
                   <h3 className="text-xs font-bold font-mono tracking-wider text-slate-400 uppercase select-none">
-                    Batch File Navigator ({files.length})
+                    {tr("Batch File Navigator (")}{files.length})
                   </h3>
-                  <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+                  <div className="space-y-1.5 max-h-[160px] overflow-y-auto pe-1">
                     {files.map((file) => {
                       const active = file.id === selectedFileId;
                       return (
@@ -337,7 +338,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                               }}
                               id={`btn-remove-nup-file-${file.id}`}
                               className="p-1 hover:text-rose-500 hover:bg-rose-500/10 rounded-sm cursor-pointer"
-                              title="Delete file from workspace"
+                              title={tr("Delete file from workspace")}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -352,14 +353,14 @@ export default function NUpTool({ onBack }: NUpToolProps) {
               <div className="p-5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 space-y-5">
                 <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
                   <Grid className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                  <span>Configure Grid Layout</span>
+                  <span>{tr("Configure Grid Layout")}</span>
                 </div>
 
                 {/* Rows & Cols Inputs */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Columns
+                      {tr("Columns")}
                     </label>
                     <input
                       type="number"
@@ -378,7 +379,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Rows
+                      {tr("Rows")}
                     </label>
                     <input
                       type="number"
@@ -400,17 +401,17 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 {/* Presets Row */}
                 <div className="space-y-2">
                   <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Quick Preset Grid Sizes
+                    {tr("Quick Preset Grid Sizes")}
                   </label>
                   <div className="flex flex-wrap gap-1.5">
                     {[
-                      { r: 1, c: 2, label: '2-Up' },
-                      { r: 2, c: 1, label: '2-Up Vert' },
-                      { r: 2, c: 2, label: '4-Up (2x2)' },
-                      { r: 2, c: 3, label: '6-Up' },
-                      { r: 2, c: 4, label: '8-Up' },
-                      { r: 3, c: 3, label: '9-Up' },
-                      { r: 4, c: 4, label: '16-Up' }
+                      { r: 1, c: 2, label: tr("2-Up") },
+                      { r: 2, c: 1, label: tr("2-Up Vert") },
+                      { r: 2, c: 2, label: tr("4-Up (2x2)") },
+                      { r: 2, c: 3, label: tr("6-Up") },
+                      { r: 2, c: 4, label: tr("8-Up") },
+                      { r: 3, c: 3, label: tr("9-Up") },
+                      { r: 4, c: 4, label: tr("16-Up") }
                     ].map((preset, idx) => (
                       <button
                         key={idx}
@@ -432,7 +433,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 <div className="grid grid-cols-2 gap-4 pt-1">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Margins (pt)
+                      {tr("Margins (pt)")}
                     </label>
                     <select
                       value={margin}
@@ -443,15 +444,15 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                       id="select-nup-margin"
                       className="w-full text-xs py-2 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-semibold cursor-pointer outline-none focus:ring-1 focus:ring-teal-500"
                     >
-                      <option value="0">0 pt (Borderless)</option>
-                      <option value="10">10 pt (Small)</option>
-                      <option value="20">20 pt (Standard)</option>
-                      <option value="40">40 pt (Wide)</option>
+                      <option value="0">{tr("0 pt (Borderless)")}</option>
+                      <option value="10">{tr("10 pt (Small)")}</option>
+                      <option value="20">{tr("20 pt (Standard)")}</option>
+                      <option value="40">{tr("40 pt (Wide)")}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Gap Distance (pt)
+                      {tr("Gap Distance (pt)")}
                     </label>
                     <select
                       value={gap}
@@ -462,11 +463,11 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                       id="select-nup-gap"
                       className="w-full text-xs py-2 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-semibold cursor-pointer outline-none focus:ring-1 focus:ring-teal-500"
                     >
-                      <option value="0">No Gap</option>
-                      <option value="5">5 pt (Compact)</option>
-                      <option value="10">10 pt (Normal)</option>
-                      <option value="15">15 pt (Spacious)</option>
-                      <option value="25">25 pt (Wide)</option>
+                      <option value="0">{tr("No Gap")}</option>
+                      <option value="5">{tr("5 pt (Compact)")}</option>
+                      <option value="10">{tr("10 pt (Normal)")}</option>
+                      <option value="15">{tr("15 pt (Spacious)")}</option>
+                      <option value="25">{tr("25 pt (Wide)")}</option>
                     </select>
                   </div>
                 </div>
@@ -475,7 +476,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Sheet Size
+                      {tr("Sheet Size")}
                     </label>
                     <select
                       value={pageSize}
@@ -486,14 +487,14 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                       id="select-nup-pagesize"
                       className="w-full text-xs py-2 px-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-semibold cursor-pointer outline-none focus:ring-1 focus:ring-teal-500"
                     >
-                      <option value="Letter">Letter (US)</option>
-                      <option value="A4">A4 (Standard)</option>
-                      <option value="SameAsSource">Same as original</option>
+                      <option value="Letter">{tr("Letter (US)")}</option>
+                      <option value="A4">{tr("A4 (Standard)")}</option>
+                      <option value="SameAsSource">{tr("Same as original")}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Orientation
+                      {tr("Orientation")}
                     </label>
                     <select
                       value={orientation}
@@ -504,8 +505,8 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                       id="select-nup-orientation"
                       className="w-full text-xs py-2 px-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-semibold cursor-pointer outline-none focus:ring-1 focus:ring-teal-500"
                     >
-                      <option value="portrait">Portrait</option>
-                      <option value="landscape">Landscape</option>
+                      <option value="portrait">{tr("Portrait")}</option>
+                      <option value="landscape">{tr("Landscape")}</option>
                     </select>
                   </div>
                 </div>
@@ -514,7 +515,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                      Grid Flow Placement
+                      {tr("Grid Flow Placement")}
                     </label>
                     <div className="flex bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-200/50 dark:border-slate-700">
                       <button
@@ -528,9 +529,9 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                             ? 'bg-white dark:bg-slate-900 text-teal-605 dark:text-teal-400 shadow-xs'
                             : 'text-slate-500 dark:text-slate-450'
                         }`}
-                        title="Left-to-right rows first"
+                        title={tr("Left-to-right rows first")}
                       >
-                        Horizontal →
+                        {tr("Horizontal →")}
                       </button>
                       <button
                         onClick={() => {
@@ -543,9 +544,9 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                             ? 'bg-white dark:bg-slate-900 text-teal-605 dark:text-teal-400 shadow-xs'
                             : 'text-slate-500 dark:text-slate-450'
                         }`}
-                        title="Top-to-bottom columns first"
+                        title={tr("Top-to-bottom columns first")}
                       >
-                        Vertical ↓
+                        {tr("Vertical ↓")}
                       </button>
                     </div>
                   </div>
@@ -562,7 +563,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                         id="checkbox-draw-borders"
                         className="w-4 h-4 rounded text-teal-600 border-slate-305 dark:border-slate-700 focus:ring-teal-500 cursor-pointer"
                       />
-                      Draw frame outlines
+                      {tr("Draw frame outlines")}
                     </label>
                   </div>
                 </div>
@@ -572,10 +573,10 @@ export default function NUpTool({ onBack }: NUpToolProps) {
               {/* PDF Info box */}
               {activeFile && (
                 <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">File details:</p>
-                  <p className="truncate">Name: <span className="font-semibold">{activeFile.name}</span></p>
-                  <p>Original Page Count: <span className="font-semibold">{activeFile.pageCount} sheets</span></p>
-                  <p>Arranged Into: <span className="font-semibold text-teal-605 dark:text-teal-400">{totalSheets} output sheets</span> ({pagesPerSheet} pages/sheet)</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{tr("File details:")}</p>
+                  <p className="truncate">{tr("Name:")} <span className="font-semibold">{activeFile.name}</span></p>
+                  <p>{tr("Original Page Count:")} <span className="font-semibold">{activeFile.pageCount} {tr("sheets")}</span></p>
+                  <p>{tr("Arranged Into:")} <span className="font-semibold text-teal-605 dark:text-teal-400">{totalSheets} {tr("output sheets")}</span> ({pagesPerSheet} {tr("pages/sheet)")}</p>
                 </div>
               )}
 
@@ -587,7 +588,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                   <span className="text-xs font-bold font-mono text-slate-400 uppercase select-none">
-                    Preview Plates Grid (Dynamic Sheet {previewSheetIndex + 1} of {totalSheets || 1})
+                    {tr("Preview Plates Grid (Dynamic Sheet")} {previewSheetIndex + 1} {tr("of")} {totalSheets || 1})
                   </span>
                 </div>
 
@@ -599,19 +600,19 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                       disabled={previewSheetIndex === 0}
                       id="btn-prev-preview-sheet"
                       className="p-1 text-slate-500 hover:text-slate-800 dark:hover:text-slate-250 bg-slate-100 dark:bg-slate-800 disabled:opacity-30 rounded-lg cursor-pointer"
-                      title="Previous preview sheet"
+                      title={tr("Previous preview sheet")}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <span className="text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">
-                      Sheet {previewSheetIndex + 1} / {totalSheets}
+                      {tr("Sheet")} {previewSheetIndex + 1} / {totalSheets}
                     </span>
                     <button
                       onClick={() => setPreviewSheetIndex((prev) => Math.min(totalSheets - 1, prev + 1))}
                       disabled={previewSheetIndex === totalSheets - 1}
                       id="btn-next-preview-sheet"
                       className="p-1 text-slate-500 hover:text-slate-800 dark:hover:text-slate-250 bg-slate-100 dark:bg-slate-800 disabled:opacity-30 rounded-lg cursor-pointer"
-                      title="Next preview sheet"
+                      title={tr("Next preview sheet")}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -685,7 +686,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                                 {thumb ? (
                                   <img 
                                     src={thumb} 
-                                    alt={`Preview page ${globalPageIndex + 1}`}
+                                    alt={tr("Preview page {0}", globalPageIndex + 1)}
                                     className="w-full h-full object-contain pointer-events-none select-none"
                                     referrerPolicy="no-referrer"
                                   />
@@ -701,7 +702,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                               </>
                             ) : (
                               <div className="text-[9px] text-slate-400 select-none">
-                                empty
+                                {tr("empty")}
                               </div>
                             )}
                           </div>
@@ -716,10 +717,10 @@ export default function NUpTool({ onBack }: NUpToolProps) {
                 <div className="p-8 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center text-slate-400 select-none py-20 bg-slate-50/50 dark:bg-slate-950/5">
                   <Info className="w-8 h-8 text-slate-350 mb-2" />
                   <p className="text-sm font-semibold text-slate-500 dark:text-slate-450">
-                    No Document Uploaded
+                    {tr("No Document Uploaded")}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
-                    Upload documents to adjust paper layouts. Live visual grids render automatically to guide adjustments.
+                    {tr("Upload documents to adjust paper layouts. Live visual grids render automatically to guide adjustments.")}
                   </p>
                 </div>
               )}
@@ -736,7 +737,7 @@ export default function NUpTool({ onBack }: NUpToolProps) {
               id="btn-nup-clear-workspace"
               className="text-xs font-bold text-rose-505 hover:text-rose-600 cursor-pointer transition-colors"
             >
-              Clear Workspace
+              {tr("Clear Workspace")}
             </button>
 
             <button
@@ -747,8 +748,8 @@ export default function NUpTool({ onBack }: NUpToolProps) {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               {files.length > 1
-                ? `Apply N-Up Layout & Download ZIP (${files.length} PDFs)`
-                : `Apply N-Up Layout & Download PDF`}
+                ? tr("Apply N-Up Layout & Download ZIP ({0} PDFs)", files.length)
+                : tr("Apply N-Up Layout & Download PDF")}
             </button>
           </div>
         )}

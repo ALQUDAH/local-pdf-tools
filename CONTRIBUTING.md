@@ -48,6 +48,26 @@ npm run desktop:dist   # build an installer for your OS into release/
 
 If you need PDF.js, import `'../lib/pdfjs'` next to your `pdfjs-dist` import so the locally bundled worker is configured.
 
+## Translating
+
+The UI is translated with a tiny built-in system, with no external service or account needed.
+
+- Text in tool screens is wrapped in `tr("English text")`. The English text **is** the key.
+  Placeholders look like `tr("Page {0} of {1}", page, total)`.
+- Translations live in `src/locales/<lang>.ts` as `{ "English text": "translation" }`.
+  Anything missing falls back to English, so partial translations are welcome.
+- Dashboard text (tool names, categories, search) lives in `src/i18n.tsx`.
+
+**Improve Arabic:** edit `src/locales/ar.ts` or `src/i18n.tsx` and open a PR.
+
+**Add a language** (e.g. French):
+1. Copy `src/locales/ar.ts` to `src/locales/fr.ts` and translate the values.
+2. In `src/i18n.tsx`: add `'fr'` to the `Lang` type and `LANGUAGES` (with `dir: 'ltr'` or `'rtl'`),
+   add `fr: () => import('./locales/fr')` to `catalogLoaders`, and add dashboard strings.
+3. Run `npm run dev`, switch language, and check the screens you touched.
+
+When you add new UI text, wrap it in `tr()`. Use logical Tailwind classes (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start`) so layouts work in right-to-left languages.
+
 ## Reporting bugs
 
 Use the [bug report form](https://github.com/alqudah/local-pdf-tools/issues/new?template=bug_report.yml). If you can, attach a PDF that reproduces the problem. **Never attach a document containing personal or confidential data.**

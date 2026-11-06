@@ -1145,12 +1145,7 @@ export default function App() {
             <p className="text-slate-500 font-medium dark:text-slate-400">{t('loading.tool')}</p>
           </div>
         }>
-          {activeTool === 'dashboard' || lang === 'en' ? (
-            renderActiveTool()
-          ) : (
-            // Tool screens are not translated yet: keep them left-to-right English for now
-            <div dir="ltr" lang="en">{renderActiveTool()}</div>
-          )}
+          {renderActiveTool()}
         </React.Suspense>
       </main>
 

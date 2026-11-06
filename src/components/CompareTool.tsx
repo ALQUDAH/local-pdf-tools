@@ -22,6 +22,7 @@ import {
 import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import { tr } from '../i18n';
 import '../lib/pdfjs';
 
 interface CompareToolProps {
@@ -64,7 +65,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
 
   const handleFileDrop = async (file: File, target: 'A' | 'B') => {
     setLoading(true);
-    setStatusText(`Parsing document ${target}...`);
+    setStatusText(tr("Parsing document {0}...", target));
     try {
       const arrayBuffer = await fileToArrayBuffer(file);
       const { pageCount, previews } = await getPdfDetails(arrayBuffer, 1);
@@ -86,7 +87,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
       }
     } catch (err) {
       console.error(err);
-      alert(`Could not process PDF file ${file.name}. Secure password protection or standard stream corruption could block locally. Ensure the file is not protected.`);
+      alert(tr("Could not process PDF file {0}. Secure password protection or standard stream corruption could block locally. Ensure the file is not protected.", file.name));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -312,6 +313,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-compare-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -319,10 +322,10 @@ export default function CompareTool({ onBack }: CompareToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <GitCompare className="w-6 h-6 text-emerald-500" /> Page Comparison Tool
+              <GitCompare className="w-6 h-6 text-emerald-500" /> {tr("Page Comparison Tool")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Analyze physical layout updates, paragraph revisions, and page element modifications side-by-side or combined entirely in-browser.
+              {tr("Analyze physical layout updates, paragraph revisions, and page element modifications side-by-side or combined entirely in-browser.")}
             </p>
           </div>
         </div>
@@ -333,7 +336,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
             id="btn-compare-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 font-bold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Reset Documents
+            {tr("Reset Documents")}
           </button>
         )}
       </div>
@@ -345,7 +348,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
           <div className="flex flex-col space-y-3">
             <h3 className="text-sm font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-sans font-bold text-xs">A</span>
-              Base Document (Original)
+              {tr("Base Document (Original)")}
             </h3>
             {fileA ? (
               <div className="p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl flex flex-col items-center text-center space-y-3">
@@ -354,13 +357,13 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate max-w-xs">{fileA.name}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{fileA.pageCount} Pages • {formatFileSize(fileA.size)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{fileA.pageCount} {tr("Pages •")} {formatFileSize(fileA.size)}</p>
                 </div>
                 <button
                   onClick={() => setFileA(null)}
                   className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 >
-                  Change File
+                  {tr("Change File")}
                 </button>
               </div>
             ) : (
@@ -375,8 +378,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                   }}
                 />
                 <Upload className="w-10 h-10 text-slate-400 dark:text-slate-600 mb-3" />
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Load Base PDF</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">Select from device folders</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{tr("Load Base PDF")}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">{tr("Select from device folders")}</span>
               </label>
             )}
           </div>
@@ -385,7 +388,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
           <div className="flex flex-col space-y-3">
             <h3 className="text-sm font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-sky-500/10 text-sky-500 flex items-center justify-center font-sans font-bold text-xs">B</span>
-              Target Document (Modified)
+              {tr("Target Document (Modified)")}
             </h3>
             {fileB ? (
               <div className="p-6 bg-sky-500/5 border border-sky-500/20 rounded-2xl flex flex-col items-center text-center space-y-3">
@@ -394,13 +397,13 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate max-w-xs">{fileB.name}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{fileB.pageCount} Pages • {formatFileSize(fileB.size)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{fileB.pageCount} {tr("Pages •")} {formatFileSize(fileB.size)}</p>
                 </div>
                 <button
                   onClick={() => setFileB(null)}
                   className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 >
-                  Change File
+                  {tr("Change File")}
                 </button>
               </div>
             ) : (
@@ -415,8 +418,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                   }}
                 />
                 <Upload className="w-10 h-10 text-slate-400 dark:text-slate-600 mb-3" />
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Load Compare PDF</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">Select from device folders</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{tr("Load Compare PDF")}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">{tr("Select from device folders")}</span>
               </label>
             )}
           </div>
@@ -428,13 +431,13 @@ export default function CompareTool({ onBack }: CompareToolProps) {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-5 shadow-xs">
               <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Workspace Compare Modes
+                {tr("Workspace Compare Modes")}
               </h3>
 
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => setDiffMode('side-by-side')}
-                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-left cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-start cursor-pointer transition-all ${
                     diffMode === 'side-by-side'
                       ? 'bg-emerald-500/10 hover:bg-emerald-500/15 border-l-4 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400 font-medium'
@@ -442,14 +445,14 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 >
                   <Columns className="w-4 h-4 shrink-0" />
                   <div>
-                    <p className="text-xs">Side-by-Side Split</p>
-                    <p className="text-[10px] font-medium opacity-70">Compare document pages next to each other</p>
+                    <p className="text-xs">{tr("Side-by-Side Split")}</p>
+                    <p className="text-[10px] font-medium opacity-70">{tr("Compare document pages next to each other")}</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setDiffMode('swipe')}
-                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-left cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-start cursor-pointer transition-all ${
                     diffMode === 'swipe'
                       ? 'bg-emerald-500/10 hover:bg-emerald-500/15 border-l-4 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400 font-medium'
@@ -457,14 +460,14 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 >
                   <Move className="w-4 h-4 shrink-0" />
                   <div>
-                    <p className="text-xs">Sliding Wipe Curtain</p>
-                    <p className="text-[10px] font-medium opacity-70">Slide divider to dynamically inspect changes</p>
+                    <p className="text-xs">{tr("Sliding Wipe Curtain")}</p>
+                    <p className="text-[10px] font-medium opacity-70">{tr("Slide divider to dynamically inspect changes")}</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setDiffMode('blend')}
-                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-left cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-start cursor-pointer transition-all ${
                     diffMode === 'blend'
                       ? 'bg-emerald-500/10 hover:bg-emerald-500/15 border-l-4 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400 font-medium'
@@ -472,14 +475,14 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 >
                   <Layers className="w-4 h-4 shrink-0" />
                   <div>
-                    <p className="text-xs">Crossfade Alpha Blend</p>
-                    <p className="text-[10px] font-medium opacity-70">Overlay transparency with opacity slider</p>
+                    <p className="text-xs">{tr("Crossfade Alpha Blend")}</p>
+                    <p className="text-[10px] font-medium opacity-70">{tr("Overlay transparency with opacity slider")}</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setDiffMode('pixel-diff')}
-                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-left cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-xl justify-start grow text-start cursor-pointer transition-all ${
                     diffMode === 'pixel-diff'
                       ? 'bg-emerald-500/10 hover:bg-emerald-500/15 border-l-4 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400 font-medium'
@@ -487,8 +490,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 >
                   <GitCompare className="w-4 h-4 shrink-0" />
                   <div>
-                    <p className="text-xs">Visual Pixel Difference</p>
-                    <p className="text-[10px] font-medium opacity-70">Contrast highlighting modifications in red ink</p>
+                    <p className="text-xs">{tr("Visual Pixel Difference")}</p>
+                    <p className="text-[10px] font-medium opacity-70">{tr("Contrast highlighting modifications in red ink")}</p>
                   </div>
                 </button>
               </div>
@@ -496,13 +499,13 @@ export default function CompareTool({ onBack }: CompareToolProps) {
               {/* Dynamic Sub-Inputs depend on active compare mode */}
               <div className="border-t border-slate-100 dark:border-slate-850 pt-4 space-y-4">
                 <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                  <Sliders className="w-3.5 h-3.5" /> Filter Parameters
+                  <Sliders className="w-3.5 h-3.5" /> {tr("Filter Parameters")}
                 </h4>
 
                 {diffMode === 'swipe' && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                      <span>Curtain Wipe Position</span>
+                      <span>{tr("Curtain Wipe Position")}</span>
                       <span>{swipePosition}%</span>
                     </div>
                     <input
@@ -519,7 +522,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 {diffMode === 'blend' && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                      <span>Overlay B Opacity</span>
+                      <span>{tr("Overlay B Opacity")}</span>
                       <span>{blendOpacity}%</span>
                     </div>
                     <input
@@ -536,8 +539,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 {diffMode === 'pixel-diff' && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                      <span>Sensitivity/Threshold</span>
-                      <span>{sensitivity} units</span>
+                      <span>{tr("Sensitivity/Threshold")}</span>
+                      <span>{sensitivity} {tr("units")}</span>
                     </div>
                     <input
                       type="range"
@@ -547,13 +550,13 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                       onChange={(e) => setSensitivity(Number(e.target.value))}
                       className="w-full accent-emerald-500 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer"
                     />
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 text-left">Sets the visual threshold to isolate subtle shifts or compression artifacts.</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 text-left">{tr("Sets the visual threshold to isolate subtle shifts or compression artifacts.")}</p>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                    <span>Viewport scale factor</span>
+                    <span>{tr("Viewport scale factor")}</span>
                     <span>{zoom.toFixed(1)}x</span>
                   </div>
                   <input
@@ -572,14 +575,14 @@ export default function CompareTool({ onBack }: CompareToolProps) {
             {/* Pagination Controls */}
             <div className="bg-slate-900 border border-slate-800 text-white rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                <span>Navigate Pages</span>
-                <span className="text-emerald-400">Page {currentPage} of {maxPage}</span>
+                <span>{tr("Navigate Pages")}</span>
+                <span className="text-emerald-400">{tr("Page")} {currentPage} {tr("of")} {maxPage}</span>
               </div>
 
               {fileA && fileB && fileA.pageCount !== fileB.pageCount && (
                 <div className="p-3 bg-amber-500/10 rounded-xl text-[10px] text-amber-400 flex items-start gap-2 border border-amber-500/20">
                   <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <span>The files contain different lengths (A: {fileA.pageCount}, B: {fileB.pageCount}). Compare mode aligns the first {maxPage} sheets.</span>
+                  <span>{tr("The files contain different lengths (A:")} {fileA.pageCount}, B: {fileB.pageCount}{tr("). Compare mode aligns the first")} {maxPage} {tr("sheets.")}</span>
                 </div>
               )}
 
@@ -590,7 +593,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                   disabled={currentPage === 1}
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs font-mono transition-colors border border-slate-750 cursor-pointer"
                 >
-                  Previous Page
+                  {tr("Previous Page")}
                 </button>
                 <button
                   type="button"
@@ -598,7 +601,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                   disabled={currentPage === maxPage}
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs font-mono transition-colors border border-slate-750 cursor-pointer"
                 >
-                  Next Page
+                  {tr("Next Page")}
                 </button>
               </div>
             </div>
@@ -620,7 +623,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 /* Side-by-side comparative canvases */
                 <div className="flex flex-col md:flex-row gap-6 w-full items-center justify-center">
                   <div className="flex flex-col space-y-2 items-center">
-                    <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px] font-mono border border-emerald-500/20">A: DEFAULT / BASE</span>
+                    <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px] font-mono border border-emerald-500/20">{tr("A: DEFAULT / BASE")}</span>
                     <div className="bg-white p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-full overflow-hidden">
                       <canvas 
                         // Synchronize to draw offscreen canvas A directly
@@ -638,7 +641,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                   </div>
 
                   <div className="flex flex-col space-y-2 items-center">
-                    <span className="px-2.5 py-1 rounded bg-sky-500/10 text-sky-500 font-bold text-[10px] font-mono border border-sky-500/20">B: TARGET / MODIFIED</span>
+                    <span className="px-2.5 py-1 rounded bg-sky-500/10 text-sky-500 font-bold text-[10px] font-mono border border-sky-500/20">{tr("B: TARGET / MODIFIED")}</span>
                     <div className="bg-white p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-full overflow-hidden">
                       <canvas 
                         ref={(el) => {
@@ -659,8 +662,8 @@ export default function CompareTool({ onBack }: CompareToolProps) {
                 <div className="flex flex-col items-center space-y-3 w-full">
                   <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 px-3 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold">
                     <Eye className="w-3 h-3 text-emerald-500" />
-                    <span>Mode:</span>
-                    <span className="capitalize text-slate-800 dark:text-slate-200">{diffMode.replace('-', ' ')} view</span>
+                    <span>{tr("Mode:")}</span>
+                    <span className="capitalize text-slate-800 dark:text-slate-200">{diffMode.replace('-', ' ')} {tr("view")}</span>
                   </div>
                   
                   <div className="bg-white p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md max-w-full overflow-hidden">
@@ -671,12 +674,12 @@ export default function CompareTool({ onBack }: CompareToolProps) {
             </div>
 
             {/* Quick Helper Tips footer */}
-            <div className="bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 border border-emerald-500/10 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-left items-start">
+            <div className="bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 border border-emerald-500/10 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-start items-start">
               <Info className="w-5 h-5 shrink-0 text-emerald-500" />
               <div>
-                <span className="font-bold">Comparative Tip:</span>
+                <span className="font-bold">{tr("Comparative Tip:")}</span>
                 <p className="mt-0.5 font-medium">
-                  Use the **Visual Pixel Difference** filter mode to isolate precisely which pixels change color, revealing relocated words, new legal signature stamps, modified pricing coordinates, and hidden watermark lines instantly.
+                  {tr("Use the **Visual Pixel Difference** filter mode to isolate precisely which pixels change color, revealing relocated words, new legal signature stamps, modified pricing coordinates, and hidden watermark lines instantly.")}
                 </p>
               </div>
             </div>
@@ -690,7 +693,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
             <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">This operation matches layout structures entirely locally.</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("This operation matches layout structures entirely locally.")}</p>
             </div>
           </div>
         </div>

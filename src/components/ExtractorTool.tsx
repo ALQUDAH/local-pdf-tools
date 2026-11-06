@@ -26,6 +26,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 import * as pdfjsLib from 'pdfjs-dist';
+import { tr } from '../i18n';
 import '../lib/pdfjs';
 
 interface ExtractorToolProps {
@@ -89,7 +90,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
 
     } catch (err) {
       console.error(err);
-      alert('Failed to extract text. Ensure the file is not corrupted or password protected.');
+      alert(tr("Failed to extract text. Ensure the file is not corrupted or password protected."));
       setFile(null);
     } finally {
       setLoading(false);
@@ -364,10 +365,10 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
           id="btn-extractor-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full font-bold">
-          Text Extraction Tool
+          {tr("Text Extraction Tool")}
         </span>
       </div>
 
@@ -375,10 +376,10 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              PDF Text &amp; Layout Extractor
+              {tr("PDF Text & Layout Extractor")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-              Decrypt layout matrices to convert PDF documents instantly into beautifully formatted Markdown sheets, structured JSON objects, or plain text with spatial grid formatting.
+              {tr("Decrypt layout matrices to convert PDF documents instantly into beautifully formatted Markdown sheets, structured JSON objects, or plain text with spatial grid formatting.")}
             </p>
           </div>
 
@@ -386,8 +387,8 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
             id="extractor-dropzone"
             onFilesSelected={handleFileSelected}
             multiple={false}
-            title="Upload a PDF document to extract layout & text"
-            description="Drag and drop or search directory to load a single file"
+            title={tr("Upload a PDF document to extract layout & text")}
+            description={tr("Drag and drop or search directory to load a single file")}
           />
         </div>
       ) : (
@@ -404,13 +405,13 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     {file.name}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {formatSize(file.size)} • {file.pageCount} Pages • Document loaded
+                    {formatSize(file.size)} • {file.pageCount} {tr("Pages • Document loaded")}
                   </p>
                 </div>
                 <button
                   onClick={handleReset}
                   className="p-1.5 hover:bg-slate-50 dark:hover:bg-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors cursor-pointer"
-                  title="Upload another document"
+                  title={tr("Upload another document")}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -420,7 +421,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
               {loading && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-slate-500 font-mono">
-                    <span>Analyzing document structure...</span>
+                    <span>{tr("Analyzing document structure...")}</span>
                     <span>{extractionProgress}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -436,32 +437,32 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
               {success && pagesData.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <BarChart className="w-4 h-4 text-slate-400" /> Structure Analytics
+                    <BarChart className="w-4 h-4 text-slate-400" /> {tr("Structure Analytics")}
                   </h3>
                   
                   <div className="grid grid-cols-2 gap-3.5">
                     <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850/80 rounded-xl">
-                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Total Words</span>
+                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">{tr("Total Words")}</span>
                       <span className="text-lg font-extrabold text-slate-800 dark:text-white mt-1 block">
                         {totalStats.words.toLocaleString()}
                       </span>
                     </div>
                     <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-101 dark:border-slate-852/80 rounded-xl">
-                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Characters</span>
+                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">{tr("Characters")}</span>
                       <span className="text-lg font-extrabold text-slate-800 dark:text-white mt-1 block">
                         {totalStats.chars.toLocaleString()}
                       </span>
                     </div>
                     <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-101 dark:border-slate-852/80 rounded-xl">
-                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Headings Detected</span>
+                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">{tr("Headings Detected")}</span>
                       <span className="text-lg font-extrabold text-slate-800 dark:text-white mt-1 block">
                         {totalStats.headings}
                       </span>
                     </div>
                     <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-101 dark:border-slate-852/80 rounded-xl">
-                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Read Time (Est.)</span>
+                      <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">{tr("Read Time (Est.)")}</span>
                       <span className="text-lg font-extrabold text-slate-800 dark:text-white mt-1 block">
-                        {totalStats.readingTime} Min
+                        {totalStats.readingTime} {tr("Min")}
                       </span>
                     </div>
                   </div>
@@ -472,12 +473,12 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
               {success && (
                 <div className="space-y-4 border-t border-slate-100 dark:border-slate-800/80 pt-6">
                   <h3 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest">
-                    Export Settings
+                    {tr("Export Settings")}
                   </h3>
 
                   <div className="space-y-2">
                     <label className="block text-xs font-semibold text-slate-650 dark:text-slate-350">
-                      Target Export Format
+                      {tr("Target Export Format")}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       <button
@@ -488,7 +489,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                             : 'border-slate-200 dark:border-slate-800 text-slate-650 hover:bg-slate-50 dark:hover:bg-slate-950'
                         }`}
                       >
-                        TEXT (.txt)
+                        {tr("TEXT (.txt)")}
                       </button>
                       <button
                         onClick={() => setOutputFormat('md')}
@@ -498,7 +499,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                             : 'border-slate-200 dark:border-slate-805 text-slate-650 hover:bg-slate-50 dark:hover:bg-slate-950'
                         }`}
                       >
-                        MARKDOWN (.md)
+                        {tr("MARKDOWN (.md)")}
                       </button>
                       <button
                         onClick={() => setOutputFormat('json')}
@@ -508,7 +509,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                             : 'border-slate-200 dark:border-slate-805 text-slate-655 hover:bg-slate-50 dark:hover:bg-slate-950'
                         }`}
                       >
-                        JSON (.json)
+                        {tr("JSON (.json)")}
                       </button>
                     </div>
                   </div>
@@ -523,11 +524,11 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                           className="rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-800"
                         />
                         <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                          Preserve Spacing Grid Layout
+                          {tr("Preserve Spacing Grid Layout")}
                         </span>
                       </label>
-                      <p className="text-[10px] text-slate-400 leading-relaxed pl-6">
-                        Pads line text blocks with accurate spacing margins based on visual coordinate positions mapping horizontally, rendering tabular figures correctly.
+                      <p className="text-[10px] text-slate-400 leading-relaxed ps-6">
+                        {tr("Pads line text blocks with accurate spacing margins based on visual coordinate positions mapping horizontally, rendering tabular figures correctly.")}
                       </p>
                     </div>
                   )}
@@ -536,7 +537,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl flex gap-2.5 text-[11px] text-slate-500 leading-relaxed">
                       <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                       <span>
-                        Heuristics automatically identify titles and visual headers based on spatial font properties, mapping them out as native H2 &amp; H3 tags.
+                        {tr("Heuristics automatically identify titles and visual headers based on spatial font properties, mapping them out as native H2 & H3 tags.")}
                       </span>
                     </div>
                   )}
@@ -550,7 +551,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     onClick={handleDownloadStructuredFile}
                     className="w-full py-3 px-5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-50 text-white dark:text-slate-900 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer text-xs"
                   >
-                    <Download className="w-4 h-4" /> Download Complete Document
+                    <Download className="w-4 h-4" /> {tr("Download Complete Document")}
                   </button>
                 </div>
               )}
@@ -569,7 +570,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                   {/* Page index selectors */}
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-bold font-mono text-slate-400 uppercase">
-                      Sheet Sheet:
+                      {tr("Sheet Sheet:")}
                     </span>
                     <select
                       value={selectedPageIndex}
@@ -578,12 +579,12 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     >
                       {pagesData.map((p, idx) => (
                         <option key={idx} value={idx}>
-                          Page {idx + 1}
+                          {tr("Page")} {idx + 1}
                         </option>
                       ))}
                     </select>
                     <span className="text-[10px] text-slate-400 font-mono">
-                      ({activePageData.stats.words} Words)
+                      ({activePageData.stats.words} {tr("Words)")}
                     </span>
                   </div>
 
@@ -592,10 +593,10 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     <Search className="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Find keyword..."
+                      placeholder={tr("Find keyword...")}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full text-xs py-1.5 pl-8 pr-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-amber-500 text-slate-850 dark:text-white"
+                      className="w-full text-xs py-1.5 ps-8 pe-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-amber-500 text-slate-850 dark:text-white"
                     />
                   </div>
 
@@ -607,11 +608,11 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     >
                       {copied ? (
                         <>
-                          <ClipboardCheck className="w-3.5 h-3.5 text-emerald-500" /> Copied!
+                          <ClipboardCheck className="w-3.5 h-3.5 text-emerald-500" /> {tr("Copied!")}
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3.5 h-3.5" /> Copy This Page
+                          <Copy className="w-3.5 h-3.5" /> {tr("Copy This Page")}
                         </>
                       )}
                     </button>
@@ -621,7 +622,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center py-20 text-slate-400">
                   <FileText className="w-14 h-14 text-slate-200 dark:text-slate-800 mb-3 animate-pulse" />
-                  <p className="text-sm">Load document to start text extraction heuristics.</p>
+                  <p className="text-sm">{tr("Load document to start text extraction heuristics.")}</p>
                 </div>
               )}
 
@@ -632,9 +633,9 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                     
                     {/* Panel heading detailing current selections representation */}
                     <div className="px-4 py-2 bg-slate-100/50 dark:bg-slate-900/40 border-b border-slate-150/40 dark:border-slate-800/40 flex items-center justify-between text-[10px] font-mono font-semibold text-slate-400">
-                      <span>PREVIEW SHEET (FORMAT: {outputFormat.toUpperCase()})</span>
+                      <span>{tr("PREVIEW SHEET (FORMAT:")} {outputFormat.toUpperCase()})</span>
                       {searchQuery && (
-                        <span>SEARCH ACTIVE</span>
+                        <span>{tr("SEARCH ACTIVE")}</span>
                       )}
                     </div>
 
@@ -643,7 +644,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                       <pre className="font-mono text-xs text-slate-750 dark:text-slate-300 whitespace-pre leading-relaxed select-text">
                         {getFilteredText(activePageData) || (
                           <span className="italic text-slate-400 select-none">
-                            [This page does not contain machine-readable text elements or fonts. Try checking with image OCR tools.]
+                            {tr("[This page does not contain machine-readable text elements or fonts. Try checking with image OCR tools.]")}
                           </span>
                         )}
                       </pre>
@@ -655,7 +656,7 @@ export default function ExtractorTool({ onBack }: ExtractorToolProps) {
                   {file && file.pageCount > 1 && (
                     <div className="border-t border-slate-100 dark:border-slate-805 mt-6 pt-5">
                       <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-3">
-                        Slides Carousel ({file.pageCount} Sheets)
+                        {tr("Slides Carousel (")}{file.pageCount} {tr("Sheets)")}
                       </span>
                       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hidden">
                         {pagesData.map((p, idx) => (

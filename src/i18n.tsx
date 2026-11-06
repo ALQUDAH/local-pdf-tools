@@ -159,6 +159,24 @@ const toolsAr: Partial<Record<ActiveTool, { title: string; description: string }
 
 const messages: Record<Lang, Partial<Record<MessageKey, string>>> = { en, ar };
 
+// ---------------------------------------------------------------------------
+// Tool screens: gettext-style translation keyed by the English text itself.
+//   tr("Merge PDF")                 -> "دمج PDF"
+//   tr("Page {0} of {1}", i, total) -> "الصفحة 3 من 10"
+// Untranslated strings fall back to English. Catalogs load on demand.
+// ---------------------------------------------------------------------------
+type Catalog = Record<string, string>;
+const catalogLoaders: Partial<Record<Lang, () => Promise<{ default: Catalog }>>> = {
+  ar: () => import('./locales/ar'),
+};
+const catalogs: Partial<Record<Lang, Catalog>> = {};
+let currentLang: Lang = 'en';
+
+export function tr(text: string, ...args: Array<string | number>): string {
+  const translated = (currentLang !== 'en' && catalogs[currentLang]?.[text]) || text;
+  return args.length ? translated.replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i)] ?? '')) : translated;
+}
+
 const STORAGE_KEY = 'pdf-lang';
 
 function detectLang(): Lang {
@@ -184,7 +202,19 @@ const I18nContext = createContext<I18nValue | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>(detectLang);
+  const [catalogVersion, setCatalogVersion] = useState(0);
   const dir = LANGUAGES.find((l) => l.id === lang)!.dir;
+  // Make tr() follow the active language for everything rendered below
+  currentLang = lang;
+
+  useEffect(() => {
+    const load = catalogLoaders[lang];
+    if (!load || catalogs[lang]) return;
+    load().then((m) => {
+      catalogs[lang] = m.default;
+      setCatalogVersion((v) => v + 1);
+    });
+  }, [lang]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -209,7 +239,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     const groupText: I18nValue['groupText'] = (name, shortName) =>
       (lang === 'ar' && groupNamesAr[name]) || { name, short: shortName || name };
     return { lang, dir, setLang, t, toolText, groupText };
-  }, [lang, dir]);
+    // catalogVersion: re-render consumers once a catalog has loaded
+  }, [lang, dir, catalogVersion]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }

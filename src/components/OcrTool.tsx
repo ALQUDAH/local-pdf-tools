@@ -21,6 +21,7 @@ import { fileToArrayBuffer, getPdfDetails, downloadFile, sanitizeForWinAnsi } fr
 import Dropzone from './Dropzone';
 import { getTesseractOptions, ocrFontUrl } from '../lib/ocrAssets';
 
+import { tr } from '../i18n';
 interface OcrToolProps {
   onBack: () => void;
 }
@@ -280,7 +281,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       setCustomRange(`1-${Math.min(3, pageCount)}`);
     } catch (err) {
       console.error(err);
-      alert('Could not parsed standard PDF structures.');
+      alert(tr("Could not parsed standard PDF structures."));
     } finally {
       setLoading(false);
     }
@@ -329,7 +330,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       } else {
         targetPages = parseRanges(customRange, file.pageCount);
         if (targetPages.length === 0) {
-          alert('Please input a valid page selection index range.');
+          alert(tr("Please input a valid page selection index range."));
           setLoading(false);
           return;
         }
@@ -338,7 +339,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       setTotalOcrPagesNum(targetPages.length);
 
       // Load pdf using pdfJS
-      setCurrentStep('Loading original document matrix...');
+      setCurrentStep(tr("Loading original document matrix..."));
       const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(file.arrayBuffer.slice(0)) });
       const pdfDoc = await loadingTask.promise;
 
@@ -347,7 +348,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       for (let index = 0; index < targetPages.length; index++) {
         const pageNum = targetPages[index];
         setCurrentPageNum(index + 1);
-        setCurrentStep(`Rendering high-resolution Page ${pageNum}...`);
+        setCurrentStep(tr("Rendering high-resolution Page {0}...", pageNum));
         setPageProgressPercent(0);
 
         // Render page as a high quality image for OCR (scale 2.0 works great)
@@ -386,7 +387,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
         const imgDataUrl = canvas.toDataURL('image/jpeg', 0.9);
 
         // Perform OCR
-        setCurrentStep(`Running Tesseract optical scanning on Page ${pageNum}...`);
+        setCurrentStep(tr("Running Tesseract optical scanning on Page {0}...", pageNum));
         const ocrResult = await Tesseract.recognize(
           imgDataUrl,
           selectedLang,
@@ -394,16 +395,16 @@ export default function OcrTool({ onBack }: OcrToolProps) {
             ...getTesseractOptions(),
             logger: (m) => {
               if (m.status === 'loading tesseract core') {
-                setCurrentStep(`Loading Tesseract Module Core...`);
+                setCurrentStep(tr("Loading Tesseract Module Core..."));
                 setPageProgressPercent(Math.round(m.progress * 100));
               } else if (m.status === 'initializing api') {
-                setCurrentStep(`Initializing character OCR engine APIs...`);
+                setCurrentStep(tr("Initializing character OCR engine APIs..."));
                 setPageProgressPercent(Math.round(m.progress * 100));
               } else if (m.status === 'loading language traineddata') {
-                setCurrentStep(`Downloading & loading [${selectedLang.toUpperCase()}] language data package...`);
+                setCurrentStep(tr("Downloading & loading [{0}] language data package...", selectedLang.toUpperCase()));
                 setPageProgressPercent(Math.round(m.progress * 100));
               } else if (m.status === 'recognizing text') {
-                setCurrentStep(`Transcribing and extracting characters from Page ${pageNum}...`);
+                setCurrentStep(tr("Transcribing and extracting characters from Page {0}...", pageNum));
                 setPageProgressPercent(Math.round(m.progress * 100));
               } else {
                 setPageProgressPercent(Math.round(m.progress * 100));
@@ -425,7 +426,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Optical character extraction failed. Ensure your PDF has compatible images.');
+      alert(tr("Optical character extraction failed. Ensure your PDF has compatible images."));
     } finally {
       setLoading(false);
       setPageProgressPercent(0);
@@ -572,7 +573,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
 
   const startTTS = (textStr: string) => {
     if (!('speechSynthesis' in window)) {
-      alert("Local synthesis is not supported on this device.");
+      alert(tr("Local synthesis is not supported on this device."));
       return;
     }
     
@@ -861,7 +862,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
   const handleDownloadSearchablePdf = async () => {
     if (results.length === 0) return;
     setLoading(true);
-    setCurrentStep('Generating searchable PDF document...');
+    setCurrentStep(tr("Generating searchable PDF document..."));
     
     try {
       const pdfDoc = await PDFDocument.create();
@@ -884,7 +885,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       const fontUrl = FONT_PRESETS[selectedLang] ? ocrFontUrl(FONT_PRESETS[selectedLang]) : undefined;
       if (fontUrl) {
         try {
-          setCurrentStep(`Downloading language-specific font pack for [${selectedLang.toUpperCase()}]...`);
+          setCurrentStep(tr("Downloading language-specific font pack for [{0}]...", selectedLang.toUpperCase()));
           const response = await fetch(fontUrl);
           if (response.ok) {
             const fontBytes = await response.arrayBuffer();
@@ -979,7 +980,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
       downloadFile(compiledPdfBytes, `${baseName}_ocr_selectable.pdf`, 'application/pdf');
     } catch (err) {
       console.error(err);
-      alert('Error generating searchable transcript PDF.');
+      alert(tr("Error generating searchable transcript PDF."));
     } finally {
       setLoading(false);
       setCurrentStep('');
@@ -1001,20 +1002,20 @@ export default function OcrTool({ onBack }: OcrToolProps) {
           id="btn-ocr-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold flex items-center gap-1.5 shadow-xs">
-          <Sparkles className="w-3.5 h-3.5" /> High-Contrast Tesseract OCR
+          <Sparkles className="w-3.5 h-3.5" /> {tr("High-Contrast Tesseract OCR")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight flex items-center gap-2">
-            <FileSearch className="w-6 h-6 text-violet-500" /> Optical Character Recognition (OCR)
+            <FileSearch className="w-6 h-6 text-violet-500" /> {tr("Optical Character Recognition (OCR)")}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Perform high-accuracy character recognition completely local in-browser. Transcribe un-selectable text grids from scans instantly.
+            {tr("Perform high-accuracy character recognition completely local in-browser. Transcribe un-selectable text grids from scans instantly.")}
           </p>
         </div>
 
@@ -1025,8 +1026,8 @@ export default function OcrTool({ onBack }: OcrToolProps) {
               id="ocr-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload scanned document to scan OCR"
-              description="Upload files to run full lexical character scans on flat picture layers without server roundtrips."
+              title={tr("Upload scanned document to scan OCR")}
+              description={tr("Upload files to run full lexical character scans on flat picture layers without server roundtrips.")}
             />
           </div>
         )}
@@ -1038,12 +1039,12 @@ export default function OcrTool({ onBack }: OcrToolProps) {
               <div className="flex items-center gap-3">
                 <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
                 <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
-                  OCR Status: <span className="text-violet-600 dark:text-violet-400 font-medium">{currentStep}</span>
+                  {tr("OCR Status:")} <span className="text-violet-600 dark:text-violet-400 font-medium">{currentStep}</span>
                 </span>
               </div>
               {currentPageNum > 0 && (
                 <span className="text-xs font-mono font-bold bg-violet-100 dark:bg-violet-950 px-2 py-0.5 rounded text-violet-600">
-                  Page {currentPageNum} of {totalOcrPagesNum}
+                  {tr("Page")} {currentPageNum} {tr("of")} {totalOcrPagesNum}
                 </span>
               )}
             </div>
@@ -1052,7 +1053,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
             {totalOcrPagesNum > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs text-slate-405 font-mono">
-                  <span>Recognition cycle completion</span>
+                  <span>{tr("Recognition cycle completion")}</span>
                   <span>{pageProgressPercent}%</span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
@@ -1075,7 +1076,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                 {/* Left side: Upload details or thumbnail cover */}
                 <div className="space-y-6">
                   <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                    Target Document Profile
+                    {tr("Target Document Profile")}
                   </span>
 
                   <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-2xl space-y-4">
@@ -1084,7 +1085,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         <div className="flex gap-1 overflow-x-auto p-1 max-w-[150px] shrink-0">
                           <img
                             src={file.previews[0]}
-                            alt="document thumb"
+                            alt={tr("document thumb")}
                             referrerPolicy="no-referrer"
                             className="w-16 h-22 object-cover rounded-md shadow-md border border-slate-200 bg-white"
                           />
@@ -1098,7 +1099,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{file.name}</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-404 mt-1 font-semibold">{formatSize(file.size)}</p>
                         <span className="text-xs font-bold px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded inline-block text-slate-600 dark:text-slate-300 mt-2">
-                          {file.pageCount} Pages Loaded
+                          {file.pageCount} {tr("Pages Loaded")}
                         </span>
                       </div>
                     </div>
@@ -1109,7 +1110,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         onClick={resetTool}
                         className="text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
                       >
-                        Change File
+                        {tr("Change File")}
                       </button>
                     </div>
                   </div>
@@ -1118,7 +1119,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                   <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-2xl space-y-5">
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs font-bold font-mono tracking-widest text-slate-400 uppercase flex items-center gap-1.5">
-                        <Sliders className="w-3.5 h-3.5 text-violet-500" /> Preprocessing Filters
+                        <Sliders className="w-3.5 h-3.5 text-violet-500" /> {tr("Preprocessing Filters")}
                       </h4>
                       <button
                         type="button"
@@ -1127,31 +1128,31 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       >
                         {showPreprocessedPreview ? (
                           <>
-                            <EyeOff className="w-3 h-3" /> Hide Preview
+                            <EyeOff className="w-3 h-3" /> {tr("Hide Preview")}
                           </>
                         ) : (
                           <>
-                            <Eye className="w-3 h-3" /> Show Preview
+                            <Eye className="w-3 h-3" /> {tr("Show Preview")}
                           </>
                         )}
                       </button>
                     </div>
 
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
-                      Clarify and sharpen character edges by converting page layers. Real-time thresholding cleans up shadows and scanned line noises local-side.
+                      {tr("Clarify and sharpen character edges by converting page layers. Real-time thresholding cleans up shadows and scanned line noises local-side.")}
                     </p>
 
                     {/* Quick filter presets */}
                     <div className="space-y-1.5 pt-1">
                       <span className="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider font-mono">
-                        Quick Scanning Presets
+                        {tr("Quick Scanning Presets")}
                       </span>
                       <div className="flex flex-wrap gap-1.5">
                         {[
-                          { id: 'default', label: '📄 Standard' },
-                          { id: 'faint', label: '✍️ Faint / Light Print' },
-                          { id: 'photocopy', label: '🌑 Photocopy / Shadow' },
-                          { id: 'blueprint', label: '📐 Blueprint Inverted' }
+                          { id: 'default', label: tr("📄 Standard") },
+                          { id: 'faint', label: tr("✍️ Faint / Light Print") },
+                          { id: 'photocopy', label: tr("🌑 Photocopy / Shadow") },
+                          { id: 'blueprint', label: tr("📐 Blueprint Inverted") }
                         ].map((p) => (
                           <button
                             key={p.id}
@@ -1169,7 +1170,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       {/* Contrast Slider */}
                       <div className="space-y-1">
                         <div className="flex justify-between text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                          <span>Contrast stretch factor</span>
+                          <span>{tr("Contrast stretch factor")}</span>
                           <span className="font-mono text-violet-650 dark:text-violet-400">{contrast.toFixed(1)}x</span>
                         </div>
                         <input
@@ -1192,13 +1193,13 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             onChange={(e) => setBinarize(e.target.checked)}
                             className="rounded border-slate-300 dark:border-slate-700 text-violet-650 tracking-wide"
                           />
-                          <span>Strict Black / White (Binarize)</span>
+                          <span>{tr("Strict Black / White (Binarize)")}</span>
                         </label>
 
                         {binarize && (
-                          <div className="space-y-1 pl-5">
+                          <div className="space-y-1 ps-5">
                             <div className="flex justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                              <span>Cutoff threshold limit</span>
+                              <span>{tr("Cutoff threshold limit")}</span>
                               <span className="font-mono text-violet-650 dark:text-violet-400">{binarizeThreshold} / 255</span>
                             </div>
                             <input
@@ -1223,7 +1224,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             onChange={(e) => setSharpen(e.target.checked)}
                             className="rounded border-slate-300 dark:border-slate-705 text-violet-605 focus:ring-violet-500 w-3.5 h-3.5"
                           />
-                          <span>Sharpen Edges</span>
+                          <span>{tr("Sharpen Edges")}</span>
                         </label>
 
                         <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-[10px] font-semibold text-slate-650 dark:text-slate-300 cursor-pointer select-none">
@@ -1233,7 +1234,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             onChange={(e) => setInvert(e.target.checked)}
                             className="rounded border-slate-300 dark:border-slate-705 text-violet-605 focus:ring-violet-500 w-3.5 h-3.5"
                           />
-                          <span>Invert Colors</span>
+                          <span>{tr("Invert Colors")}</span>
                         </label>
                       </div>
                     </div>
@@ -1242,16 +1243,16 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                     {showPreprocessedPreview && previewFilterUrl && (
                       <div className="pt-3 border-t border-slate-200 dark:border-slate-850 space-y-2">
                         <span className="block text-[10px] font-semibold text-slate-450 dark:text-slate-400">
-                          Interactive Live Filter Result (Page 1 preview):
+                          {tr("Interactive Live Filter Result (Page 1 preview):")}
                         </span>
                         <div className="relative border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 overflow-hidden aspect-[1/1.3] flex items-center justify-center max-h-[180px]">
                           <img
                             src={previewFilterUrl}
-                            alt="Filter preview"
+                            alt={tr("Filter preview")}
                             className="h-full object-contain"
                           />
                           <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-violet-600/80 dark:bg-violet-500/80 text-white font-mono text-[8px] font-semibold tracking-wider">
-                            FILTERED VIEW
+                            {tr("FILTERED VIEW")}
                           </div>
                         </div>
                       </div>
@@ -1261,10 +1262,10 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                   {/* Informative tips box */}
                   <div className="p-4 rounded-xl bg-violet-600/5 border border-violet-500/10 space-y-2 text-xs">
                     <h5 className="font-bold text-violet-750 dark:text-violet-300 flex items-center gap-1">
-                      <Languages className="w-3.5 h-3.5 shrink-0" /> Local WebOCR Notice
+                      <Languages className="w-3.5 h-3.5 shrink-0" /> {tr("Local WebOCR Notice")}
                     </h5>
                     <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-                      All calculations process strictly standard client-side sandbox environments using WebAssembly. None of your sensitive intellectual details or scanned layout data will ever be sent over external APIs.
+                      {tr("All calculations process strictly standard client-side sandbox environments using WebAssembly. None of your sensitive intellectual details or scanned layout data will ever be sent over external APIs.")}
                     </p>
                   </div>
                 </div>
@@ -1272,13 +1273,13 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                 {/* Right side: OCR settings toggles */}
                 <div className="space-y-6">
                   <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                    Config Character Recognition Matchers
+                    {tr("Config Character Recognition Matchers")}
                   </span>
 
                   {/* OCR Language */}
                   <div className="space-y-2">
                     <label htmlFor="ocr-lang-selector" className="block text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                      <Languages className="w-3.5 h-3.5 text-violet-500" /> Language Dictionary
+                      <Languages className="w-3.5 h-3.5 text-violet-500" /> {tr("Language Dictionary")}
                     </label>
                     <select
                       id="ocr-lang-selector"
@@ -1297,13 +1298,13 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                   {/* Page Range selection */}
                   <div className="space-y-3">
                     <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-violet-500" /> Process Page Selector
+                      <FileText className="w-3.5 h-3.5 text-violet-500" /> {tr("Process Page Selector")}
                     </label>
 
                     <div className="grid grid-cols-2 gap-3 p-1 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-800">
                       {[
                         { id: 'all', label: `Scan All Pages (${file.pageCount})` },
-                        { id: 'custom', label: 'Custom Range index' }
+                        { id: 'custom', label: tr("Custom Range index") }
                       ].map((t) => (
                         <button
                           key={t.id}
@@ -1324,7 +1325,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                     {ocrPages === 'custom' && (
                       <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-3 animate-fade-in">
                         <label htmlFor="ocr-custom-pages" className="block text-xs font-bold text-slate-500 dark:text-slate-450">
-                          Specify page range (e.g. 1-2, 4)
+                          {tr("Specify page range (e.g. 1-2, 4)")}
                         </label>
                         <input
                           type="text"
@@ -1343,7 +1344,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                     type="submit"
                     className="w-full py-4 bg-violet-600 hover:bg-violet-505 text-white font-bold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
                   >
-                    <Play className="w-4 h-4 fill-white" /> Start Optical Scan Recognition
+                    <Play className="w-4 h-4 fill-white" /> {tr("Start Optical Scan Recognition")}
                   </button>
                 </div>
               </div>
@@ -1354,9 +1355,9 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                 {/* Download Actions & Headers list */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-violet-550/5 dark:bg-violet-500/5 border border-violet-550/15 dark:border-violet-500/10 rounded-2xl">
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-50">OCR Analysis Complete!</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-50">{tr("OCR Analysis Complete!")}</h4>
                     <p className="text-xs text-slate-550 dark:text-slate-400 mt-1">
-                      Extract elements verified. Select formats to save local.
+                      {tr("Extract elements verified. Select formats to save local.")}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2.5">
@@ -1365,36 +1366,36 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       onClick={handleDownloadTxt}
                       id="btn-ocr-download-txt"
                       className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors"
-                      title="Download full document text transcript"
+                      title={tr("Download full document text transcript")}
                     >
-                      <Download className="w-3.5 h-3.5" /> TXT
+                      <Download className="w-3.5 h-3.5" /> {tr("TXT")}
                     </button>
                     <button
                       type="button"
                       onClick={handleDownloadMarkdown}
                       id="btn-ocr-download-md"
                       className="px-3 py-2 bg-indigo-600 hover:bg-indigo-550 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors"
-                      title="Download copy styled as Markdown report"
+                      title={tr("Download copy styled as Markdown report")}
                     >
-                      <BookOpen className="w-3.5 h-3.5" /> Markdown
+                      <BookOpen className="w-3.5 h-3.5" /> {tr("Markdown")}
                     </button>
                     <button
                       type="button"
                       onClick={handleDownloadJson}
                       id="btn-ocr-download-json"
                       className="px-3 py-2 bg-emerald-600 hover:bg-emerald-550 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors"
-                      title="Export all structural parameters to JSON dump"
+                      title={tr("Export all structural parameters to JSON dump")}
                     >
-                      <FileCode className="w-3.5 h-3.5" /> JSON Data
+                      <FileCode className="w-3.5 h-3.5" /> {tr("JSON Data")}
                     </button>
                     <button
                       type="button"
                       onClick={handleDownloadSearchablePdf}
                       id="btn-ocr-download-pdf"
                       className="px-3.5 py-2 bg-violet-600 hover:bg-violet-550 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors"
-                      title="Download searchable vector PDF"
+                      title={tr("Download searchable vector PDF")}
                     >
-                      <FileSearch className="w-3.5 h-3.5" /> Searchable PDF
+                      <FileSearch className="w-3.5 h-3.5" /> {tr("Searchable PDF")}
                     </button>
                     <button
                       type="button"
@@ -1402,7 +1403,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       id="btn-ocr-new"
                       className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-705 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl cursor-pointer"
                     >
-                      Reset Tool
+                      {tr("Reset Tool")}
                     </button>
                   </div>
                 </div>
@@ -1411,16 +1412,16 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-full min-h-[480px]">
                   
                   {/* Left Column: List of processed items (3 cells) */}
-                  <div className="md:col-span-3 space-y-2 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
+                  <div className="md:col-span-3 space-y-2 max-h-[500px] overflow-y-auto pe-2 scrollbar-thin">
                     <span className="block text-[10px] font-bold font-mono tracking-widest text-slate-400 uppercase mb-2">
-                      Scan Pages Output
+                      {tr("Scan Pages Output")}
                     </span>
                     {results.map((r, idx) => (
                       <button
                         key={r.pageNumber}
                         type="button"
                         onClick={() => setActiveTab(idx)}
-                        className={`w-full p-2.5 rounded-xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                        className={`w-full p-2.5 rounded-xl border text-start flex items-center gap-3 transition-all cursor-pointer ${
                           activeTab === idx
                             ? 'border-violet-500 bg-violet-500/5 ring-2 ring-violet-500/20'
                             : 'border-slate-200 dark:border-slate-801 bg-white hover:bg-slate-50 dark:bg-slate-900/40'
@@ -1428,14 +1429,14 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       >
                         <img
                           src={r.previewUrl}
-                          alt={`page ${r.pageNumber} layout cover`}
+                          alt={tr("page {0} layout cover", r.pageNumber)}
                           referrerPolicy="no-referrer"
                           className="w-10 h-14 object-cover rounded bg-slate-100 border shrink-0"
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1.5 min-w-0">
-                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate pr-1">
-                              Page {r.pageNumber}
+                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate pe-1">
+                              {tr("Page")} {r.pageNumber}
                             </span>
                             {r.confidence !== undefined && r.confidence > 0 && (
                               <span className={`text-[8.5px] px-1 py-0.2 rounded font-mono font-bold shrink-0 ${
@@ -1450,7 +1451,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             )}
                           </div>
                           <span className="block text-[10px] font-mono text-slate-450 mt-1 truncate">
-                            {r.text.length} characters recognized
+                            {r.text.length} {tr("characters recognized")}
                           </span>
                         </div>
                       </button>
@@ -1463,15 +1464,15 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                     {/* Active page scan thumbnail */}
                     <div className="space-y-3 shrink-0">
                       <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-                        <span>Physical Page Visual scan</span>
+                        <span>{tr("Physical Page Visual scan")}</span>
                         <span className="font-mono bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-650">
-                          PAGE {results[activeTab].pageNumber}
+                          {tr("PAGE")} {results[activeTab].pageNumber}
                         </span>
                       </div>
                       <div className="border border-slate-200 dark:border-slate-800 bg-white aspect-[1/1.41] rounded shadow-md overflow-hidden flex items-center justify-center">
                         <img
                           src={results[activeTab].previewUrl}
-                          alt="active visual layout view"
+                          alt={tr("active visual layout view")}
                           referrerPolicy="no-referrer"
                           className="h-full w-full object-cover"
                         />
@@ -1485,10 +1486,10 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       <div className="flex flex-wrap items-center justify-between border-b border-slate-150 dark:border-slate-800 pb-2.5 gap-2">
                         <div className="flex flex-wrap gap-1 bg-slate-100/80 dark:bg-slate-950/60 p-1 rounded-xl border border-slate-200/50 dark:border-slate-800/80">
                           {[
-                            { id: 'proofread', label: '✍️ Editor', desc: 'Proofread text' },
-                            { id: 'entities', label: '🔍 Extractor', desc: 'Find variables/data' },
-                            { id: 'speech', label: '🗣️ Reader', desc: 'Listen to document' },
-                            { id: 'metrics', label: '📊 Metrics', desc: 'Readability score' }
+                            { id: 'proofread', label: tr("✍️ Editor"), desc: tr("Proofread text") },
+                            { id: 'entities', label: tr("🔍 Extractor"), desc: tr("Find variables/data") },
+                            { id: 'speech', label: tr("🗣️ Reader"), desc: tr("Listen to document") },
+                            { id: 'metrics', label: tr("📊 Metrics"), desc: tr("Readability score") }
                           ].map((tab) => (
                             <button
                               key={tab.id}
@@ -1518,11 +1519,11 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         >
                           {copyFeedback ? (
                             <>
-                              <Check className="w-3.5 h-3.5 text-emerald-500" /> Copied!
+                              <Check className="w-3.5 h-3.5 text-emerald-500" /> {tr("Copied!")}
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3.5 h-3.5" /> Copy Text
+                              <Copy className="w-3.5 h-3.5" /> {tr("Copy Text")}
                             </>
                           )}
                         </button>
@@ -1536,7 +1537,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                           <div className="space-y-2 bg-slate-100/40 dark:bg-slate-950/30 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800 text-xs">
                             <div className="flex items-center justify-between text-[10.5px] font-bold text-slate-500">
                               <span className="flex items-center gap-1 font-mono tracking-wide">
-                                <Search className="w-3.5 h-3.5 text-violet-500" /> SEARCH & REPLACE MATCHES
+                                <Search className="w-3.5 h-3.5 text-violet-500" /> {tr("SEARCH & REPLACE MATCHES")}
                               </span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
@@ -1545,13 +1546,13 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                   type="text"
                                   value={searchTerm}
                                   onChange={(e) => setSearchTerm(e.target.value)}
-                                  placeholder="Type keyword to find..."
-                                  className="w-full pl-7 pr-16 py-1.5 text-[11px] bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-750 rounded-md focus:outline-none focus:border-violet-500 font-mono text-slate-800 dark:text-slate-100"
+                                  placeholder={tr("Type keyword to find...")}
+                                  className="w-full ps-7 pe-16 py-1.5 text-[11px] bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-750 rounded-md focus:outline-none focus:border-violet-500 font-mono text-slate-800 dark:text-slate-100"
                                 />
                                 <Search className="w-3 h-3 text-slate-400 absolute left-2.5 top-2.5" />
                                 {searchMatchesCount !== null && (
                                   <span className="absolute right-2 top-1.5 text-[9px] font-bold font-mono px-1 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-                                    {searchMatchesCount} hit{searchMatchesCount !== 1 ? 's' : ''}
+                                    {searchMatchesCount} {tr("hit")}{searchMatchesCount !== 1 ? 's' : ''}
                                   </span>
                                 )}
                               </div>
@@ -1561,7 +1562,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                   type="text"
                                   value={replaceTerm}
                                   onChange={(e) => setReplaceTerm(e.target.value)}
-                                  placeholder="Replace with..."
+                                  placeholder={tr("Replace with...")}
                                   className="flex-1 px-2.5 py-1.5 text-[11px] bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-750 rounded-md focus:outline-none focus:border-violet-500 font-mono text-slate-800 dark:text-slate-100"
                                 />
                                 <button
@@ -1570,7 +1571,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                   disabled={!searchTerm}
                                   className="px-2 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-705 dark:text-slate-300 text-[10px] font-bold rounded-md hover:bg-slate-250 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                                 >
-                                  Replace
+                                  {tr("Replace")}
                                 </button>
                                 <button
                                   type="button"
@@ -1578,7 +1579,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                   disabled={!searchTerm}
                                   className="px-2 py-1.5 bg-violet-600 text-white text-[10px] font-bold rounded-md hover:bg-violet-550 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                                 >
-                                  All
+                                  {tr("All")}
                                 </button>
                               </div>
                             </div>
@@ -1587,62 +1588,62 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                           {/* Formatting Row */}
                           <div className="flex flex-col gap-2 p-2 bg-slate-50 dark:bg-slate-950/30 border border-slate-200/80 dark:border-slate-800/80 rounded-xl">
                             <div className="flex flex-wrap gap-1 items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800/60">
-                              <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wide font-mono mr-1.5 shrink-0">Cleaners:</span>
+                              <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wide font-mono me-1.5 shrink-0">{tr("Cleaners:")}</span>
                               <button
                                 type="button"
                                 onClick={cleanJoinLines}
-                                title="Removes single newlines to join broken lines of text into continuous paragraphs automatically"
+                                title={tr("Removes single newlines to join broken lines of text into continuous paragraphs automatically")}
                                 className="px-2 py-1 text-[10px] font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:border-violet-500 hover:text-violet-600 rounded-md transition-colors cursor-pointer"
                               >
-                                Flow Paragraphs
+                                {tr("Flow Paragraphs")}
                               </button>
                               <button
                                 type="button"
                                 onClick={cleanStripDoubleSpaces}
-                                title="Trims duplicate spaces and trailing tabulators"
+                                title={tr("Trims duplicate spaces and trailing tabulators")}
                                 className="px-2 py-1 text-[10px] font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:border-violet-500 hover:text-violet-600 rounded-md transition-colors cursor-pointer"
                               >
-                                Trim Spaces
+                                {tr("Trim Spaces")}
                               </button>
                               <button
                                 type="button"
                                 onClick={cleanRemoveEmptyLines}
-                                title="Discard completely empty lines"
+                                title={tr("Discard completely empty lines")}
                                 className="px-2 py-1 text-[10px] font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:border-violet-500 hover:text-violet-600 rounded-md transition-colors cursor-pointer"
                               >
-                                Strip Empty Lines
+                                {tr("Strip Empty Lines")}
                               </button>
                             </div>
 
                             <div className="flex flex-wrap gap-1 items-center">
-                              <span className="text-[9px] font-bold text-slate-455 uppercase tracking-wide font-mono mr-1.5 shrink-0">Case Modifiers:</span>
+                              <span className="text-[9px] font-bold text-slate-455 uppercase tracking-wide font-mono me-1.5 shrink-0">{tr("Case Modifiers:")}</span>
                               <button
                                 type="button"
                                 onClick={() => cleanChangeCase('sentence')}
                                 className="px-2 py-0.5 text-[10px] font-semibold hover:text-violet-650 dark:hover:text-violet-400 text-slate-655 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer transition-colors"
                               >
-                                Sentence
+                                {tr("Sentence")}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => cleanChangeCase('title')}
                                 className="px-2 py-0.5 text-[10px] font-semibold hover:text-violet-655 dark:hover:text-violet-400 text-slate-655 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer transition-colors"
                               >
-                                Title
+                                {tr("Title")}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => cleanChangeCase('upper')}
                                 className="px-2 py-0.5 text-[10px] font-semibold hover:text-violet-655 dark:hover:text-violet-400 text-slate-655 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer transition-colors"
                               >
-                                UPPER
+                                {tr("UPPER")}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => cleanChangeCase('lower')}
                                 className="px-2 py-0.5 text-[10px] font-semibold hover:text-violet-655 dark:hover:text-violet-400 text-slate-655 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer transition-colors"
                               >
-                                lower
+                                {tr("lower")}
                               </button>
                             </div>
                           </div>
@@ -1651,7 +1652,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             value={results[activeTab].text}
                             onChange={(e) => handleTextEdit(activeTab, e.target.value)}
                             className="w-full p-4 text-xs bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-750 text-slate-800 dark:text-slate-100 font-mono leading-relaxed rounded-xl focus:outline-none focus:border-violet-500 resize-none h-[250px] overflow-y-auto"
-                            placeholder="Page text transcript content..."
+                            placeholder={tr("Page text transcript content...")}
                           />
                         </div>
                       )}
@@ -1661,17 +1662,17 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         <div className="space-y-4 animate-fade-in bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl">
                           <div className="space-y-1">
                             <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-1.5 font-sans">
-                              📊 Lexical Entity Extractor (Client-Side)
+                              {tr("📊 Lexical Entity Extractor (Client-Side)")}
                             </h4>
                             <p className="text-[11px] text-slate-500">
-                              Analyzes the active page transcript inline using static token filters to capture indices. Click items to copy them.
+                              {tr("Analyzes the active page transcript inline using static token filters to capture indices. Click items to copy them.")}
                             </p>
                           </div>
 
                           {/* Custom Regex search bar */}
                           <div className="space-y-1.5 p-3 bg-violet-500/5 dark:bg-violet-955/10 rounded-xl border border-violet-500/10">
                             <label htmlFor="custom-regex" className="block text-[10px] font-bold text-violet-700 dark:text-violet-400 uppercase tracking-wider font-mono">
-                              ✏️ Run Custom Pattern (Regular Expression)
+                              {tr("✏️ Run Custom Pattern (Regular Expression)")}
                             </label>
                             <div className="flex gap-1.5">
                               <input
@@ -1686,7 +1687,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                           </div>
 
                           {/* Render Categories */}
-                          <div className="space-y-3.5 max-h-[280px] overflow-y-auto pr-1">
+                          <div className="space-y-3.5 max-h-[280px] overflow-y-auto pe-1">
                             {(() => {
                               const ents = extractEntitiesFromText(results[activeTab].text, customRegexStr);
                               const categories = [
@@ -1710,16 +1711,16 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                       <cat.icon className="w-3.5 h-3.5 text-violet-500" /> {cat.name} ({cat.items.length})
                                     </span>
                                     {cat.items.length === 0 ? (
-                                      <span className="block text-[10px] text-slate-400 italic pl-5">{cat.empty}</span>
+                                      <span className="block text-[10px] text-slate-400 italic ps-5">{cat.empty}</span>
                                     ) : (
-                                      <div className="flex flex-wrap gap-1.5 pl-5">
+                                      <div className="flex flex-wrap gap-1.5 ps-5">
                                         {cat.items.map((item, index) => (
                                           <button
                                             key={`${cat.id}-${index}`}
                                             type="button"
                                             onClick={() => handleCopyToClipboard(item)}
                                             className="px-2 py-1 text-[10px] font-bold font-mono bg-slate-100 hover:bg-violet-100 dark:bg-slate-800 dark:hover:bg-violet-950 text-slate-700 dark:text-slate-300 hover:text-violet-650 dark:hover:text-violet-300 rounded-md transition-all cursor-pointer border border-transparent dark:border-slate-800 flex items-center gap-1 align-middle"
-                                            title="Click to copy value"
+                                            title={tr("Click to copy value")}
                                           >
                                             {item} <Copy className="w-2.5 h-2.5 opacity-40 shrink-0" />
                                           </button>
@@ -1739,10 +1740,10 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         <div className="space-y-4 animate-fade-in bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between min-h-[300px]">
                           <div className="space-y-1">
                             <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
-                              🔊 Offline Speech Synthesizer & Auditor
+                              {tr("🔊 Offline Speech Synthesizer & Auditor")}
                             </h4>
                             <p className="text-[11px] text-slate-500">
-                              Listen to the optical character scan aloud. Ideal for auditing, reviewing, and proofreading complex documents.
+                              {tr("Listen to the optical character scan aloud. Ideal for auditing, reviewing, and proofreading complex documents.")}
                             </p>
                           </div>
 
@@ -1760,7 +1761,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                               </div>
                             ) : (
                               <span className="text-[10px] font-mono text-slate-400 capitalize">
-                                {speechPaused ? "⏸️ Reading stream paused" : "⏹️ Synthesizer line ready"}
+                                {speechPaused ? tr("⏸️ Reading stream paused") : tr("⏹️ Synthesizer line ready")}
                               </span>
                             )}
                           </div>
@@ -1769,7 +1770,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             {/* Voice selector */}
                             <div className="space-y-1">
                               <label htmlFor="voice-select" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">
-                                Synthesized Voice Pack
+                                {tr("Synthesized Voice Pack")}
                               </label>
                               <select
                                 id="voice-select"
@@ -1783,7 +1784,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                   </option>
                                 ))}
                                 {availableVoices.length === 0 && (
-                                  <option value="">Default OS Voice Native</option>
+                                  <option value="">{tr("Default OS Voice Native")}</option>
                                 )}
                               </select>
                             </div>
@@ -1791,7 +1792,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                             {/* Speed selector */}
                             <div className="space-y-1">
                               <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">
-                                Playing Velocity Rate ({speechRate}x)
+                                {tr("Playing Velocity Rate (")}{speechRate}x)
                               </span>
                               <div className="grid grid-cols-4 gap-1">
                                 {[0.75, 1.0, 1.25, 1.5].map((rate) => (
@@ -1826,7 +1827,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                 }}
                                 className="px-5 py-2.5 bg-violet-600 hover:bg-violet-550 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
                               >
-                                <Play className="w-3.5 h-3.5 fill-white" /> {speechPaused ? "Resume Reading" : "Read Aloud"}
+                                <Play className="w-3.5 h-3.5 fill-white" /> {speechPaused ? tr("Resume Reading") : tr("Read Aloud")}
                               </button>
                             ) : (
                               <button
@@ -1834,7 +1835,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                 onClick={pauseTTS}
                                 className="px-5 py-2.5 bg-amber-500 hover:bg-amber-450 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
                               >
-                                <Pause className="w-3.5 h-3.5 inline-block" /> Pause
+                                <Pause className="w-3.5 h-3.5 inline-block" /> {tr("Pause")}
                               </button>
                             )}
                             <button
@@ -1843,7 +1844,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                               disabled={!speechPlaying && !speechPaused}
                               className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 disabled:opacity-40 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-slate-150 transition-colors"
                             >
-                              <Square className="w-3.5 h-3.5 fill-slate-400" /> Stop Stream
+                              <Square className="w-3.5 h-3.5 fill-slate-400" /> {tr("Stop Stream")}
                             </button>
                           </div>
                         </div>
@@ -1854,10 +1855,10 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                         <div className="space-y-4 animate-fade-in bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between min-h-[300px]">
                           <div className="space-y-1">
                             <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
-                              📈 Real-Time Readability & Document KPIs
+                              {tr("📈 Real-Time Readability & Document KPIs")}
                             </h4>
                             <p className="text-[11px] text-slate-500">
-                              Automated linguistic metrics for content accessibility, complex vocabulary, and estimated speed benchmarks.
+                              {tr("Automated linguistic metrics for content accessibility, complex vocabulary, and estimated speed benchmarks.")}
                             </p>
                           </div>
 
@@ -1869,13 +1870,13 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   {/* Flesch Reading Score */}
                                   <div className="p-3 bg-violet-500/5 border border-violet-500/10 rounded-xl space-y-1">
-                                    <span className="text-[9px] font-bold text-violet-750 dark:text-violet-400 uppercase tracking-wide font-mono block">Flesch Reading Ease score</span>
+                                    <span className="text-[9px] font-bold text-violet-750 dark:text-violet-400 uppercase tracking-wide font-mono block">{tr("Flesch Reading Ease score")}</span>
                                     <div className="flex items-baseline gap-1">
                                       <span className="text-2xl font-black text-violet-650 dark:text-violet-300 font-mono">{m.fleschScore}</span>
                                       <span className="text-[10px] text-slate-400 font-semibold font-sans">/ 100</span>
                                     </div>
                                     <p className="text-[10px] text-slate-505 dark:text-slate-400 leading-tight font-medium font-sans">
-                                      Complexity: <strong>{m.fleschLabel}</strong>
+                                      {tr("Complexity:")} <strong>{m.fleschLabel}</strong>
                                     </p>
                                     <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full overflow-hidden mt-1.5">
                                       <div
@@ -1887,12 +1888,12 @@ export default function OcrTool({ onBack }: OcrToolProps) {
 
                                   {/* Automated Readability Grade Index */}
                                   <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-1">
-                                    <span className="text-[9px] font-bold text-emerald-750 dark:text-emerald-400 uppercase tracking-wide font-mono block">Understandability Grade</span>
+                                    <span className="text-[9px] font-bold text-emerald-750 dark:text-emerald-400 uppercase tracking-wide font-mono block">{tr("Understandability Grade")}</span>
                                     <div className="flex items-baseline gap-1">
-                                      <span className="text-xl font-black text-emerald-650 dark:text-emerald-300 font-mono">Grade {m.ariScore}</span>
+                                      <span className="text-xl font-black text-emerald-650 dark:text-emerald-300 font-mono">{tr("Grade")} {m.ariScore}</span>
                                     </div>
                                     <p className="text-[10px] text-slate-505 dark:text-slate-400 leading-tight font-medium font-sans mt-0.5">
-                                      Target profile: <strong>{m.ariLabel}</strong>
+                                      {tr("Target profile:")} <strong>{m.ariLabel}</strong>
                                     </p>
                                     <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full overflow-hidden mt-2">
                                       <div
@@ -1906,16 +1907,16 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                                 {/* Count Grid */}
                                 <div className="grid grid-cols-3 gap-2.5 text-center">
                                   <div className="p-2.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-850">
-                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Word Count</span>
+                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">{tr("Word Count")}</span>
                                     <span className="text-base font-bold text-slate-700 dark:text-slate-250 font-mono mt-0.5 block">{m.wordCount}</span>
                                   </div>
                                   <div className="p-2.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-850">
-                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Sentence Count</span>
+                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">{tr("Sentence Count")}</span>
                                     <span className="text-base font-bold text-slate-700 dark:text-slate-250 font-mono mt-0.5 block">{m.sentenceCount}</span>
                                   </div>
                                   <div className="p-2.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-850">
-                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Audit Duration</span>
-                                    <span className="text-base font-bold text-slate-700 dark:text-slate-250 font-mono mt-0.5 block">{m.readingTimeMin} min</span>
+                                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">{tr("Audit Duration")}</span>
+                                    <span className="text-base font-bold text-slate-700 dark:text-slate-250 font-mono mt-0.5 block">{m.readingTimeMin} {tr("min")}</span>
                                   </div>
                                 </div>
                               </div>
@@ -1926,7 +1927,7 @@ export default function OcrTool({ onBack }: OcrToolProps) {
                       
                       <div className="flex items-center gap-2 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[10px] text-emerald-700 dark:text-emerald-400 mt-2">
                         <Check className="w-3.5 h-3.5 shrink-0" />
-                        <span>Worksheets update live as edits occur in standard editor screens.</span>
+                        <span>{tr("Worksheets update live as edits occur in standard editor screens.")}</span>
                       </div>
                     </div>
 

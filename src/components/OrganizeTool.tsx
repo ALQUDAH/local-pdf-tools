@@ -26,6 +26,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, organizePdfPages, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface OrganizeToolProps {
   onBack: () => void;
 }
@@ -87,14 +88,14 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
         {!isBlank && thumb ? (
           <img
             src={thumb}
-            alt={`Orig page ${origIdx + 1}`}
+            alt={tr("Orig page {0}", origIdx + 1)}
             className="w-full h-full object-contain pointer-events-none select-none bg-white"
             referrerPolicy="no-referrer"
           />
         ) : isBlank ? (
           <div className="flex flex-col items-center gap-1 text-amber-500 dark:text-amber-400 font-bold font-mono text-[10px] uppercase select-none">
             <PlusCircle className="w-6 h-6 animate-pulse" />
-            <span>Blank Spacer</span>
+            <span>{tr("Blank Spacer")}</span>
           </div>
         ) : (
           <div className="text-slate-400 font-bold text-xs select-none">
@@ -104,12 +105,12 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
 
         {/* Order label info */}
         <div className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-slate-900/80 text-white rounded font-mono text-[9px] font-bold">
-          PAGE {index + 1}
+          {tr("PAGE")} {index + 1}
         </div>
 
         {!isBlank && (
           <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-slate-200/90 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded font-mono text-[9px] font-bold">
-            Source P. {origIdx + 1}
+            {tr("Source P.")} {origIdx + 1}
           </div>
         )}
       </div>
@@ -122,7 +123,7 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
             disabled={index === 0}
             id={`btn-move-left-${index}`}
             className="p-1 px-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 disabled:opacity-20 cursor-pointer"
-            title="Move Page Back"
+            title={tr("Move Page Back")}
           >
             <LeftIcon className="w-3 h-3" />
           </button>
@@ -131,7 +132,7 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
             onClick={() => onInsertBlank(index)}
             id={`btn-insert-blank-${index}`}
             className="p-1 px-1.5 text-emerald-500 hover:text-emerald-600 cursor-pointer"
-            title="Insert Blank After"
+            title={tr("Insert Blank After")}
           >
             <PlusCircle className="w-3 h-3" />
           </button>
@@ -140,7 +141,7 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
             onClick={() => onDelete(index)}
             id={`btn-delete-node-${index}`}
             className="p-1 px-1.5 text-rose-500 hover:text-rose-600 cursor-pointer"
-            title="Delete Page"
+            title={tr("Delete Page")}
           >
             <Trash2 className="w-3 h-3" />
           </button>
@@ -150,7 +151,7 @@ function SortablePageItem({ element, index, totalLength, fileDetails, onMoveLeft
             disabled={index === totalLength - 1}
             id={`btn-move-right-${index}`}
             className="p-1 px-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 disabled:opacity-20 cursor-pointer"
-            title="Move Page Forward"
+            title={tr("Move Page Forward")}
           >
             <ArrowRight className="w-3 h-3" />
           </button>
@@ -228,7 +229,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
       setSequence(items);
     } catch (err) {
       console.error(err);
-      alert('Error parsing PDF page sequence details.');
+      alert(tr("Error parsing PDF page sequence details."));
     } finally {
       setLoading(false);
     }
@@ -287,7 +288,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to output organized PDF pages.');
+      alert(tr("Failed to output organized PDF pages."));
     } finally {
       setLoading(false);
     }
@@ -319,19 +320,18 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
           id="btn-organize-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-          Local Organize Engine
+          {tr("Local Organize Engine")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Organize PDF Pages</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Organize PDF Pages")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Reorder, delete, replicate, or insert blank spacer pages visually to refine your PDF package flows.
-            Drag and drop pages to arrange them.
+            {tr("Reorder, delete, replicate, or insert blank spacer pages visually to refine your PDF package flows. Drag and drop pages to arrange them.")}
           </p>
         </div>
 
@@ -342,8 +342,8 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
               id="organize-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to organize pages"
-              description="Drop a document to manipulate and arrange individual pages visually."
+              title={tr("Upload PDF to organize pages")}
+              description={tr("Drop a document to manipulate and arrange individual pages visually.")}
             />
           </div>
         )}
@@ -352,7 +352,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
-            <span>Processing structural edits and exporting fresh PDF...</span>
+            <span>{tr("Processing structural edits and exporting fresh PDF...")}</span>
           </div>
         )}
 
@@ -362,7 +362,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Compiled!</span> The modified organized document has been downloaded.
+                <span className="font-semibold">{tr("Successfully Compiled!")}</span> {tr("The modified organized document has been downloaded.")}
               </span>
             </div>
             <button
@@ -370,7 +370,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
               id="btn-organize-reset"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -393,14 +393,14 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
                   id="btn-organize-append-blank"
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 text-emerald-500" /> Add Blank Page
+                  <PlusCircle className="w-3.5 h-3.5 text-emerald-500" /> {tr("Add Blank Page")}
                 </button>
                 <button
                   onClick={resetAllFilters}
                   id="btn-organize-reset-sequence"
                   className="px-3 py-1.5 hover:bg-rose-500/10 text-rose-500 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer"
                 >
-                  <Undo className="w-3.5 h-3.5" /> Reset Layout
+                  <Undo className="w-3.5 h-3.5" /> {tr("Reset Layout")}
                 </button>
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
             {/* Structured Page sequence grid */}
             {sequence.length === 0 ? (
               <div className="text-center py-12 text-slate-400 bg-slate-50 dark:bg-slate-950/25 rounded-2xl border border-dashed">
-                All pages removed. Please add a blank page or reset custom selections.
+                {tr("All pages removed. Please add a blank page or reset custom selections.")}
               </div>
             ) : (
               <DndContext
@@ -446,7 +446,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
                 id="btn-organize-change-sheet"
                 className="text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
               >
-                Change Document
+                {tr("Change Document")}
               </button>
 
               <button
@@ -456,7 +456,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                Generate Organized PDF
+                {tr("Generate Organized PDF")}
               </button>
             </div>
           </div>

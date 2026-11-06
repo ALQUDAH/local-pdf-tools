@@ -4,6 +4,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, addWatermarkToPdf, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface WatermarkToolProps {
   onBack: () => void;
 }
@@ -92,7 +93,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
       setPreviewPageIndex(0);
     } catch (err) {
       console.error(err);
-      alert('Error parsing PDF content attributes.');
+      alert(tr("Error parsing PDF content attributes."));
     } finally {
       setLoading(false);
     }
@@ -102,7 +103,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
     e.preventDefault();
     if (!file) return;
     if (!text.trim()) {
-      alert('Please enter some text for the watermark.');
+      alert(tr("Please enter some text for the watermark."));
       return;
     }
     setLoading(true);
@@ -127,7 +128,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to stamp watermark to PDF.');
+      alert(tr("Failed to stamp watermark to PDF."));
     } finally {
       setLoading(false);
     }
@@ -170,18 +171,18 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
           id="btn-watermark-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-105 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full font-semibold">
-          Local Watermark Engine
+          {tr("Local Watermark Engine")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Watermark PDF</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Watermark PDF")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Overprint customized text labels with adjustable angles, colors, and repeating grid layers. Drag to position.
+            {tr("Overprint customized text labels with adjustable angles, colors, and repeating grid layers. Drag to position.")}
           </p>
         </div>
 
@@ -191,8 +192,8 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
               id="watermark-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to stamp watermark"
-              description="Upload a document to apply professional security overlays immediately."
+              title={tr("Upload PDF to stamp watermark")}
+              description={tr("Upload a document to apply professional security overlays immediately.")}
             />
           </div>
         )}
@@ -200,7 +201,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
         {loading && (
           <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300 mb-6">
             <Loader2 className="w-5 h-5 text-rose-500 animate-spin" />
-            <span>Processing layers and creating vector stamps...</span>
+            <span>{tr("Processing layers and creating vector stamps...")}</span>
           </div>
         )}
 
@@ -209,7 +210,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Watermarked!</span> Your stylized copy has been saved and downloaded.
+                <span className="font-semibold">{tr("Successfully Watermarked!")}</span> {tr("Your stylized copy has been saved and downloaded.")}
               </span>
             </div>
             <button
@@ -217,7 +218,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
               id="btn-watermark-reset"
               className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -231,7 +232,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                   <FileCode className="w-5 h-5 text-rose-500" />
                   <div className="truncate">
                     <p className="font-semibold text-slate-750 dark:text-slate-250 truncate">{file.name}</p>
-                    <p className="text-slate-500 dark:text-slate-400 font-mono mt-0.5">{file.pageCount} pages • {formatSize(file.size)}</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-mono mt-0.5">{file.pageCount} {tr("pages •")} {formatSize(file.size)}</p>
                   </div>
                 </div>
                 <button
@@ -239,13 +240,13 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                   onClick={resetTool}
                   className="text-rose-500 hover:text-rose-600 font-semibold px-2 py-1 cursor-pointer"
                 >
-                  Change
+                  {tr("Change")}
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">Layout Overlay Mode</label>
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">{tr("Layout Overlay Mode")}</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[
                       { id: 'diagonal', icon: Compass },
@@ -272,7 +273,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
 
                 <div className="space-y-2">
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                    <Type className="w-3.5 h-3.5 text-rose-500" /> Watermark Text
+                    <Type className="w-3.5 h-3.5 text-rose-500" /> {tr("Watermark Text")}
                   </label>
                   <input
                     type="text"
@@ -297,7 +298,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">Font Size (pt)</label>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">{tr("Font Size (pt)")}</label>
                     <input
                       type="number"
                       value={fontSize}
@@ -306,7 +307,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">Color</label>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400">{tr("Color")}</label>
                     <div className="flex gap-2">
                       <input
                         type="color"
@@ -326,7 +327,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                    <label>Rotate Angle</label>
+                    <label>{tr("Rotate Angle")}</label>
                     <span className="font-mono">{rotation}°</span>
                   </div>
                   <input
@@ -341,7 +342,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
 
                 <div className="space-y-2 pb-1">
                   <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                    <label>Opacity</label>
+                    <label>{tr("Opacity")}</label>
                     <span className="font-mono">{Math.round(opacity * 100)}%</span>
                   </div>
                   <input
@@ -358,7 +359,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                   disabled={loading}
                   className="w-full py-3 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 mt-2 cursor-pointer shadow-md"
                 >
-                  <Play className="w-4 h-4 fill-white" /> Apply Watermark
+                  <Play className="w-4 h-4 fill-white" /> {tr("Apply Watermark")}
                 </button>
               </div>
             </div>
@@ -367,7 +368,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
             <div className="lg:col-span-7 flex flex-col space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <Maximize className="w-4 h-4 text-rose-500" />
-                <span className="text-xs font-bold font-mono text-slate-400 uppercase">Live Preview Page 1</span>
+                <span className="text-xs font-bold font-mono text-slate-400 uppercase">{tr("Live Preview Page 1")}</span>
               </div>
 
               <div className="bg-slate-100/50 dark:bg-slate-950/40 rounded-2xl border border-slate-200/50 dark:border-slate-800 p-8 flex items-center justify-center min-h-[460px] relative overflow-hidden select-none">
@@ -382,7 +383,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                       src={file.previews[previewPageIndex]}
                       className="w-full h-full object-cover select-none absolute top-0 left-0"
                       referrerPolicy="no-referrer"
-                      alt="Preview Doc"
+                      alt={tr("Preview Doc")}
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-slate-300 bg-slate-50">

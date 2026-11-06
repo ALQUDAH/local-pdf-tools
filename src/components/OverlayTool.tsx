@@ -28,6 +28,7 @@ import { fileToArrayBuffer, getPdfDetails, applyOverlayToPdf, downloadFile } fro
 import Dropzone from './Dropzone';
 import { Rnd } from 'react-rnd';
 
+import { tr } from '../i18n';
 interface OverlayToolProps {
   onBack: () => void;
 }
@@ -133,7 +134,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
   const handlePrimarySelected = async (files: File[]) => {
     if (files.length === 0) return;
     setLoading(true);
-    setStatusText('Reading primary PDF document...');
+    setStatusText(tr("Reading primary PDF document..."));
     setSuccess(false);
 
     try {
@@ -153,7 +154,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
       setPreviewPageIndex(0);
     } catch (err) {
       console.error(err);
-      alert('Failed to parse primary PDF. It might be corrupt or encrypted.');
+      alert(tr("Failed to parse primary PDF. It might be corrupt or encrypted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -163,7 +164,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
   // 2. Handle Overlay File upload (Image or PDF)
   const handleOverlayFile = async (file: File) => {
     setLoading(true);
-    setStatusText('Importing overlay template file...');
+    setStatusText(tr("Importing overlay template file..."));
     setSuccess(false);
 
     try {
@@ -174,7 +175,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
       let pagesTotal = 0;
 
       if (isPdfValue) {
-        setStatusText('Analyzing overlay PDF page templates...');
+        setStatusText(tr("Analyzing overlay PDF page templates..."));
         const details = await getPdfDetails(arrayBuffer, 5);
         previews = details.previews;
         pagesTotal = details.pageCount;
@@ -200,7 +201,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
       }));
     } catch (err) {
       console.error(err);
-      alert('Failed to load overlay file. Please upload a valid PDF, PNG, or JPG.');
+      alert(tr("Failed to load overlay file. Please upload a valid PDF, PNG, or JPG."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -228,7 +229,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
   const handleApplyOverlay = async () => {
     if (!primaryFile || !overlayConfig.buffer) return;
     setLoading(true);
-    setStatusText('Stitching layer elements & stitching PDF plates...');
+    setStatusText(tr("Stitching layer elements & stitching PDF plates..."));
 
     try {
       const resBytes = await applyOverlayToPdf(primaryFile.arrayBuffer, {
@@ -407,14 +408,14 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
           id="btn-overlay-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-            Overlay Layer Engine
+            {tr("Overlay Layer Engine")}
           </span>
           <span className="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-            Secure client-side merge
+            {tr("Secure client-side merge")}
           </span>
         </div>
       </div>
@@ -423,9 +424,9 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
         
         {/* Core title */}
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">PDF Layers & Overlay Tool</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("PDF Layers & Overlay Tool")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Superimpose an image, stamp, signature or document template (like letterhead/seal) on top of an existing PDF layer-by-layer.
+            {tr("Superimpose an image, stamp, signature or document template (like letterhead/seal) on top of an existing PDF layer-by-layer.")}
           </p>
         </div>
 
@@ -433,7 +434,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-violet-500/5 border border-violet-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-violet-605 animate-spin shrink-0" />
-            <span>{statusText || 'Stitching layout coordinates...'}</span>
+            <span>{statusText || tr("Stitching layout coordinates...")}</span>
           </div>
         )}
 
@@ -443,8 +444,8 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold font-sans">Layermerge Applied Successfully!</span>{' '}
-                Your processed layout PDF has been saved and downloaded.
+                <span className="font-semibold font-sans">{tr("Layermerge Applied Successfully!")}</span>{' '}
+                {tr("Your processed layout PDF has been saved and downloaded.")}
               </span>
             </div>
             <button
@@ -452,7 +453,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
               id="btn-overlay-reset-success"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-705 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start new overlay
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start new overlay")}
             </button>
           </div>
         )}
@@ -461,14 +462,14 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
         {!primaryFile ? (
           <div className="space-y-4">
             <h3 className="text-sm font-bold font-mono text-slate-400 tracking-wider uppercase">
-              Step 1: Upload Underlay Base document (Primary PDF)
+              {tr("Step 1: Upload Underlay Base document (Primary PDF)")}
             </h3>
             <Dropzone
               id="primary-pdf-dropzone"
               onFilesSelected={handlePrimarySelected}
               multiple={false}
-              title="Drag & drop primary base PDF document here"
-              description="This serves as the underlying target host file. Processing runs inside localized client memory."
+              title={tr("Drag & drop primary base PDF document here")}
+              description={tr("This serves as the underlying target host file. Processing runs inside localized client memory.")}
             />
           </div>
         ) : (
@@ -484,7 +485,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   <FileText className="w-5 h-5 text-violet-605" />
                   <div className="truncate">
                     <p className="font-semibold text-slate-750 dark:text-slate-250 truncate">{primaryFile.name}</p>
-                    <p className="text-slate-400">{formatSize(primaryFile.size)} • {primaryFile.pageCount} Pages</p>
+                    <p className="text-slate-400">{formatSize(primaryFile.size)} • {primaryFile.pageCount} {tr("Pages")}</p>
                   </div>
                 </div>
                 <button
@@ -492,7 +493,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   id="btn-remove-primary-doc"
                   className="p-1 px-2.5 border border-slate-200 hover:border-rose-500 rounded-lg text-rose-500 text-[10px] hover:bg-rose-500/5 cursor-pointer font-bold"
                 >
-                  Change Base
+                  {tr("Change Base")}
                 </button>
               </div>
 
@@ -501,7 +502,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold font-mono text-slate-400 tracking-wider uppercase">
-                      Step 2: Upload Overlay Item (Stamp, Seal or PDF)
+                      {tr("Step 2: Upload Overlay Item (Stamp, Seal or PDF)")}
                     </h3>
                   </div>
 
@@ -535,10 +536,10 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       <Layers className="w-6 h-6" />
                     </div>
                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      Upload Signature, Seal, Logo, or PDF
+                      {tr("Upload Signature, Seal, Logo, or PDF")}
                     </p>
                     <p className="text-[10px] text-slate-400 mt-1">
-                      Supports PNG, JPG, or PDF (Letterhead / Template overlays)
+                      {tr("Supports PNG, JPG, or PDF (Letterhead / Template overlays)")}
                     </p>
                   </div>
                 </div>
@@ -553,10 +554,10 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       )}
                       <div className="truncate">
                         <p className="font-semibold text-slate-700 dark:text-slate-300 truncate">
-                          Overlay: {overlayConfig.file?.name}
+                          {tr("Overlay:")} {overlayConfig.file?.name}
                         </p>
                         <p className="text-[10px] text-slate-450 uppercase font-bold font-mono">
-                          Type: {overlayConfig.type} • {overlayConfig.pageCount > 0 ? `${overlayConfig.pageCount} sheets` : 'Image file'}
+                          {tr("Type:")} {overlayConfig.type} • {overlayConfig.pageCount > 0 ? tr("{0} sheets", overlayConfig.pageCount) : tr("Image file")}
                         </p>
                       </div>
                     </div>
@@ -564,7 +565,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       onClick={removeOverlayFile}
                       id="btn-remove-overlay-file"
                       className="p-1 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer"
-                      title="Remove overlay model"
+                      title={tr("Remove overlay model")}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -574,7 +575,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   {overlayConfig.type === 'pdf' && overlayConfig.pageCount > 1 && (
                     <div className="p-4 border border-slate-100 dark:border-slate-850 rounded-xl space-y-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider font-mono">
-                        Select page of overlay PDF to apply:
+                        {tr("Select page of overlay PDF to apply:")}
                       </label>
                       <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border">
                         {Array.from({ length: Math.min(6, overlayConfig.pageCount) }).map((_, oIdx) => (
@@ -604,23 +605,23 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   <div className="p-5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 space-y-5">
                     <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
                       <Settings className="w-4 h-4 text-violet-605" />
-                      <span>Overlay Coordinates & Position</span>
+                      <span>{tr("Overlay Coordinates & Position")}</span>
                     </div>
 
                     {/* Presets Grid */}
                     <div className="space-y-2">
                       <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        Position Preset Anchor
+                        {tr("Position Preset Anchor")}
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1">
                         {[
-                          { key: 'full', label: 'Full Page (Template)' },
-                          { key: 'center', label: 'Center Alignment' },
-                          { key: 'top-left', label: 'Top-Left Core' },
-                          { key: 'top-right', label: 'Top-Right' },
-                          { key: 'bottom-left', label: 'Bottom-Left' },
-                          { key: 'bottom-right', label: 'Bottom-Right Stamp' },
-                          { key: 'custom', label: 'Coordinate Manual' }
+                          { key: 'full', label: tr("Full Page (Template)") },
+                          { key: 'center', label: tr("Center Alignment") },
+                          { key: 'top-left', label: tr("Top-Left Core") },
+                          { key: 'top-right', label: tr("Top-Right") },
+                          { key: 'bottom-left', label: tr("Bottom-Left") },
+                          { key: 'bottom-right', label: tr("Bottom-Right Stamp") },
+                          { key: 'custom', label: tr("Coordinate Manual") }
                         ].map((preset) => (
                           <button
                             key={preset.key}
@@ -642,7 +643,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                     <div className="space-y-3 pt-1 border-t border-slate-150 dark:border-slate-800">
                       <div>
                         <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                          Target Primary PDF Pages
+                          {tr("Target Primary PDF Pages")}
                         </label>
                         <select
                           value={overlayConfig.targetPages}
@@ -652,17 +653,17 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                           id="select-overlay-target-pages"
                           className="w-full text-xs py-2 px-3 bg-white dark:bg-slate-800 border border-slate-205 rounded-xl font-semibold text-slate-705 cursor-pointer outline-none focus:ring-1 focus:ring-violet-500"
                         >
-                          <option value="all">Draw overlay on ALL pages</option>
-                          <option value="first">Draw overlay on FIRST page only</option>
-                          <option value="last">Draw overlay on LAST page only</option>
-                          <option value="custom">Draw overlay on CUSTOM page range...</option>
+                          <option value="all">{tr("Draw overlay on ALL pages")}</option>
+                          <option value="first">{tr("Draw overlay on FIRST page only")}</option>
+                          <option value="last">{tr("Draw overlay on LAST page only")}</option>
+                          <option value="custom">{tr("Draw overlay on CUSTOM page range...")}</option>
                         </select>
                       </div>
 
                       {overlayConfig.targetPages === 'custom' && (
                         <div className="animation-fade-in space-y-1">
                           <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">
-                            Specify Page list (e.g. "1, 2, 4-6"):
+                            {tr("Specify Page list (e.g. \"1, 2, 4-6\"):")}
                           </label>
                           <input
                             type="text"
@@ -683,7 +684,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       <div className="space-y-3 pt-1 border-t border-slate-150 dark:border-slate-800">
                         <div>
                           <div className="flex justify-between text-xs font-bold text-slate-550 mb-1">
-                            <span>Image/PDF Scale Factor</span>
+                            <span>{tr("Image/PDF Scale Factor")}</span>
                             <span className="text-violet-600">{Math.round(overlayConfig.scale * 100)}%</span>
                           </div>
                           <input
@@ -707,7 +708,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       <div className="grid grid-cols-2 gap-4 pt-1 border-t border-slate-150 dark:border-slate-800">
                         <div>
                           <div className="flex justify-between text-xs font-bold text-slate-550 mb-1">
-                            <span>Offset X (pt)</span>
+                            <span>{tr("Offset X (pt)")}</span>
                             <span className="font-mono text-slate-400">{overlayConfig.offsetX}</span>
                           </div>
                           <input
@@ -722,7 +723,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                         </div>
                         <div>
                           <div className="flex justify-between text-xs font-bold text-slate-550 mb-1">
-                            <span>Offset Y (pt)</span>
+                            <span>{tr("Offset Y (pt)")}</span>
                             <span className="font-mono text-slate-400">{overlayConfig.offsetY}</span>
                           </div>
                           <input
@@ -742,7 +743,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                     <div className="grid grid-cols-2 gap-4 pt-1 border-t border-slate-150 dark:border-slate-800">
                       <div>
                         <div className="flex justify-between text-xs font-bold text-slate-555 mb-1.5">
-                          <span>Layer Opacity</span>
+                          <span>{tr("Layer Opacity")}</span>
                           <span className="text-violet-600 font-bold">{Math.round(overlayConfig.opacity * 100)}%</span>
                         </div>
                         <input
@@ -760,7 +761,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       </div>
                       <div>
                         <div className="flex justify-between text-xs font-bold text-slate-555 mb-1.5">
-                          <span>Step Rotation</span>
+                          <span>{tr("Step Rotation")}</span>
                         </div>
                         <select
                           value={overlayConfig.rotation}
@@ -770,10 +771,10 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                           id="select-overlay-rotation"
                           className="w-full text-xs py-1 px-2 pb-1.5 bg-white dark:bg-slate-800 border rounded-xl font-mono"
                         >
-                          <option value="0">0° (None)</option>
-                          <option value="90">90° CW</option>
-                          <option value="180">180° Flat</option>
-                          <option value="270">270° CCW</option>
+                          <option value="0">{tr("0° (None)")}</option>
+                          <option value="90">{tr("90° CW")}</option>
+                          <option value="180">{tr("180° Flat")}</option>
+                          <option value="270">{tr("270° CCW")}</option>
                         </select>
                       </div>
                     </div>
@@ -791,7 +792,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                 <div className="flex items-center gap-2">
                   <Maximize className="w-4 h-4 text-violet-606" />
                   <span className="text-xs font-bold font-mono text-slate-400 uppercase select-none">
-                    Preview Layers Assembly (Standard Plate Page {previewPageIndex + 1} of {primaryFile.pageCount})
+                    {tr("Preview Layers Assembly (Standard Plate Page")} {previewPageIndex + 1} {tr("of")} {primaryFile.pageCount})
                   </span>
                 </div>
 
@@ -803,7 +804,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       disabled={previewPageIndex === 0}
                       id="btn-overlay-prev-page"
                       className="p-1 text-slate-505 hover:text-slate-805 bg-slate-100 disabled:opacity-30 rounded-lg cursor-pointer"
-                      title="See previous page stamp"
+                      title={tr("See previous page stamp")}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -815,7 +816,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       disabled={previewPageIndex === primaryFile.pageCount - 1}
                       id="btn-overlay-next-page"
                       className="p-1 text-slate-505 hover:text-slate-805 bg-slate-100 disabled:opacity-30 rounded-lg cursor-pointer"
-                      title="See next page stamp"
+                      title={tr("See next page stamp")}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -838,7 +839,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   {primaryFile.previews[previewPageIndex] ? (
                     <img
                       src={primaryFile.previews[previewPageIndex]}
-                      alt="Primary document slide"
+                      alt={tr("Primary document slide")}
                       className="w-full h-full object-cover pointer-events-none select-none absolute top-0 left-0"
                       referrerPolicy="no-referrer"
                     />
@@ -863,7 +864,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                       {overlayImageSrc ? (
                         <img 
                           src={overlayImageSrc} 
-                          alt="Layout watermark stamp preview" 
+                          alt={tr("Layout watermark stamp preview")} 
                           className="w-full h-full object-contain"
                           referrerPolicy="no-referrer"
                         />
@@ -878,9 +879,9 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
                   {/* Banner helper indicating overlay status */}
                   <div className="absolute top-2 left-2 z-10 px-2.5 py-1 bg-slate-900/80 text-white rounded text-[9px] font-bold font-mono">
                     {isAppliedOnCurrentPage ? (
-                      <span className="text-emerald-400">● OVERLAY ARMED</span>
+                      <span className="text-emerald-400">{tr("● OVERLAY ARMED")}</span>
                     ) : (
-                      <span className="text-slate-400">● LAYER PASSTHROUGH</span>
+                      <span className="text-slate-400">{tr("● LAYER PASSTHROUGH")}</span>
                     )}
                   </div>
 
@@ -892,13 +893,12 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
               <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 rounded-xl flex items-start gap-3">
                 <HelpCircle className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-500 dark:text-slate-450 leading-relaxed">
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">Target Range layout guide:</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{tr("Target Range layout guide:")}</p>
                   <p>
-                    Layers will draw on: {overlayConfig.targetPages === 'all' ? 'Every page of the base PDF' : 
-                    overlayConfig.targetPages === 'first' ? 'First page only' : 
-                    overlayConfig.targetPages === 'last' ? 'Last page only' : 
-                    `Selected page indicies: "${overlayConfig.customRangeString}"`}. 
-                    Adjust position presets or use point coordinates to place stamps exactly without shifting margins.
+                    {tr("Layers will draw on:")} {overlayConfig.targetPages === 'all' ? tr("Every page of the base PDF") : 
+                    overlayConfig.targetPages === 'first' ? tr("First page only") : 
+                    overlayConfig.targetPages === 'last' ? tr("Last page only") : 
+                    tr("Selected page indicies: \"{0}\"", overlayConfig.customRangeString)}{tr(". Adjust position presets or use point coordinates to place stamps exactly without shifting margins.")}
                   </p>
                 </div>
               </div>
@@ -916,7 +916,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
               id="btn-overlay-clear-workspace"
               className="text-xs font-bold text-rose-505 hover:text-rose-600 cursor-pointer transition-colors"
             >
-              Clear Workspace
+              {tr("Clear Workspace")}
             </button>
 
             <button
@@ -926,7 +926,7 @@ export default function OverlayTool({ onBack }: OverlayToolProps) {
               className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:bg-violet-500/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-              Apply Layers & Merge PDF
+              {tr("Apply Layers & Merge PDF")}
             </button>
           </div>
         )}

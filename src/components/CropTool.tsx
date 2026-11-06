@@ -23,6 +23,7 @@ import '../lib/pdfjs';
 import { PDFDocument } from 'pdf-lib';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface CropToolProps {
   onBack: () => void;
 }
@@ -50,7 +51,7 @@ export default function CropTool({ onBack }: CropToolProps) {
 
   const handleFileDrop = async (selectedFile: File) => {
     setLoading(true);
-    setStatusText('Analyzing document for visual cropping...');
+    setStatusText(tr("Analyzing document for visual cropping..."));
     setSuccess(false);
 
     try {
@@ -69,7 +70,7 @@ export default function CropTool({ onBack }: CropToolProps) {
       setPreviewPage(1);
     } catch (err) {
       console.error(err);
-      alert('Could not parse PDF. Ensure files are non-protected Standard PDFs.');
+      alert(tr("Could not parse PDF. Ensure files are non-protected Standard PDFs."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -190,7 +191,7 @@ export default function CropTool({ onBack }: CropToolProps) {
   const handleCropCompile = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText('Applying precision crop factors...');
+    setStatusText(tr("Applying precision crop factors..."));
     
     try {
       const pdfDoc = await PDFDocument.load(new Uint8Array(file.arrayBuffer), { ignoreEncryption: true });
@@ -259,7 +260,7 @@ export default function CropTool({ onBack }: CropToolProps) {
         pagesToFlatten.add(i);
       }
 
-      setStatusText('Rasterizing to flatten trimmed boundaries permanently...');
+      setStatusText(tr("Rasterizing to flatten trimmed boundaries permanently..."));
       const intermediateBytes = await pdfDoc.save();
 
       let finalSavedBytes = intermediateBytes;
@@ -305,14 +306,14 @@ export default function CropTool({ onBack }: CropToolProps) {
         finalSavedBytes = await finalPdfDoc.save();
       }
 
-      setStatusText('Saving trimmed PDF document...');
+      setStatusText(tr("Saving trimmed PDF document..."));
       const newName = file.name.replace('.pdf', '') + '_cropped.pdf';
 
       downloadFile(finalSavedBytes, newName, 'application/pdf');
       setSuccess(true);
     } catch (err: any) {
       console.error(err);
-      alert(`Could not apply crop coordinates onto document streams: ${err.message || 'Unknown error'}`);
+      alert(tr("Could not apply crop coordinates onto document streams: {0}", err.message || 'Unknown error'));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -334,6 +335,8 @@ export default function CropTool({ onBack }: CropToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-crop-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -341,10 +344,10 @@ export default function CropTool({ onBack }: CropToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <Crop className="w-6 h-6 text-emerald-500" /> Page Cropper & Margin Trim
+              <Crop className="w-6 h-6 text-emerald-500" /> {tr("Page Cropper & Margin Trim")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Eliminate extensive margins, cut out signature margins, or crop specific segments from single or multiple pages visually.
+              {tr("Eliminate extensive margins, cut out signature margins, or crop specific segments from single or multiple pages visually.")}
             </p>
           </div>
         </div>
@@ -358,7 +361,7 @@ export default function CropTool({ onBack }: CropToolProps) {
             id="btn-crop-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 id-heavy font-extrabold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Change Document
+            {tr("Change Document")}
           </button>
         )}
       </div>
@@ -367,8 +370,8 @@ export default function CropTool({ onBack }: CropToolProps) {
         <Dropzone
           onFilesSelected={(files) => handleFileDrop(files[0])}
           multiple={false}
-          title="Drop PDF to crop margins"
-          description="Interactively select and modify page dimensions in-house. Your documents are NEVER processed or saved outside."
+          title={tr("Drop PDF to crop margins")}
+          description={tr("Interactively select and modify page dimensions in-house. Your documents are NEVER processed or saved outside.")}
         />
       ) : (
         /* Visual workspace block */
@@ -378,14 +381,14 @@ export default function CropTool({ onBack }: CropToolProps) {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-5 shadow-xs">
               <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-550 flex items-center gap-1.5">
-                <Settings className="w-4 h-4 text-emerald-500" /> Bounding Selection
+                <Settings className="w-4 h-4 text-emerald-500" /> {tr("Bounding Selection")}
               </h3>
 
               <div className="space-y-4">
                 {/* Crop sliders */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-455">
-                    <span>Trim Top Margin</span>
+                    <span>{tr("Trim Top Margin")}</span>
                     <span className="font-mono text-emerald-500">{cropTop}%</span>
                   </div>
                   <input
@@ -401,7 +404,7 @@ export default function CropTool({ onBack }: CropToolProps) {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-455">
-                    <span>Trim Bottom Margin</span>
+                    <span>{tr("Trim Bottom Margin")}</span>
                     <span className="font-mono text-emerald-500">{cropBottom}%</span>
                   </div>
                   <input
@@ -417,7 +420,7 @@ export default function CropTool({ onBack }: CropToolProps) {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-455">
-                    <span>Trim Left Margin</span>
+                    <span>{tr("Trim Left Margin")}</span>
                     <span className="font-mono text-emerald-500">{cropLeft}%</span>
                   </div>
                   <input
@@ -433,7 +436,7 @@ export default function CropTool({ onBack }: CropToolProps) {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-455">
-                    <span>Trim Right Margin</span>
+                    <span>{tr("Trim Right Margin")}</span>
                     <span className="font-mono text-emerald-500">{cropRight}%</span>
                   </div>
                   <input
@@ -450,7 +453,7 @@ export default function CropTool({ onBack }: CropToolProps) {
 
               {/* Set multi-page scopes */}
               <div className="border-t border-slate-100 dark:border-slate-850 pt-4 space-y-3">
-                <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">Range Action Scope</h4>
+                <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">{tr("Range Action Scope")}</h4>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -461,7 +464,7 @@ export default function CropTool({ onBack }: CropToolProps) {
                         : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 text-slate-500 dark:text-slate-400'
                     }`}
                   >
-                    All Pages ({file.pageCount})
+                    {tr("All Pages (")}{file.pageCount})
                   </button>
                   <button
                     type="button"
@@ -472,7 +475,7 @@ export default function CropTool({ onBack }: CropToolProps) {
                         : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 text-slate-500 dark:text-slate-400'
                     }`}
                   >
-                    Only Page {previewPage}
+                    {tr("Only Page")} {previewPage}
                   </button>
                 </div>
               </div>
@@ -481,19 +484,19 @@ export default function CropTool({ onBack }: CropToolProps) {
             {/* Run crop action panel */}
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-850 text-white space-y-4 shadow-sm">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 flex justify-between">
-                <span>Active Target</span>
-                <span className="text-emerald-400">Cropped Output</span>
+                <span>{tr("Active Target")}</span>
+                <span className="text-emerald-400">{tr("Cropped Output")}</span>
               </div>
               
               <div>
                 <span className="block text-xs font-bold text-slate-200 truncate">{file.name}</span>
-                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} Pages • {formatFileSize(file.size)}</span>
+                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} {tr("Pages •")} {formatFileSize(file.size)}</span>
               </div>
 
               {success ? (
                 <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-xl flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span className="font-bold">Cropped PDF saved successfully!</span>
+                  <span className="font-bold">{tr("Cropped PDF saved successfully!")}</span>
                 </div>
               ) : (
                 <button
@@ -501,7 +504,7 @@ export default function CropTool({ onBack }: CropToolProps) {
                   id="btn-crop-compile"
                   className="w-full text-center py-3 bg-emerald-600 hover:bg-emerald-500 font-extrabold text-xs  rounded-xl transition-all flex items-center justify-center gap-2 text-white cursor-pointer hover:shadow-md active:scale-98 uppercase font-mono tracking-widest"
                 >
-                  <Scissors className="w-4 h-4" /> Trim & Download PDF
+                  <Scissors className="w-4 h-4" /> {tr("Trim & Download PDF")}
                 </button>
               )}
             </div>
@@ -511,7 +514,7 @@ export default function CropTool({ onBack }: CropToolProps) {
           <div className="lg:col-span-3 space-y-6">
             <div className="p-6 bg-slate-100 dark:bg-slate-950 rounded-3xl border border-slate-150 dark:border-slate-900 flex flex-col items-center justify-center overflow-auto min-h-[480px] shadow-inner relative">
               <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 px-2.5 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold shadow-xs">
-                <Eye className="w-3.5 h-3.5 text-emerald-500 animate-pulse" /> Cropping Bounds Match • Page {previewPage} of {file.pageCount}
+                <Eye className="w-3.5 h-3.5 text-emerald-500 animate-pulse" /> {tr("Cropping Bounds Match • Page")} {previewPage} {tr("of")} {file.pageCount}
               </div>
 
               <div 
@@ -550,26 +553,26 @@ export default function CropTool({ onBack }: CropToolProps) {
                   disabled={previewPage === 1}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous Page
+                  {tr("Previous Page")}
                 </button>
-                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">Page {previewPage} of {file.pageCount}</span>
+                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">{tr("Page")} {previewPage} {tr("of")} {file.pageCount}</span>
                 <button
                   type="button"
                   onClick={() => setPreviewPage(prev => Math.min(file.pageCount, prev + 1))}
                   disabled={previewPage === file.pageCount}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Next Page
+                  {tr("Next Page")}
                 </button>
               </div>
             </div>
 
-            <div className="bg-emerald-500/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/10 rounded-2xl p-4 flex gap-3 text-xs text-left leading-relaxed">
+            <div className="bg-emerald-500/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/10 rounded-2xl p-4 flex gap-3 text-xs text-start leading-relaxed">
               <Scissors className="w-5 h-5 shrink-0 text-emerald-500" />
               <div>
-                <span className="font-extrabold text-slate-700 dark:text-slate-200">How Native PDF Cropping works:</span>
+                <span className="font-extrabold text-slate-700 dark:text-slate-200">{tr("How Native PDF Cropping works:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  Instead of converting pages to flat rasterized images, this tool adjusts the internal `/CropBox` and `/MediaBox` bounding metadata fields of the document directly. This keeps your document's text layers hyper-sharp, clickable, searchable, and fully vector-retained, but hidden outside the new bounds.
+                  {tr("Instead of converting pages to flat rasterized images, this tool adjusts the internal `/CropBox` and `/MediaBox` bounding metadata fields of the document directly. This keeps your document's text layers hyper-sharp, clickable, searchable, and fully vector-retained, but hidden outside the new bounds.")}
                 </p>
               </div>
             </div>
@@ -583,7 +586,7 @@ export default function CropTool({ onBack }: CropToolProps) {
             <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Adjusting page viewports...</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("Adjusting page viewports...")}</p>
             </div>
           </div>
         </div>

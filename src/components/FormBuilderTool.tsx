@@ -28,6 +28,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import '../lib/pdfjs';
 import { PDFDocument } from 'pdf-lib';
 
+import { tr } from '../i18n';
 interface FormBuilderToolProps {
   onBack: () => void;
 }
@@ -62,7 +63,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
 
   const handleFileDrop = async (selectedFile: File) => {
     setLoading(true);
-    setStatusText('Reading template for interactive field placements...');
+    setStatusText(tr("Reading template for interactive field placements..."));
     setSuccess(false);
 
     try {
@@ -83,7 +84,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
       setSelectedFieldId(null);
     } catch (err) {
       console.error(err);
-      alert('Could not parse PDF. Ensure files are non-protected Standard PDFs.');
+      alert(tr("Could not parse PDF. Ensure files are non-protected Standard PDFs."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -194,7 +195,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
   const handleCompileForm = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText('Compiling interactive form components...');
+    setStatusText(tr("Compiling interactive form components..."));
 
     try {
       const pdfDoc = await PDFDocument.load(file.arrayBuffer, { ignoreEncryption: true });
@@ -238,7 +239,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
         }
       });
 
-      setStatusText('Generating final PDF bytes...');
+      setStatusText(tr("Generating final PDF bytes..."));
       const savedBytes = await pdfDoc.save();
       const newName = file.name.replace('.pdf', '') + '_fillable.pdf';
 
@@ -246,7 +247,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Could not compile standard interactive field nodes.');
+      alert(tr("Could not compile standard interactive field nodes."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -268,6 +269,8 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-formb-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -275,10 +278,10 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <FileText className="w-6 h-6 text-emerald-500" /> Interactive Form Builder
+              <FileText className="w-6 h-6 text-emerald-500" /> {tr("Interactive Form Builder")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Convert plain, scanned PDF layouts into interactive, fillable documents with authentic input fields and checkboxes.
+              {tr("Convert plain, scanned PDF layouts into interactive, fillable documents with authentic input fields and checkboxes.")}
             </p>
           </div>
         </div>
@@ -294,7 +297,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             id="btn-formb-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 font-extrabold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Reset Template
+            {tr("Reset Template")}
           </button>
         )}
       </div>
@@ -303,10 +306,8 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
         <Dropzone
           onFilesSelected={(files) => handleFileDrop(files[0])}
           multiple={false}
-          title="Drop PDF to place form fields"
-          description="
-            Draft text inserts, user agreements, checkboxes, and interactive actions into document frames natively and securely.
-          "
+          title={tr("Drop PDF to place form fields")}
+          description={tr("Draft text inserts, user agreements, checkboxes, and interactive actions into document frames natively and securely.")}
         />
       ) : (
         /* Workspace panels */
@@ -317,30 +318,30 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             
             {/* Widget tools insertion box */}
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-4 shadow-sm">
-              <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">Insert Elements</h3>
+              <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{tr("Insert Elements")}</h3>
               
               <div className="grid grid-cols-1 gap-2.5">
                 <button
                   type="button"
                   onClick={() => handleAddField('text')}
-                  className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-emerald-500/10 hover:border-emerald-500/30 text-slate-700 dark:text-slate-200 text-xs font-bold text-left justify-start cursor-pointer transition-all"
+                  className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-emerald-500/10 hover:border-emerald-500/30 text-slate-700 dark:text-slate-200 text-xs font-bold text-start justify-start cursor-pointer transition-all"
                 >
                   <AlignLeft className="w-4 h-4 text-emerald-500" />
                   <div>
-                    <p className="font-semibold">Text Input Field</p>
-                    <p className="text-[9px] text-slate-400 font-medium">Allows text insertions</p>
+                    <p className="font-semibold">{tr("Text Input Field")}</p>
+                    <p className="text-[9px] text-slate-400 font-medium">{tr("Allows text insertions")}</p>
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleAddField('checkbox')}
-                  className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-emerald-500/10 hover:border-emerald-500/30 text-slate-700 dark:text-slate-200 text-xs font-bold text-left justify-start cursor-pointer transition-all"
+                  className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-emerald-500/10 hover:border-emerald-500/30 text-slate-700 dark:text-slate-200 text-xs font-bold text-start justify-start cursor-pointer transition-all"
                 >
                   <CheckSquare className="w-4 h-4 text-emerald-500" />
                   <div>
-                    <p className="font-semibold">Interactive Checkbox</p>
-                    <p className="text-[9px] text-slate-400 font-medium">Toggles check state mark</p>
+                    <p className="font-semibold">{tr("Interactive Checkbox")}</p>
+                    <p className="text-[9px] text-slate-400 font-medium">{tr("Toggles check state mark")}</p>
                   </div>
                 </button>
               </div>
@@ -350,18 +351,18 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             {currentSelectedField && (
               <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">Edit Selected</h3>
+                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{tr("Edit Selected")}</h3>
                   <button
                     onClick={() => handleDeleteField(currentSelectedField.id)}
                     className="p-1 px-1.5 rounded-md hover:bg-rose-50 text-rose-500 dark:hover:bg-rose-950/20 text-xs flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    <Trash2 className="w-3.5 h-3.5" /> delete
+                    <Trash2 className="w-3.5 h-3.5" /> {tr("delete")}
                   </button>
                 </div>
 
                 <div className="space-y-3.5 pt-2">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Field identifier (Name)</label>
+                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Field identifier (Name)")}</label>
                     <input
                       type="text"
                       value={currentSelectedField.name}
@@ -372,7 +373,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
 
                   {currentSelectedField.type === 'text' && (
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Initial Placeholder</label>
+                      <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Initial Placeholder")}</label>
                       <input
                         type="text"
                         value={currentSelectedField.placeholder}
@@ -385,7 +386,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
                   {/* Positioning ranges */}
                   <div className="space-y-1 pt-1.5">
                     <div className="flex justify-between text-[10px] font-bold text-slate-400 font-mono uppercase">
-                      <span>Horizontal X Position</span>
+                      <span>{tr("Horizontal X Position")}</span>
                       <span>{currentSelectedField.xPct}%</span>
                     </div>
                     <input
@@ -400,7 +401,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px] font-bold text-slate-400 font-mono uppercase">
-                      <span>Vertical Y Position</span>
+                      <span>{tr("Vertical Y Position")}</span>
                       <span>{currentSelectedField.yPct}%</span>
                     </div>
                     <input
@@ -415,7 +416,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px] font-bold text-slate-400 font-mono uppercase">
-                      <span>Field Width size</span>
+                      <span>{tr("Field Width size")}</span>
                       <span>{currentSelectedField.widthPct}%</span>
                     </div>
                     <input
@@ -430,7 +431,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px] font-bold text-slate-400 font-mono uppercase">
-                      <span>Field Height size</span>
+                      <span>{tr("Field Height size")}</span>
                       <span>{currentSelectedField.heightPct}%</span>
                     </div>
                     <input
@@ -449,8 +450,8 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             {/* List of currently created elements */}
             {formFields.length > 0 && (
               <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-3.5 shadow-sm">
-                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-550">Form Fields ({formFields.length})</h3>
-                <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-550">{tr("Form Fields (")}{formFields.length})</h3>
+                <div className="max-h-56 overflow-y-auto space-y-1.5 pe-1">
                   {formFields.map((field) => (
                     <button
                       key={field.id}
@@ -463,7 +464,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
                       }`}
                     >
                       <span className="truncate max-w-[120px]">{field.name}</span>
-                      <span className="text-[9px] font-mono opacity-60">Pg {field.page} • {field.type}</span>
+                      <span className="text-[9px] font-mono opacity-60">{tr("Pg")} {field.page} • {field.type}</span>
                     </button>
                   ))}
                 </div>
@@ -473,19 +474,19 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             {/* Save compiler action node */}
             <div className="bg-slate-900 text-white p-5 rounded-2xl border border-slate-850 space-y-3.5 shadow-sm">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 flex justify-between">
-                <span>Compiler</span>
-                <span className="text-emerald-400">PDF-Form Engine</span>
+                <span>{tr("Compiler")}</span>
+                <span className="text-emerald-400">{tr("PDF-Form Engine")}</span>
               </div>
               
               <div>
                 <span className="block text-xs font-bold truncate">{file.name}</span>
-                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} Pages • {formFields.length} Form Fields</span>
+                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} {tr("Pages •")} {formFields.length} {tr("Form Fields")}</span>
               </div>
 
               {success ? (
                 <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-xl flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span className="font-bold">Form elements integrated!</span>
+                  <span className="font-bold">{tr("Form elements integrated!")}</span>
                 </div>
               ) : (
                 <button
@@ -493,7 +494,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
                   id="btn-formb-compile"
                   className="w-full text-center py-3 bg-emerald-600 hover:bg-emerald-500 font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-2 text-white cursor-pointer uppercase font-mono tracking-wider shadow-sm hover:shadow-md"
                 >
-                  <Download className="w-4 h-4" /> Save interactive PDF
+                  <Download className="w-4 h-4" /> {tr("Save interactive PDF")}
                 </button>
               )}
             </div>
@@ -505,13 +506,13 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             <div className="p-6 bg-slate-100 dark:bg-slate-950 rounded-3xl border border-slate-150 dark:border-slate-900 flex flex-col items-center justify-center overflow-auto min-h-[480px] shadow-inner relative">
               
               <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 px-2.5 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold shadow-xs">
-                <Eye className="w-3.5 h-3.5 text-emerald-500" /> Form Blueprint Mode • Page {previewPage} of {file.pageCount}
+                <Eye className="w-3.5 h-3.5 text-emerald-500" /> {tr("Form Blueprint Mode • Page")} {previewPage} {tr("of")} {file.pageCount}
               </div>
 
               {/* Central sandbox layout warning tips if no fields are yet placed */}
               {formFields.length === 0 && (
                 <div className="absolute top-16 max-w-sm text-center p-3.5 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 text-xs border border-emerald-500/10 rounded-xl">
-                  📄 Click <span className="font-extrabold">Text Input</span> or <span className="font-extrabold">Checkbox</span> in the left sidebar to start placing interactive nodes on this page.
+                  {tr("📄 Click")} <span className="font-extrabold">{tr("Text Input")}</span> {tr("or")} <span className="font-extrabold">{tr("Checkbox")}</span> {tr("in the left sidebar to start placing interactive nodes on this page.")}
                 </div>
               )}
 
@@ -550,16 +551,16 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
                   disabled={previewPage === 1}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous page
+                  {tr("Previous page")}
                 </button>
-                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">Page {previewPage} of {file.pageCount}</span>
+                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">{tr("Page")} {previewPage} {tr("of")} {file.pageCount}</span>
                 <button
                   type="button"
                   onClick={() => setPreviewPage(prev => Math.min(file.pageCount, prev + 1))}
                   disabled={previewPage === file.pageCount}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Next page
+                  {tr("Next page")}
                 </button>
               </div>
             </div>
@@ -567,9 +568,9 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-left">
               <Sparkles className="w-5 h-5 shrink-0 text-emerald-500" />
               <div>
-                <span className="font-extrabold text-slate-700 dark:text-slate-200">Standard interactive Acrobat integration:</span>
+                <span className="font-extrabold text-slate-700 dark:text-slate-200">{tr("Standard interactive Acrobat integration:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  Unlike simple overlay annotations, this tool uses Adobe-compliant `/InteractiveForm` descriptors. This creates true responsive vector fields natively within the document stream so that any person opening this document on Adobe Reader, Mac Preview, Chrome, or Android can easily click, fill, and submit form responses!
+                  {tr("Unlike simple overlay annotations, this tool uses Adobe-compliant `/InteractiveForm` descriptors. This creates true responsive vector fields natively within the document stream so that any person opening this document on Adobe Reader, Mac Preview, Chrome, or Android can easily click, fill, and submit form responses!")}
                 </p>
               </div>
             </div>
@@ -583,7 +584,7 @@ export default function FormBuilderTool({ onBack }: FormBuilderToolProps) {
             <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Interfacing PDF structure...</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("Interfacing PDF structure...")}</p>
             </div>
           </div>
         </div>

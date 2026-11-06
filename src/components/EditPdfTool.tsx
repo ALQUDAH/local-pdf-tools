@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
+import { tr } from '../i18n';
 import '../lib/pdfjs';
 
 
@@ -87,7 +88,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
         setPagesCount(pdfDoc.numPages);
       } catch (err: any) {
         console.error(err);
-        setError('Failed to extract PDF coordinates. Please verify file is not corrupted.');
+        setError(tr("Failed to extract PDF coordinates. Please verify file is not corrupted."));
         setFile(null);
       } finally {
         setLoading(false);
@@ -269,7 +270,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
       document.body.removeChild(a);
     } catch (err: any) {
       console.error(err);
-      setError('An error occurred during coordinate flattening.');
+      setError(tr("An error occurred during coordinate flattening."));
     } finally {
       setExporting(false);
     }
@@ -284,10 +285,10 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
           className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back to Dashboard</span>
+          <span>{tr("Back to Dashboard")}</span>
         </button>
         <span className="text-xs text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full font-semibold">
-          100% Client-Side Private Sandboxed Editor
+          {tr("100% Client-Side Private Sandboxed Editor")}
         </span>
       </div>
 
@@ -298,15 +299,15 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
             <Type className="w-8 h-8 text-indigo-600" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 mb-2">
-            Advanced PDF Annotation Editor
+            {tr("Advanced PDF Annotation Editor")}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto mb-8 leading-relaxed">
-            Upload document containing layouts to insert custom text blocks or draw colored opaque highlight covers onto target coordinates.
+            {tr("Upload document containing layouts to insert custom text blocks or draw colored opaque highlight covers onto target coordinates.")}
           </p>
 
           <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 cursor-pointer hover:bg-slate-50 transition">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Select PDF document
+              {tr("Select PDF document")}
             </span>
             <input
               type="file"
@@ -323,7 +324,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
           <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 rounded-3xl space-y-6">
             <div>
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-                Annotation Tools
+                {tr("Annotation Tools")}
               </h3>
               <div className="space-y-2">
                 <button
@@ -338,7 +339,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                   }`}
                 >
                   <Type className="w-4 h-4" />
-                  <span>Insert Text Block</span>
+                  <span>{tr("Insert Text Block")}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -352,7 +353,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                   }`}
                 >
                   <Square className="w-4 h-4" />
-                  <span>Highlight Cover Rectangle</span>
+                  <span>{tr("Highlight Cover Rectangle")}</span>
                 </button>
               </div>
             </div>
@@ -362,10 +363,10 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
               {activeSubTool === 'text' ? (
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Text Options
+                    {tr("Text Options")}
                   </h4>
                   <div>
-                    <label className="text-xs text-slate-500 font-medium block mb-1">Color</label>
+                    <label className="text-xs text-slate-500 font-medium block mb-1">{tr("Color")}</label>
                     <input
                       type="color"
                       value={textColor}
@@ -374,7 +375,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-slate-400 block mb-1">Font Size: {textSize}px</label>
+                    <label className="text-xs text-slate-400 block mb-1">{tr("Font Size:")} {textSize}{tr("px")}</label>
                     <input
                       type="range"
                       min="10"
@@ -388,10 +389,10 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
               ) : (
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Shape Options
+                    {tr("Shape Options")}
                   </h4>
                   <div>
-                    <label className="text-xs text-slate-500 block mb-1">Color</label>
+                    <label className="text-xs text-slate-500 block mb-1">{tr("Color")}</label>
                     <input
                       type="color"
                       value={shapeCol}
@@ -400,7 +401,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-slate-400 block mb-1">Opacity: {Math.round(shapeOp * 100)}%</label>
+                    <label className="text-xs text-slate-400 block mb-1">{tr("Opacity:")} {Math.round(shapeOp * 100)}%</label>
                     <input
                       type="range"
                       min="10"
@@ -418,7 +419,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
             {/* Instruction Help */}
             <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-400 flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-              <span>Click anywhere inside the document preview page coordinates to paint chosen overlay blocks. Double-click text blocks in the workspace to edit original contents.</span>
+              <span>{tr("Click anywhere inside the document preview page coordinates to paint chosen overlay blocks. Double-click text blocks in the workspace to edit original contents.")}</span>
             </div>
 
             {/* Actions bar */}
@@ -429,7 +430,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 border border-rose-200 dark:border-rose-900 rounded-xl text-sm font-semibold hover:bg-rose-100 transition"
                 >
                   <Trash2 className="w-4 h-4" />
-                  <span>Delete Selected Annotation</span>
+                  <span>{tr("Delete Selected Annotation")}</span>
                 </button>
               )}
 
@@ -441,12 +442,12 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                 {exporting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Flattening layers...</span>
+                    <span>{tr("Flattening layers...")}</span>
                   </>
                 ) : (
                   <>
                     <FileDown className="w-4 h-4" />
-                    <span>Flatten & Download</span>
+                    <span>{tr("Flatten & Download")}</span>
                   </>
                 )}
               </button>
@@ -459,7 +460,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
             {/* Pages selector bar */}
             <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl shadow-xs">
               <span className="text-xs text-slate-500 font-semibold truncate max-w-sm">
-                File: {file.name}
+                {tr("File:")} {file.name}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -471,10 +472,10 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                   }}
                   className="p-1 px-3 bg-slate-50 rounded-xl text-xs hover:bg-slate-100 border border-slate-200 dark:border-slate-800 disabled:opacity-40 cursor-pointer"
                 >
-                  Prev Page
+                  {tr("Prev Page")}
                 </button>
                 <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                  Page {currentPage} of {pagesCount}
+                  {tr("Page")} {currentPage} {tr("of")} {pagesCount}
                 </span>
                 <button
                   disabled={currentPage >= pagesCount}
@@ -485,7 +486,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
                   }}
                   className="p-1 px-3 bg-slate-50 rounded-xl text-xs hover:bg-slate-100 border border-slate-200 dark:border-slate-800 disabled:opacity-40 cursor-pointer"
                 >
-                  Next Page
+                  {tr("Next Page")}
                 </button>
               </div>
             </div>

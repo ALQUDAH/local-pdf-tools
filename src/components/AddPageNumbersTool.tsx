@@ -9,6 +9,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, addPageNumbersToPdf, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface AddPageNumbersToolProps {
   onBack: () => void;
 }
@@ -54,7 +55,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
       });
     } catch (err) {
       console.error(err);
-      alert('Error parsing PDF content attributes.');
+      alert(tr("Error parsing PDF content attributes."));
     } finally {
       setLoading(false);
     }
@@ -82,7 +83,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to stamp page numbering schema to PDF.');
+      alert(tr("Failed to stamp page numbering schema to PDF."));
     } finally {
       setLoading(false);
     }
@@ -102,18 +103,18 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
           id="btn-pagenum-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-105 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-          Local Page Numbering
+          {tr("Local Page Numbering")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Add PDF Page Numbers</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Add PDF Page Numbers")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Configure placement grids, running layout formulas, font scaling, and title-page skipping parameters.
+            {tr("Configure placement grids, running layout formulas, font scaling, and title-page skipping parameters.")}
           </p>
         </div>
 
@@ -124,8 +125,8 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
               id="pagenum-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to number pages"
-              description="Upload a document to stamp page numbering indexes dynamically."
+              title={tr("Upload PDF to number pages")}
+              description={tr("Upload a document to stamp page numbering indexes dynamically.")}
             />
           </div>
         )}
@@ -133,7 +134,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
         {loading && (
           <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300 mb-6">
             <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
-            <span>Reading sheets & compiling virtual numbers...</span>
+            <span>{tr("Reading sheets & compiling virtual numbers...")}</span>
           </div>
         )}
 
@@ -142,7 +143,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Numbered!</span> Your formatted document has been saved and downloaded.
+                <span className="font-semibold">{tr("Successfully Numbered!")}</span> {tr("Your formatted document has been saved and downloaded.")}
               </span>
             </div>
             <button
@@ -150,7 +151,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
               id="btn-pagenum-reset"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -162,7 +163,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                 <FileCode className="w-3.5 h-3.5" />
-                <span>Selected Document</span>
+                <span>{tr("Selected Document")}</span>
               </div>
 
               <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-xl space-y-4">
@@ -170,7 +171,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                   {file.previews.length > 0 ? (
                     <img
                       src={file.previews[0]}
-                      alt="Cover Screen"
+                      alt={tr("Cover Screen")}
                       referrerPolicy="no-referrer"
                       className="w-16 h-22 object-cover rounded-md shadow-md border border-slate-200 bg-white shrink-0"
                     />
@@ -183,7 +184,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                     <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{file.name}</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">{formatSize(file.size)}</p>
                     <span className="text-xs font-bold px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded inline-block text-slate-600 dark:text-slate-300 mt-2">
-                      {file.pageCount} Pages Loaded
+                      {file.pageCount} {tr("Pages Loaded")}
                     </span>
                   </div>
                 </div>
@@ -195,7 +196,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                     id="btn-pagenum-change-file"
                     className="text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
                   >
-                    Change File
+                    {tr("Change File")}
                   </button>
                 </div>
               </div>
@@ -203,7 +204,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
               {/* Layout Placement Matrix */}
               <div className="space-y-3">
                 <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                  Page Positioning Grid
+                  {tr("Page Positioning Grid")}
                 </span>
                 <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50 dark:bg-slate-955 rounded-xl border border-slate-100 dark:border-slate-800 max-w-sm">
                   {(['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'] as NumberPosition[]).map((pos) => (
@@ -229,14 +230,14 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                 <Settings2 className="w-3.5 h-3.5" />
-                <span>Style & Content Options</span>
+                <span>{tr("Style & Content Options")}</span>
               </div>
 
               <div className="space-y-4">
                 {/* Format selection */}
                 <div className="space-y-2">
                   <label htmlFor="pagenum-format-field" className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                    Running Text Formula
+                    {tr("Running Text Formula")}
                   </label>
                   <select
                     id="pagenum-format-field"
@@ -244,11 +245,11 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                     onChange={(e) => setFormat(e.target.value)}
                     className="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 text-slate-800 dark:text-slate-100 font-medium"
                   >
-                    <option value="Page {n} of {total}">Page X of Y (Page {1} of {file.pageCount})</option>
-                    <option value="Page {n}">Page X (Page {1})</option>
-                    <option value="{n}">Just Number Index ({1})</option>
+                    <option value="Page {n} of {total}">{tr("Page X of Y (Page")} {1} {tr("of")} {file.pageCount})</option>
+                    <option value="Page {n}">{tr("Page X (Page")} {1})</option>
+                    <option value="{n}">{tr("Just Number Index (")}{1})</option>
                     <option value="- {n} -">- X - (- {1} -)</option>
-                    <option value="Page {n} / {total}">Page X / Y (Page {1} / {file.pageCount})</option>
+                    <option value="Page {n} / {total}">{tr("Page X / Y (Page")} {1} / {file.pageCount})</option>
                   </select>
                 </div>
 
@@ -256,7 +257,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="pagenum-fontSize-field" className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                      Font Size (pt)
+                      {tr("Font Size (pt)")}
                     </label>
                     <input
                       type="number"
@@ -270,7 +271,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="pagenum-color-field" className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                      Label Color
+                      {tr("Label Color")}
                     </label>
                     <div className="flex gap-2">
                       <input
@@ -303,10 +304,10 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                     />
                     <div>
                       <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">
-                        Skip Cover Page (Page 1)
+                        {tr("Skip Cover Page (Page 1)")}
                       </span>
                       <span className="block text-[10px] text-slate-400 mt-0.5">
-                        Do not stamp numbering elements on the first page of the document.
+                        {tr("Do not stamp numbering elements on the first page of the document.")}
                       </span>
                     </div>
                   </label>
@@ -320,7 +321,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
                   className="w-full mt-4 py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-violet-650/40 text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
-                  Add Page Numbers to PDF
+                  {tr("Add Page Numbers to PDF")}
                 </button>
               </div>
             </div>

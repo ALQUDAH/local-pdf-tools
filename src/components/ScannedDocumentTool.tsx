@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { imagesToPdf, downloadFile } from '../lib/pdfUtils';
 
+import { tr } from '../i18n';
 interface ScannedDocumentToolProps {
   onBack: () => void;
 }
@@ -405,7 +406,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
   const handleCompileScan = async () => {
     if (pages.length === 0) return;
     setLoading(true);
-    setStatusText('Compiling and saving digitized printable document...');
+    setStatusText(tr("Compiling and saving digitized printable document..."));
 
     try {
       const payload = pages.map((page, index) => {
@@ -428,7 +429,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
       setSuccess(true);
     } catch (err: any) {
       console.error(err);
-      alert('Error building high resolution scanned PDF compilation.');
+      alert(tr("Error building high resolution scanned PDF compilation."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -455,14 +456,14 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
           id="btn-scanner-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full font-semibold">
-            Cam-Enhance Engine
+            {tr("Cam-Enhance Engine")}
           </span>
           <span className="text-xs font-mono px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full font-semibold">
-            Auto-Crop & Filter
+            {tr("Auto-Crop & Filter")}
           </span>
         </div>
       </div>
@@ -472,9 +473,9 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
         {/* Title details */}
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Camera Document Scanner</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Camera Document Scanner")}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Capture physical forms, paper sheets, receipts, or notes. Filter out shadow gradients, auto-crop boundaries, and stitch into a single, compact PDF.
+              {tr("Capture physical forms, paper sheets, receipts, or notes. Filter out shadow gradients, auto-crop boundaries, and stitch into a single, compact PDF.")}
             </p>
           </div>
           {pages.length > 0 && (
@@ -483,7 +484,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               id="btn-reset-scanner-workspace"
               className="px-3.5 py-1.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Reset Digitizer
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Reset Digitizer")}
             </button>
           )}
         </div>
@@ -492,7 +493,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-teal-500/5 border border-teal-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-teal-605 animate-spin shrink-0" />
-            <span>{statusText || 'Calibrating digital page matrices...'}</span>
+            <span>{statusText || tr("Calibrating digital page matrices...")}</span>
           </div>
         )}
 
@@ -501,8 +502,8 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Document Digitization Finished!</span>{' '}
-                Your scanned document has been compiled, aligned, and saved as a vector PDF.
+                <span className="font-semibold">{tr("Document Digitization Finished!")}</span>{' '}
+                {tr("Your scanned document has been compiled, aligned, and saved as a vector PDF.")}
               </span>
             </div>
             <button
@@ -510,7 +511,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               id="btn-scan-success-reset"
               className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer font-sans"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start another scan
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start another scan")}
             </button>
           </div>
         )}
@@ -524,7 +525,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-xs font-mono text-slate-400 uppercase tracking-wide">
                   <Camera className="w-4 h-4 text-teal-600" />
-                  <span>Interactive Capture Station</span>
+                  <span>{tr("Interactive Capture Station")}</span>
                 </div>
 
                 {cameraDevices.length > 1 && (
@@ -532,11 +533,11 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     value={selectedDeviceId}
                     onChange={(e) => setSelectedDeviceId(e.target.value)}
                     id="select-scanner-camera-device"
-                    className="text-[10px] bg-white dark:bg-slate-900 border border-slate-205 py-1 px-2 pr-1 rounded-md outline-none text-slate-600 font-sans"
+                    className="text-[10px] bg-white dark:bg-slate-900 border border-slate-205 py-1 px-2 pe-1 rounded-md outline-none text-slate-600 font-sans"
                   >
                     {cameraDevices.map((device, idx) => (
                       <option key={device.deviceId} value={device.deviceId}>
-                        {device.label || `Cam ${idx + 1}`}
+                        {device.label || tr("Cam {0}", idx + 1)}
                       </option>
                     ))}
                   </select>
@@ -560,7 +561,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                   {/* Aesthetic grid scanner visual laser outline */}
                   <div className="absolute inset-0 border-2 border-dashed border-teal-500/40 m-6 flex flex-col justify-between pointer-events-none rounded-sm">
                     <p className="text-[10px] select-none text-center bg-teal-500/80 text-white font-mono uppercase px-1.5 py-0.5 rounded-sm self-center mt-2 tracking-wider">
-                      Center document page here
+                      {tr("Center document page here")}
                     </p>
                     <div className="h-0.5 w-full bg-teal-500/65 animate-pulse mb-8" />
                   </div>
@@ -568,7 +569,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                   {!cameraStream && !cameraError && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-405 gap-2.5 p-4 bg-slate-950/90 text-center">
                       <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
-                      <p className="text-xs font-semibold text-slate-300">Granting browser capture hook permissions...</p>
+                      <p className="text-xs font-semibold text-slate-300">{tr("Granting browser capture hook permissions...")}</p>
                     </div>
                   )}
 
@@ -582,7 +583,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                         id="btn-reconnect-webcam"
                         className="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                       >
-                        <RefreshCw className="w-3.5 h-3.5" /> Reconnect camera
+                        <RefreshCw className="w-3.5 h-3.5" /> {tr("Reconnect camera")}
                       </button>
                     </div>
                   )}
@@ -590,16 +591,16 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               ) : (
                 <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-900/60 rounded-xl flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200">
                   <CameraOff className="w-8 h-8 text-slate-400 mb-2" />
-                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Webcam stand-by sleep state</p>
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{tr("Webcam stand-by sleep state")}</p>
                   <p className="text-[10px] text-slate-400 mt-1 max-w-[200px]">
-                    To capture sheets using a physical scanner feed, boot on camera stream.
+                    {tr("To capture sheets using a physical scanner feed, boot on camera stream.")}
                   </p>
                   <button
                     onClick={toggleCamera}
                     id="btn-reactivate-feed"
                     className="mt-4 px-3.5 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
                   >
-                    Turn Camera On
+                    {tr("Turn Camera On")}
                   </button>
                 </div>
               )}
@@ -612,14 +613,14 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     id="btn-capture-scan-page"
                     className="flex-1 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer font-sans text-xs uppercase tracking-wider"
                   >
-                    <Plus className="w-4 h-4" /> Capture Page {pages.length + 1}
+                    <Plus className="w-4 h-4" /> {tr("Capture Page")} {pages.length + 1}
                   </button>
 
                   <button
                     onClick={toggleCamera}
                     id="btn-scanner-pause-cam"
                     className="p-3 bg-slate-150 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-750 dark:text-slate-300 rounded-xl cursor-pointer"
-                    title="Sleep webcam stream"
+                    title={tr("Sleep webcam stream")}
                   >
                     <CameraOff className="w-4.5 h-4.5" />
                   </button>
@@ -629,7 +630,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               {/* LOCAL FALLBACK FILE SELECTOR */}
               <div className="border-t border-slate-150 dark:border-slate-850 pt-3">
                 <div className="text-center text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-wide">
-                  — OR IMPORT DOCUMENT FROM DEVICE —
+                  {tr("— OR IMPORT DOCUMENT FROM DEVICE —")}
                 </div>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -637,7 +638,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                   className="w-full py-2 bg-white dark:bg-slate-900 border border-slate-300 hover:bg-slate-50 text-slate-705 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <FileText className="w-4 h-4 text-teal-600" />
-                  Pick local photo scans / JPG / PNG
+                  {tr("Pick local photo scans / JPG / PNG")}
                 </button>
                 <input
                   ref={fileInputRef}
@@ -657,14 +658,14 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               <div className="p-4 border border-slate-100 dark:border-slate-800 rounded-2xl bg-slate-55/40 space-y-3">
                 <div className="flex items-center justify-between select-none">
                   <span className="text-[11px] font-bold font-mono text-slate-450 uppercase tracking-widest">
-                    Scan stack ({pages.length} pages captured)
+                    {tr("Scan stack (")}{pages.length} {tr("pages captured)")}
                   </span>
                   <span className="text-[10px] text-teal-600 dark:text-teal-400 font-sans font-semibold">
-                    Click card to edit
+                    {tr("Click card to edit")}
                   </span>
                 </div>
 
-                <div className="space-y-2 max-h-[290px] overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-[290px] overflow-y-auto pe-1">
                   {pages.map((page, idx) => (
                     <div
                       key={page.id}
@@ -685,7 +686,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                       <div className="w-12 h-16 bg-slate-100 rounded-md border flex-shrink-0 relative overflow-hidden">
                         <img
                           src={page.processedDataUrl}
-                          alt="Thumbnail scanner page"
+                          alt={tr("Thumbnail scanner page")}
                           className="w-full h-full object-cover pointer-events-none"
                           referrerPolicy="no-referrer"
                         />
@@ -696,11 +697,11 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
 
                       {/* Metadata file text */}
                       <div className="flex-1 truncate">
-                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate pr-4">
-                          Image scan page_{idx + 1}
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate pe-4">
+                          {tr("Image scan page_")}{idx + 1}
                         </p>
                         <p className="text-[10px] text-slate-400 truncate uppercase tracking-widest font-mono font-bold mt-0.5">
-                          Filter: {page.filter}
+                          {tr("Filter:")} {page.filter}
                         </p>
                       </div>
 
@@ -737,7 +738,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                         }}
                         id={`btn-scanned-delete-page-${idx}`}
                         className="p-1.5 hover:bg-rose-50 hover:text-rose-605 rounded-xl absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 transition-all text-slate-400 cursor-pointer"
-                        title="Discard page from scanned plate"
+                        title={tr("Discard page from scanned plate")}
                       >
                         <Trash2 className="w-3.5 h-3.5 hover:scale-110 transition-transform" />
                       </button>
@@ -761,12 +762,12 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                   <div className="flex items-center gap-2">
                     <Sliders className="w-4.5 h-4.5 text-teal-600" />
                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300 font-sans">
-                      Align Page {activePageIndex + 1} of {pages.length}
+                      {tr("Align Page")} {activePageIndex + 1} {tr("of")} {pages.length}
                     </span>
                   </div>
 
                   <span className="text-xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 text-slate-500 rounded-lg">
-                    Adjust original template resolution
+                    {tr("Adjust original template resolution")}
                   </span>
                 </div>
 
@@ -784,7 +785,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     {/* Processed active frame */}
                     <img
                       src={activePage.processedDataUrl}
-                      alt="Digitized scanner sheet view"
+                      alt={tr("Digitized scanner sheet view")}
                       className="w-full h-full object-contain pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
@@ -801,7 +802,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                         }}
                       >
                         <span className="text-[9px] bg-rose-500 text-white font-mono uppercase px-1 py-0.5 rounded font-bold">
-                          Cropped Print Area
+                          {tr("Cropped Print Area")}
                         </span>
                       </div>
                     )}
@@ -821,7 +822,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                             : 'text-slate-500'
                         }`}
                       >
-                        <Sparkles className="w-3.5 h-3.5 inline mr-1" /> Filters
+                        <Sparkles className="w-3.5 h-3.5 inline me-1" /> {tr("Filters")}
                       </button>
                       <button
                         onClick={() => setActiveTab('crop')}
@@ -832,7 +833,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                             : 'text-slate-500'
                         }`}
                       >
-                        <Crop className="w-3.5 h-3.5 inline mr-1" /> Crop Margins
+                        <Crop className="w-3.5 h-3.5 inline me-1" /> {tr("Crop Margins")}
                       </button>
                       <button
                         onClick={() => setActiveTab('rotate')}
@@ -843,7 +844,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                             : 'text-slate-500'
                         }`}
                       >
-                        <RotateCw className="w-3.5 h-3.5 inline mr-1" /> Rotation
+                        <RotateCw className="w-3.5 h-3.5 inline me-1" /> {tr("Rotation")}
                       </button>
                     </div>
 
@@ -851,22 +852,22 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     {activeTab === 'filter' && (
                       <div className="space-y-4">
                         <p className="text-xs text-slate-400">
-                          Color filters remove shadows, boost black text clarity, and clean up physical background paper folds recursively.
+                          {tr("Color filters remove shadows, boost black text clarity, and clean up physical background paper folds recursively.")}
                         </p>
                         
                         <div className="grid grid-cols-2 gap-2">
                           {[
-                            { key: 'original', label: 'True Colors (Photo)', desc: 'Keeps shades as shot' },
-                            { key: 'enhance', label: 'Standard Document', desc: 'Whitens margins & sharpens text' },
-                            { key: 'bw', label: 'B&W Photocopy', desc: 'Binary high-contrast outline' },
-                            { key: 'grayscale', label: 'Grayscale Office', desc: 'Clean black/white gradient' },
-                            { key: 'magic', label: 'Magic Color Boost', desc: 'High saturation vibrancy' },
+                            { key: 'original', label: tr("True Colors (Photo)"), desc: tr("Keeps shades as shot") },
+                            { key: 'enhance', label: tr("Standard Document"), desc: tr("Whitens margins & sharpens text") },
+                            { key: 'bw', label: tr("B&W Photocopy"), desc: tr("Binary high-contrast outline") },
+                            { key: 'grayscale', label: tr("Grayscale Office"), desc: tr("Clean black/white gradient") },
+                            { key: 'magic', label: tr("Magic Color Boost"), desc: tr("High saturation vibrancy") },
                           ].map((fil) => (
                             <button
                               key={fil.key}
                               onClick={() => updatePageSetting(activePageIndex, { filter: fil.key as any })}
                               id={`btn-scanner-filter-${fil.key}`}
-                              className={`p-2.5 text-left border rounded-xl transition-all cursor-pointer ${
+                              className={`p-2.5 text-start border rounded-xl transition-all cursor-pointer ${
                                 activePage.filter === fil.key
                                   ? 'border-teal-500 bg-teal-500/5 font-bold text-teal-700 dark:text-teal-400'
                                   : 'bg-white hover:bg-slate-55 dark:bg-slate-900 border-slate-200 text-slate-600'
@@ -882,7 +883,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                         {activePage.filter === 'bw' && (
                           <div className="p-3 border rounded-xl bg-white dark:bg-slate-905 space-y-1">
                             <div className="flex justify-between text-xs font-medium text-slate-600">
-                              <span>Binary B&W Threshold</span>
+                              <span>{tr("Binary B&W Threshold")}</span>
                               <span className="font-mono text-teal-605">{activePage.bwThreshold}</span>
                             </div>
                             <input
@@ -898,7 +899,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                               className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
                             />
                             <p className="text-[10px] text-slate-400 leading-tight">
-                              Increase to darken subtle ink, decrease to filter noise blemishes.
+                              {tr("Increase to darken subtle ink, decrease to filter noise blemishes.")}
                             </p>
                           </div>
                         )}
@@ -909,14 +910,14 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     {activeTab === 'crop' && (
                       <div className="space-y-4">
                         <p className="text-xs text-slate-400">
-                          Trim document page margins manually to erase table surfaces, background edges, or fingers holding the document.
+                          {tr("Trim document page margins manually to erase table surfaces, background edges, or fingers holding the document.")}
                         </p>
 
                         <div className="space-y-3.5 p-4 bg-white dark:bg-slate-900 border border-slate-200/60 rounded-2xl select-none">
                           {/* Top Crop Slider */}
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs font-semibold text-slate-600">
-                              <span>Top Border Trim</span>
+                              <span>{tr("Top Border Trim")}</span>
                               <span className="text-teal-605 font-mono">{activePage.crop.top}%</span>
                             </div>
                             <input
@@ -938,7 +939,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                           {/* Bottom Crop Slider */}
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs font-semibold text-slate-600">
-                              <span>Bottom Border Trim</span>
+                              <span>{tr("Bottom Border Trim")}</span>
                               <span className="text-teal-605 font-mono">{activePage.crop.bottom}%</span>
                             </div>
                             <input
@@ -960,7 +961,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                           {/* Left Crop Slider */}
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs font-semibold text-slate-600">
-                              <span>Left Border Trim</span>
+                              <span>{tr("Left Border Trim")}</span>
                               <span className="text-teal-605 font-mono">{activePage.crop.left}%</span>
                             </div>
                             <input
@@ -982,7 +983,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                           {/* Right Crop Slider */}
                           <div className="space-y-1">
                             <div className="flex justify-between text-xs font-semibold text-slate-600">
-                              <span>Right Border Trim</span>
+                              <span>{tr("Right Border Trim")}</span>
                               <span className="text-teal-605 font-mono">{activePage.crop.right}%</span>
                             </div>
                             <input
@@ -1009,7 +1010,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                               id="btn-rectify-crops"
                               className="px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 rounded-lg text-[10px] font-mono cursor-pointer font-bold"
                             >
-                              Standard Margins reset
+                              {tr("Standard Margins reset")}
                             </button>
                           </div>
 
@@ -1021,7 +1022,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                     {activeTab === 'rotate' && (
                       <div className="space-y-5">
                         <p className="text-xs text-slate-400">
-                          Manually rotate or mirror pages that were shot rotated horizontally or at upside-down landscape angles.
+                          {tr("Manually rotate or mirror pages that were shot rotated horizontally or at upside-down landscape angles.")}
                         </p>
 
                         <div className="flex gap-2.5">
@@ -1034,7 +1035,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                             className="flex-1 py-3 bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-205 text-slate-705 dark:text-slate-255 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
                           >
                             <RotateCw className="w-4 h-4 text-teal-606" />
-                            Rotate 90° CW
+                            {tr("Rotate 90° CW")}
                           </button>
 
                           <button
@@ -1046,12 +1047,12 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
                             className="flex-1 py-3 bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-205 text-slate-705 dark:text-slate-255 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
                           >
                             <RotateCw className="w-4 h-4 text-teal-606 transform -scale-x-100" />
-                            Rotate 90° CCW
+                            {tr("Rotate 90° CCW")}
                           </button>
                         </div>
 
                         <div className="p-3 border rounded-xl bg-orange-500/5 border-orange-500/10 text-[10.5px] text-slate-400 leading-normal">
-                          <span className="font-bold text-orange-605">TIP:</span> Rotation preserves high DPI vectors correctly, aligning standard print coordinates of pages before assembling.
+                          <span className="font-bold text-orange-605">{tr("TIP:")}</span> {tr("Rotation preserves high DPI vectors correctly, aligning standard print coordinates of pages before assembling.")}
                         </div>
 
                       </div>
@@ -1065,9 +1066,9 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
             ) : (
               <div className="h-full min-h-[420px] bg-slate-55/30 border-2 border-dashed border-slate-200/50 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center text-center p-8 select-none">
                 <FileText className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
-                <p className="text-sm font-semibold text-slate-450">Scanned pages workspace empty</p>
+                <p className="text-sm font-semibold text-slate-450">{tr("Scanned pages workspace empty")}</p>
                 <p className="text-xs text-slate-400 mt-1.5 max-w-[280px]">
-                  Take a photo of your paper using the Capture feed on the left, or upload a camera photo to begin fine-tuning!
+                  {tr("Take a photo of your paper using the Capture feed on the left, or upload a camera photo to begin fine-tuning!")}
                 </p>
               </div>
             )}
@@ -1084,7 +1085,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               id="btn-clear-scanner-and-stack"
               className="text-xs font-bold text-rose-506 hover:text-rose-600 cursor-pointer text-rose-500 font-sans transition-colors"
             >
-              Discard Scanner stack ({pages.length} records)
+              {tr("Discard Scanner stack (")}{pages.length} {tr("records)")}
             </button>
 
             <button
@@ -1094,7 +1095,7 @@ export default function ScannedDocumentTool({ onBack }: ScannedDocumentToolProps
               className="px-6 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:bg-teal-500/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-              Compile {pages.length} {pages.length === 1 ? 'Page' : 'Pages'} to PDF
+              {tr("Compile")} {pages.length} {pages.length === 1 ? tr("Page") : tr("Pages")} {tr("to PDF")}
             </button>
           </div>
         )}

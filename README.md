@@ -33,7 +33,7 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 - 🧰 **30+ tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
 - 💻 **Desktop app for Windows, macOS and Linux**, with all 40 tools working fully offline.
 - 📲 **Installable web app.** Install it from your browser and it works offline after the first visit.
-- 🌍 **English and Arabic**, with a full right-to-left layout.
+- 🌍 **English and Arabic** across the whole app, with a full right-to-left layout. [Add your language](CONTRIBUTING.md#translating)!
 - 🏠 **Self-hostable.** Run it on your laptop, your intranet, or as a static site on any CDN.
 
 > **Don't trust us, verify it:** open DevTools → Network, then run any browser tool. You won't see your file go anywhere.
@@ -180,7 +180,8 @@ Build-time options for the browser app (set when running `npm run build` / `buil
 ```
 src/
   App.tsx              # Dashboard, search, tool registry & routing
-  i18n.tsx             # Translations (English, Arabic) and RTL handling
+  i18n.tsx             # Language switching, tr() and RTL handling
+  locales/ar.ts        # Arabic translations
   components/*Tool.tsx # One lazily loaded component per tool
   lib/pdfUtils.ts      # Shared PDF helpers (pdf-lib + PDF.js)
   lib/pdfjs.ts         # PDF.js worker setup (bundled, no CDN)
@@ -195,12 +196,12 @@ tests/                 # Playwright browser tests
 
 - [x] Installable PWA with full offline support
 - [x] Desktop app for Windows, macOS and Linux
-- [x] Arabic and right-to-left layout (dashboard)
-- [ ] Translate the individual tool screens
+- [x] Arabic and right-to-left layout
+- [ ] More languages (French, Spanish, Turkish, ...): [help translate](CONTRIBUTING.md#translating)
 - [ ] Move Office conversions into the browser (WASM) so all tools work without a server
 - [ ] Drag-and-drop tool chaining ("workflows")
 - [ ] Code-signed desktop installers
-- [ ] Browser tests for every tool (12 of 31 covered)
+- [ ] Browser tests for every tool
 
 Have an idea? [Open a feature request](https://github.com/alqudah/local-pdf-tools/issues/new?template=feature_request.yml).
 

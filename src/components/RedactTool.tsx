@@ -28,6 +28,7 @@ import '../lib/pdfjs';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { Rnd } from 'react-rnd';
 
+import { tr } from '../i18n';
 interface RedactToolProps {
   onBack: () => void;
 }
@@ -63,7 +64,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
 
   const handleFileDrop = async (selectedFile: File) => {
     setLoading(true);
-    setStatusText('Loading document for security sweeps...');
+    setStatusText(tr("Loading document for security sweeps..."));
     setSuccess(false);
 
     try {
@@ -84,7 +85,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
       setSelectedBoxId(null);
     } catch (err) {
       console.error(err);
-      alert('Could not parse PDF. Ensure files are non-protected Standard PDFs.');
+      alert(tr("Could not parse PDF. Ensure files are non-protected Standard PDFs."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -251,7 +252,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
   const handleBurnRedaction = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText('Burning solid blackout vectors into PDF structures...');
+    setStatusText(tr("Burning solid blackout vectors into PDF structures..."));
 
     try {
       const pdfDoc = await PDFDocument.load(new Uint8Array(file.arrayBuffer), { ignoreEncryption: true });
@@ -282,7 +283,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         });
       });
 
-      setStatusText('Rasterizing to flatten text payloads permanently...');
+      setStatusText(tr("Rasterizing to flatten text payloads permanently..."));
       const intermediateBytes = await pdfDoc.save();
 
       const pagesWithRedactions = new Set<number>();
@@ -333,7 +334,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         finalSavedBytes = await finalPdfDoc.save();
       }
 
-      setStatusText('Encrypting compliance hashes...');
+      setStatusText(tr("Encrypting compliance hashes..."));
       const cleanName = file.name.replace('.pdf', '') + '_redacted.pdf';
 
       downloadFile(finalSavedBytes, cleanName, 'application/pdf');
@@ -341,7 +342,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
     } catch (err: any) {
       console.error("Error during redact:", err);
       // We also display the specific error in standard user UI
-      alert(`Could not overlay solid redaction blocks: ${err.message || 'Unknown error'}`);
+      alert(tr("Could not overlay solid redaction blocks: {0}", err.message || 'Unknown error'));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -362,6 +363,8 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-redact-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -369,10 +372,10 @@ export default function RedactTool({ onBack }: RedactToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <Shield className="w-6 h-6 text-rose-500 animate-pulse" /> Permanent Redaction & Blackout
+              <Shield className="w-6 h-6 text-rose-500 animate-pulse" /> {tr("Permanent Redaction & Blackout")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Irreversibly black out confidential data or private names, burning solid vector layers locally so that text underneath is covered.
+              {tr("Irreversibly black out confidential data or private names, burning solid vector layers locally so that text underneath is covered.")}
             </p>
           </div>
         </div>
@@ -388,7 +391,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             id="btn-redact-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 font-extrabold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Change Document
+            {tr("Change Document")}
           </button>
         )}
       </div>
@@ -397,10 +400,8 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         <Dropzone
           onFilesSelected={(files) => handleFileDrop(files[0])}
           multiple={false}
-          title="Drop PDF to permanently redact private data"
-          description="
-            Confidential security filters are compiled and secured entirely in-browser sandbox caches. No external transmissions or storage logs are kept.
-          "
+          title={tr("Drop PDF to permanently redact private data")}
+          description={tr("Confidential security filters are compiled and secured entirely in-browser sandbox caches. No external transmissions or storage logs are kept.")}
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
@@ -410,12 +411,12 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             
             {/* Create block helper */}
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-4 shadow-sm">
-              <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">Security Actions</h3>
+              <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">{tr("Security Actions")}</h3>
               
               <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 space-y-2">
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">✍️ Interactive Blackouts</span>
-                  Draw rectangles directly on the document by clicking and dragging your mouse. You can resize and move them freely.
+                  <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">{tr("✍️ Interactive Blackouts")}</span>
+                  {tr("Draw rectangles directly on the document by clicking and dragging your mouse. You can resize and move them freely.")}
                 </p>
               </div>
 
@@ -424,7 +425,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
                 onClick={handleAddRedaction}
                 className="w-full flex items-center justify-center gap-1.5 py-4 px-4 bg-rose-500 hover:bg-rose-450 border border-transparent hover:border-rose-400 rounded-xl text-white font-extrabold text-xs uppercase cursor-pointer tracking-widest hover:shadow-md transition-all active:scale-98"
               >
-                <Plus className="w-4 h-4 shrink-0" /> Add Default Box
+                <Plus className="w-4 h-4 shrink-0" /> {tr("Add Default Box")}
               </button>
             </div>
 
@@ -432,15 +433,15 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             {redactions.length > 0 && (
               <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-3.5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-550">Active Targets ({redactions.length})</h3>
+                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-550">{tr("Active Targets (")}{redactions.length})</h3>
                   <button 
                     onClick={() => { setRedactions([]); setSelectedBoxId(null); }}
                     className="text-[10px] uppercase font-bold text-slate-400 hover:text-rose-500 transition-colors"
                   >
-                    Clear All
+                    {tr("Clear All")}
                   </button>
                 </div>
-                <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                <div className="max-h-56 overflow-y-auto space-y-1.5 pe-1">
                   {redactions.map((box, index) => (
                     <button
                       key={box.id}
@@ -452,12 +453,12 @@ export default function RedactTool({ onBack }: RedactToolProps) {
                           : 'hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-400'
                       }`}
                     >
-                      <span className="truncate pr-2">Box #{index + 1}</span>
+                      <span className="truncate pe-2">{tr("Box #")}{index + 1}</span>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[9px] font-mono opacity-60">Page {box.page}</span>
+                        <span className="text-[9px] font-mono opacity-60">{tr("Page")} {box.page}</span>
                         <Trash2 
                            onClick={(e) => { e.stopPropagation(); handleDeleteRedaction(box.id); }} 
-                           className="w-3.5 h-3.5 text-rose-400 hover:text-rose-600 ml-1" 
+                           className="w-3.5 h-3.5 text-rose-400 hover:text-rose-600 ms-1" 
                         />
                       </div>
                     </button>
@@ -469,19 +470,19 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             {/* Burn action block */}
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-850 text-white space-y-4 shadow-sm font-sans">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 flex justify-between">
-                <span>Sanitization</span>
-                <span className="text-rose-400">Military-Burn</span>
+                <span>{tr("Sanitization")}</span>
+                <span className="text-rose-400">{tr("Military-Burn")}</span>
               </div>
               
               <div>
                 <span className="block text-xs font-bold truncate">{file.name}</span>
-                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} Pages • {redactions.length} Blackouts queued</span>
+                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} {tr("Pages •")} {redactions.length} {tr("Blackouts queued")}</span>
               </div>
 
               {success ? (
                 <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-xl flex items-center gap-2 font-bold">
                   <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span>Sanitized PDF saved!</span>
+                  <span>{tr("Sanitized PDF saved!")}</span>
                 </div>
               ) : (
                 <button
@@ -489,7 +490,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
                   id="btn-redact-compile"
                   className="w-full text-center py-3 bg-rose-600 hover:bg-rose-550 font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-2 text-white cursor-pointer uppercase font-mono tracking-widest"
                 >
-                  <Shield className="w-4 h-4" /> Sanitize & Download PDF
+                  <Shield className="w-4 h-4" /> {tr("Sanitize & Download PDF")}
                 </button>
               )}
             </div>
@@ -501,13 +502,13 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             <div className="p-6 bg-slate-100 dark:bg-slate-950 rounded-3xl border border-slate-150 dark:border-slate-900 flex flex-col items-center justify-center overflow-auto min-h-[480px] shadow-inner relative select-none">
               
               <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 px-2.5 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold shadow-xs z-10 pointer-events-none">
-                <Eye className="w-3.5 h-3.5 text-rose-500" /> Layer Inspector • Page {previewPage} of {file.pageCount}
+                <Eye className="w-3.5 h-3.5 text-rose-500" /> {tr("Layer Inspector • Page")} {previewPage} {tr("of")} {file.pageCount}
               </div>
 
               {/* Tips for placing boxes */}
               {redactions.length === 0 && !isDrawing && (
                 <div className="absolute top-16 max-w-sm text-center p-3.5 bg-rose-500/5 text-rose-700 dark:text-rose-400 text-xs border border-rose-500/10 rounded-xl z-10 pointer-events-none">
-                  📄 Click and drag your cursor anywhere on the document below to draw blackout boxes.
+                  {tr("📄 Click and drag your cursor anywhere on the document below to draw blackout boxes.")}
                 </div>
               )}
 
@@ -575,7 +576,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
                              <>
                                {/* Active Indicator text */}
                                <span className="absolute top-1 left-1.5 font-bold font-mono text-[8px] text-rose-500 select-none pointer-events-none uppercase tracking-widest">
-                                 Active Redaction
+                                 {tr("Active Redaction")}
                                </span>
                                {/* Hover Trash Handle */}
                                <button 
@@ -602,16 +603,16 @@ export default function RedactTool({ onBack }: RedactToolProps) {
                   disabled={previewPage === 1}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous page
+                  {tr("Previous page")}
                 </button>
-                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">Page {previewPage} of {file.pageCount}</span>
+                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">{tr("Page")} {previewPage} {tr("of")} {file.pageCount}</span>
                 <button
                   type="button"
                   onClick={() => setPreviewPage(prev => Math.min(file.pageCount, prev + 1))}
                   disabled={previewPage === file.pageCount}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-855 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Next page
+                  {tr("Next page")}
                 </button>
               </div>
             </div>
@@ -619,9 +620,9 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-left">
               <Shield className="w-5 h-5 shrink-0 text-rose-500" />
               <div>
-                <span className="font-extrabold text-slate-700 dark:text-slate-205">Permanent Vector Redaction Protocol:</span>
+                <span className="font-extrabold text-slate-700 dark:text-slate-205">{tr("Permanent Vector Redaction Protocol:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  Unlike simple HTML highlighter annotations or CSS blackout blocks that text-scrapers or highlight-copy readers can easily read underneath, this tool directly integrates vector shapes flat into the page structural description. Once generated, the text layers located under these black masks are inaccessible, ensuring maximum legal compliance.
+                  {tr("Unlike simple HTML highlighter annotations or CSS blackout blocks that text-scrapers or highlight-copy readers can easily read underneath, this tool directly integrates vector shapes flat into the page structural description. Once generated, the text layers located under these black masks are inaccessible, ensuring maximum legal compliance.")}
                 </p>
               </div>
             </div>
@@ -635,7 +636,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
             <RefreshCw className="w-8 h-8 text-rose-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Burning structural masks...</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("Burning structural masks...")}</p>
             </div>
           </div>
         </div>

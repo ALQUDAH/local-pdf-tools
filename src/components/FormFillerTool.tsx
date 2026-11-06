@@ -25,6 +25,7 @@ import { fileToArrayBuffer, getPdfDetails, downloadFile } from '../lib/pdfUtils'
 import Dropzone from './Dropzone';
 import { PDFDocument, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup, rgb, StandardFonts } from 'pdf-lib';
 
+import { tr } from '../i18n';
 interface FormFillerToolProps {
   onBack: () => void;
 }
@@ -156,7 +157,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
 
     } catch (err) {
       console.error(err);
-      alert('Failed to read and parse PDF form elements. Please ensure this file is not corrupted.');
+      alert(tr("Failed to read and parse PDF form elements. Please ensure this file is not corrupted."));
     } finally {
       setLoading(false);
     }
@@ -318,7 +319,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Unable to compile filled PDF form values. Ensure this document has write permissions standard.');
+      alert(tr("Unable to compile filled PDF form values. Ensure this document has write permissions standard."));
     } finally {
       setLoading(false);
     }
@@ -348,10 +349,10 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
           id="btn-filler-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full font-semibold">
-          PDF Form Filler Applet
+          {tr("PDF Form Filler Applet")}
         </span>
       </div>
 
@@ -359,18 +360,18 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Fill PDF Forms &amp; Sign
+              {tr("Fill PDF Forms & Sign")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-              Auto-detect interactive fields instantly. Type custom details, choose selections, place customized notes, and download your finalized vector document securely 100% locally.
+              {tr("Auto-detect interactive fields instantly. Type custom details, choose selections, place customized notes, and download your finalized vector document securely 100% locally.")}
             </p>
           </div>
 
           <Dropzone
             onFilesSelected={handleFileSelected}
             multiple={false}
-            title="Upload a fillable or regular PDF form"
-            description="Drag and drop or browse to load document"
+            title={tr("Upload a fillable or regular PDF form")}
+            description={tr("Drag and drop or browse to load document")}
           />
         </div>
       ) : (
@@ -388,14 +389,14 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                       {file.name}
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      {formatSize(file.size)} • {file.pageCount} Pages • {detectedFields.length} Form Fields
+                      {formatSize(file.size)} • {file.pageCount} {tr("Pages •")} {detectedFields.length} {tr("Form Fields")}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={handleReset}
                     className="p-1.5 hover:bg-slate-50 dark:hover:bg-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors cursor-pointer"
-                    title="Change document"
+                    title={tr("Change document")}
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
@@ -406,16 +407,16 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <h3 className="text-xs font-bold font-mono text-slate-400 dark:text-slate-550 uppercase tracking-widest flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Interactive Fields
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" /> {tr("Interactive Fields")}
                       </h3>
                       <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-medium">
-                        Auto-Detected
+                        {tr("Auto-Detected")}
                       </span>
                     </div>
 
-                    <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
+                    <div className="space-y-4 max-h-[360px] overflow-y-auto pe-1">
                       {detectedFields.map((field) => (
-                        <div key={field.name} className="space-y-1.5 text-left border-b border-slate-50 dark:border-slate-950 pb-3 last:border-0 last:pb-0">
+                        <div key={field.name} className="space-y-1.5 text-start border-b border-slate-50 dark:border-slate-950 pb-3 last:border-0 last:pb-0">
                           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                             {field.name} <span className="text-[10px] font-mono capitalize px-1 bg-slate-100 dark:bg-slate-800 rounded text-slate-500">{field.type}</span>
                           </label>
@@ -426,7 +427,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                               value={formValues[field.name] || ''}
                               onChange={(e) => handleFieldChange(field.name, e.target.value)}
                               className="w-full text-xs py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 focus:border-amber-500 dark:focus:border-amber-500 focus:outline-none text-slate-800 dark:text-white transition-all shadow-2xs"
-                              placeholder="Empty..."
+                              placeholder={tr("Empty...")}
                             />
                           )}
 
@@ -439,7 +440,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                                 className="rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-800 w-4 h-4"
                               />
                               <span className="text-xs text-slate-500 dark:text-slate-400">
-                                {formValues[field.name] ? 'Checked / Selected' : 'Not checked'}
+                                {formValues[field.name] ? tr("Checked / Selected") : tr("Not checked")}
                               </span>
                             </label>
                           )}
@@ -450,7 +451,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                               onChange={(e) => handleFieldChange(field.name, e.target.value)}
                               className="w-full text-xs py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 focus:border-amber-500 dark:focus:border-amber-500 focus:outline-none text-slate-800 dark:text-white transition-all shadow-2xs cursor-pointer"
                             >
-                              <option value="">-- Choose option --</option>
+                              <option value="">{tr("-- Choose option --")}</option>
                               {field.options.map((opt) => (
                                 <option key={opt} value={opt}>
                                   {opt}
@@ -474,7 +475,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                                 </label>
                               ))}
                               {field.options.length === 0 && (
-                                <span className="text-[10px] text-slate-400">No options defined</span>
+                                <span className="text-[10px] text-slate-400">{tr("No options defined")}</span>
                               )}
                             </div>
                           )}
@@ -487,10 +488,10 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                     <Info className="w-5 h-5 shrink-0 text-amber-500" />
                     <div>
                       <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider font-mono">
-                        No Interactive Form Fields Found
+                        {tr("No Interactive Form Fields Found")}
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        This PDF doesn&apos;t have native fillable form inputs, but you can still stamp custom text labels, dates, signatures, or checkmarks anywhere on the sheets using our Overlay Annotator container.
+                        {tr("This PDF doesn't have native fillable form inputs, but you can still stamp custom text labels, dates, signatures, or checkmarks anywhere on the sheets using our Overlay Annotator container.")}
                       </p>
                     </div>
                   </div>
@@ -500,26 +501,26 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                 <div className="space-y-4 border-t border-slate-100 dark:border-slate-800/80 pt-6">
                   <div className="flex justify-between items-center">
                     <h3 className="text-xs font-bold font-mono text-slate-400 dark:text-slate-550 uppercase tracking-widest">
-                      Custom Text Overlays
+                      {tr("Custom Text Overlays")}
                     </h3>
                     <button
                       type="button"
                       onClick={addCustomOverlay}
                       className="text-xs flex items-center gap-1 py-1 px-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 transition-all font-medium cursor-pointer"
                     >
-                      <Plus className="w-3.5 h-3.5" /> Stamp Label
+                      <Plus className="w-3.5 h-3.5" /> {tr("Stamp Label")}
                     </button>
                   </div>
 
                   {overlays.length > 0 ? (
-                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto pe-1">
                       {overlays.map((overlay) => {
                         const isSelected = selectedOverlayId === overlay.id;
                         return (
                           <div
                             key={overlay.id}
                             onClick={() => setSelectedOverlayId(overlay.id)}
-                            className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
+                            className={`p-3.5 rounded-xl border text-start cursor-pointer transition-all ${
                               isSelected
                                 ? 'border-amber-500 bg-amber-500/5 shadow-2xs'
                                 : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 hover:border-slate-200 dark:hover:border-slate-800'
@@ -527,7 +528,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                           >
                             <div className="flex justify-between items-center mb-2">
                               <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-                                Page {overlay.pageIndex + 1} ({overlay.xPercent}%, {overlay.yPercent}%)
+                                {tr("Page")} {overlay.pageIndex + 1} ({overlay.xPercent}%, {overlay.yPercent}%)
                               </span>
                               <button
                                 type="button"
@@ -547,13 +548,13 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                               onClick={(e) => e.stopPropagation()}
                               onChange={(e) => updateOverlayProp(overlay.id, 'text', e.target.value)}
                               className="w-full text-xs font-medium py-1.5 px-2 bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-amber-500 text-slate-800 dark:text-white"
-                              placeholder="Overlay content..."
+                              placeholder={tr("Overlay content...")}
                             />
 
                             {isSelected && (
                               <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-150/40 dark:border-slate-800/40">
                                 <div className="space-y-1">
-                                  <label className="block text-[10px] uppercase font-bold text-slate-400">Size</label>
+                                  <label className="block text-[10px] uppercase font-bold text-slate-400">{tr("Size")}</label>
                                   <input
                                     type="number"
                                     min="6"
@@ -565,16 +566,16 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                                   />
                                 </div>
                                 <div className="space-y-1">
-                                  <label className="block text-[10px] uppercase font-bold text-slate-400">Text Color</label>
+                                  <label className="block text-[10px] uppercase font-bold text-slate-400">{tr("Text Color")}</label>
                                   <select
                                     value={overlay.color}
                                     onClick={(e) => e.stopPropagation()}
                                     onChange={(e) => updateOverlayProp(overlay.id, 'color', e.target.value)}
                                     className="w-full text-[11px] py-1 px-1.5 border border-slate-200 dark:border-slate-850 dark:bg-slate-900 rounded-lg text-slate-800 dark:text-slate-200 cursor-pointer"
                                   >
-                                    <option value="black">Black</option>
-                                    <option value="blue">Blue</option>
-                                    <option value="red">Red</option>
+                                    <option value="black">{tr("Black")}</option>
+                                    <option value="blue">{tr("Blue")}</option>
+                                    <option value="red">{tr("Red")}</option>
                                   </select>
                                 </div>
                               </div>
@@ -585,7 +586,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                     </div>
                   ) : (
                     <p className="text-xs text-slate-400 italic text-center py-2">
-                      No custom overlays stamped. Click or write above to position text anywhere.
+                      {tr("No custom overlays stamped. Click or write above to position text anywhere.")}
                     </p>
                   )}
                 </div>
@@ -601,11 +602,11 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                       className="rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-800 w-4 h-4"
                     />
                     <label htmlFor="opt-flatten" className="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                      Flatten Form Elements (Irreversible encryption)
+                      {tr("Flatten Form Elements (Irreversible encryption)")}
                     </label>
                   </div>
-                  <p className="text-[10px] text-slate-400 leading-relaxed pl-6">
-                    Bake all form field answers directly into the PDF content layers. Recommended before submitting to formal organizations to prevent subsequent modifications.
+                  <p className="text-[10px] text-slate-400 leading-relaxed ps-6">
+                    {tr("Bake all form field answers directly into the PDF content layers. Recommended before submitting to formal organizations to prevent subsequent modifications.")}
                   </p>
                 </div>
 
@@ -622,12 +623,12 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Composing filled PDF...
+                      {tr("Composing filled PDF...")}
                     </>
                   ) : (
                     <>
                       <Download className="w-5 h-5" />
-                      Save &amp; Download form
+                      {tr("Save & Download form")}
                     </>
                   )}
                 </button>
@@ -638,9 +639,9 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
               <div className="p-4 bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 rounded-2xl flex items-center gap-3 border border-emerald-500/10 text-left">
                 <CheckCircle className="w-5 h-5 shrink-0 text-emerald-500 animate-bounce" />
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wide font-mono">Download Commencing!</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wide font-mono">{tr("Download Commencing!")}</h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    If your download didn&apos;t invoke automatically, submit again.
+                    {tr("If your download didn't invoke automatically, submit again.")}
                   </p>
                 </div>
               </div>
@@ -654,10 +655,10 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
               {/* Pages control header selection bar */}
               <div className="w-full flex justify-between items-center mb-4">
                 <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-450 uppercase">
-                  Page Preview Panel
+                  {tr("Page Preview Panel")}
                 </span>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-500 dark:text-slate-400">Jump to sheet:</span>
+                  <span className="text-slate-500 dark:text-slate-400">{tr("Jump to sheet:")}</span>
                   <select
                     value={selectedPageIndex}
                     onChange={(e) => setSelectedPageIndex(parseInt(e.target.value) || 0)}
@@ -665,7 +666,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                   >
                     {Array.from({ length: file.pageCount }).map((_, idx) => (
                       <option key={idx} value={idx}>
-                        Page {idx + 1}
+                        {tr("Page")} {idx + 1}
                       </option>
                     ))}
                   </select>
@@ -677,8 +678,8 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                 <Info className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>
                   {selectedOverlayId 
-                    ? "Click on the sheet to reposition your selected custom overlay text box."
-                    : "Click anywhere on the document sheet to spawn a custom text annotation."
+                    ? tr("Click on the sheet to reposition your selected custom overlay text box.")
+                    : tr("Click anywhere on the document sheet to spawn a custom text annotation.")
                   }
                 </span>
               </div>
@@ -693,7 +694,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                   >
                     <img
                       src={file.previews[selectedPageIndex]}
-                      alt={`Page ${selectedPageIndex + 1}`}
+                      alt={tr("Page {0}", selectedPageIndex + 1)}
                       className="w-full h-auto object-contain block pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
@@ -725,7 +726,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                                 : 'border-slate-350 dark:border-slate-700 opacity-80 hover:opacity-100'
                             }`}
                           >
-                            <span className="truncate max-w-[120px]">{o.text || 'Annotation'}</span>
+                            <span className="truncate max-w-[120px]">{o.text || tr("Annotation")}</span>
                             <span className="text-[8px] opacity-40 font-mono">#{o.fontSize}</span>
                           </div>
                         );
@@ -735,7 +736,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
               ) : (
                 <div className="w-full flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <FileText className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3 animate-pulse" />
-                  <p className="text-xs text-slate-400">Could not extract thumbnail slice views.</p>
+                  <p className="text-xs text-slate-400">{tr("Could not extract thumbnail slice views.")}</p>
                 </div>
               )}
 
@@ -743,9 +744,9 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
               {file.pageCount > 1 && (
                 <div className="w-full border-t border-slate-200 dark:border-slate-805 mt-6 pt-6">
                   <span className="block text-[10px] font-mono font-bold text-slate-450 uppercase mb-3 text-left">
-                    All Slides Sheet ({file.pageCount})
+                    {tr("All Slides Sheet (")}{file.pageCount})
                   </span>
-                  <div className="flex gap-3 overflow-x-auto pb-2 pr-1 scrollbar-hidden">
+                  <div className="flex gap-3 overflow-x-auto pb-2 pe-1 scrollbar-hidden">
                     {Array.from({ length: file.pageCount }).map((_, index) => {
                       const hasPageOverlay = overlays.some((o) => o.pageIndex === index);
                       return (
@@ -761,7 +762,7 @@ export default function FormFillerTool({ onBack }: FormFillerToolProps) {
                           {file.previews[index] ? (
                             <img
                               src={file.previews[index]}
-                              alt={`Thumb ${index + 1}`}
+                              alt={tr("Thumb {0}", index + 1)}
                               className="w-full h-full object-cover"
                               referrerPolicy="no-referrer"
                             />

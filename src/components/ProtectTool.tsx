@@ -10,6 +10,7 @@ import { fileToArrayBuffer, getPdfDetails, unprotectPdf, downloadFile } from '..
 import { encryptPdf, decryptPdf, WrongPasswordError } from '../lib/qpdf';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface ProtectToolProps {
   onBack: () => void;
   initialMode?: 'encrypt' | 'decrypt';
@@ -63,7 +64,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
       });
     } catch (err) {
       console.error(err);
-      alert('Error parsing document details.');
+      alert(tr("Error parsing document details."));
     } finally {
       setEncryptLoading(false);
     }
@@ -86,7 +87,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
       setEncryptSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to encrypt PDF file. Ensure file is valid.');
+      alert(tr("Failed to encrypt PDF file. Ensure file is valid."));
     } finally {
       setEncryptLoading(false);
     }
@@ -159,10 +160,10 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
           id="btn-protect-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full font-semibold">
-          100% Client-Side · AES-256
+          {tr("100% Client-Side · AES-256")}
         </span>
       </div>
 
@@ -170,9 +171,9 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
         {/* Toggle Mode selectors */}
         <div className="flex border-b border-slate-100 dark:border-slate-800 pb-5 mb-6 justify-between items-center flex-wrap gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">PDF Security Suite</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("PDF Security Suite")}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Add a password to a PDF (standard AES-256, opens in any PDF reader), or remove a password you know. Files never leave your device.
+              {tr("Add a password to a PDF (standard AES-256, opens in any PDF reader), or remove a password you know. Files never leave your device.")}
             </p>
           </div>
           <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-800">
@@ -185,7 +186,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Lock className="w-3.5 h-3.5" /> Encrypt File
+              <Lock className="w-3.5 h-3.5" /> {tr("Encrypt File")}
             </button>
             <button
               onClick={() => setSubMode('decrypt')}
@@ -196,7 +197,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Unlock className="w-3.5 h-3.5" /> Decrypt File
+              <Unlock className="w-3.5 h-3.5" /> {tr("Decrypt File")}
             </button>
           </div>
         </div>
@@ -209,15 +210,15 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 id="encrypt-dropzone"
                 onFilesSelected={handleEncryptFileSelected}
                 multiple={false}
-                title="Drop PDF to Lock"
-                description="Upload a PDF to protect it with a password."
+                title={tr("Drop PDF to Lock")}
+                description={tr("Upload a PDF to protect it with a password.")}
               />
             )}
 
             {encryptLoading && (
               <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
                 <Loader2 className="w-5 h-5 text-rose-500 animate-spin" />
-                <span>Reading or securing PDF file...</span>
+                <span>{tr("Reading or securing PDF file...")}</span>
               </div>
             )}
 
@@ -226,7 +227,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 shrink-0" />
                   <div>
-                    <span className="font-semibold">Successfully Locked!</span> Your password-protected PDF has been downloaded. It opens in any PDF reader with the password.
+                    <span className="font-semibold">{tr("Successfully Locked!")}</span> {tr("Your password-protected PDF has been downloaded. It opens in any PDF reader with the password.")}
                   </div>
                 </div>
                 <button
@@ -234,7 +235,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                   id="btn-encrypt-reset"
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" /> Lock Another
+                  <RefreshCw className="w-3.5 h-3.5" /> {tr("Lock Another")}
                 </button>
               </div>
             )}
@@ -245,7 +246,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                     <FileCode className="w-3.5 h-3.5" />
-                    <span>Target Document</span>
+                    <span>{tr("Target Document")}</span>
                   </div>
 
                   <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-xl space-y-4">
@@ -253,7 +254,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                       {fileToEncrypt.previews.length > 0 ? (
                         <img
                           src={fileToEncrypt.previews[0]}
-                          alt="Cover"
+                          alt={tr("Cover")}
                           referrerPolicy="no-referrer"
                           className="w-16 h-22 object-cover rounded-md shadow-md border border-slate-200 select-none bg-white shrink-0"
                         />
@@ -266,7 +267,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{fileToEncrypt.name}</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{formatSize(fileToEncrypt.size)}</p>
                         <p className="text-xs font-bold px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded inline-block text-slate-600 dark:text-slate-300 mt-2">
-                          {fileToEncrypt.pageCount} {fileToEncrypt.pageCount === 1 ? 'page' : 'pages'}
+                          {fileToEncrypt.pageCount} {fileToEncrypt.pageCount === 1 ? tr("page") : tr("pages")}
                         </p>
                       </div>
                     </div>
@@ -277,7 +278,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                         id="btn-encrypt-change-file"
                         className="text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
                       >
-                        Change File
+                        {tr("Change File")}
                       </button>
                     </div>
                   </div>
@@ -287,13 +288,13 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <form onSubmit={handleEncryptSubmit} className="space-y-5">
                   <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Access Configuration</span>
+                    <span>{tr("Access Configuration")}</span>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label htmlFor="encrypt-password-field" className="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                        Passphrase to Encrypt PDF
+                        {tr("Passphrase to Encrypt PDF")}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">
@@ -304,9 +305,9 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                           id="encrypt-password-field"
                           value={encryptPassword}
                           onChange={(e) => setEncryptPassword(e.target.value)}
-                          placeholder="Type access restriction password..."
+                          placeholder={tr("Type access restriction password...")}
                           required
-                          className="w-full pl-10 pr-10 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-rose-500 dark:focus:border-rose-400 focus:outline-none transition-colors font-mono"
+                          className="w-full ps-10 pe-10 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-rose-500 dark:focus:border-rose-400 focus:outline-none transition-colors font-mono"
                         />
                         <button
                           type="button"
@@ -322,7 +323,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                     <div className="p-3.5 rounded-xl bg-orange-500/5 text-orange-600 dark:text-orange-400 text-xs leading-relaxed border border-orange-500/10 flex gap-2">
                       <Lock className="w-4 h-4 shrink-0 mt-0.5" />
                       <span>
-                        This creates a highly secure, client-side encrypted container. Users must use this local suite to unpack normal standard PDF sheets.
+                        {tr("Anyone with this password can open the PDF in any PDF reader. Keep it safe: a lost password cannot be recovered.")}
                       </span>
                     </div>
 
@@ -333,7 +334,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                       className="w-full py-3 bg-rose-600 hover:bg-rose-500 disabled:bg-rose-650/40 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       {encryptLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                      Encrypt PDF File
+                      {tr("Encrypt PDF File")}
                     </button>
                   </div>
                 </form>
@@ -350,15 +351,15 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 id="decrypt-dropzone"
                 onFilesSelected={handleDecryptFileSelected}
                 multiple={false}
-                title="Upload a password-protected PDF"
-                description="Enter its password to save an unlocked copy."
+                title={tr("Upload a password-protected PDF")}
+                description={tr("Enter its password to save an unlocked copy.")}
               />
             )}
 
             {decryptLoading && (
               <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
                 <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-                <span>Unlocking in your browser...</span>
+                <span>{tr("Unlocking in your browser...")}</span>
               </div>
             )}
 
@@ -367,7 +368,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 shrink-0" />
                   <div>
-                    <span className="font-semibold">Successfully Decrypted!</span> The printable PDF has been unlocked and downloaded.
+                    <span className="font-semibold">{tr("Successfully Decrypted!")}</span> {tr("The printable PDF has been unlocked and downloaded.")}
                   </div>
                 </div>
                 <button
@@ -375,7 +376,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                   id="btn-decrypt-reset"
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" /> Unlock Another
+                  <RefreshCw className="w-3.5 h-3.5" /> {tr("Unlock Another")}
                 </button>
               </div>
             )}
@@ -393,7 +394,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                     <FileCode className="w-3.5 h-3.5" />
-                    <span>Locked Document</span>
+                    <span>{tr("Locked Document")}</span>
                   </div>
 
                   <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-xl space-y-4">
@@ -405,7 +406,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{fileToDecrypt.name}</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{formatSize(fileToDecrypt.size)}</p>
                         <span className="text-[10px] font-bold text-sky-600 px-2 py-0.5 bg-sky-500/10 rounded inline-block mt-2">
-                          AES-256 Protected
+                          {tr("AES-256 Protected")}
                         </span>
                       </div>
                     </div>
@@ -416,7 +417,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                         id="btn-decrypt-change-file"
                         className="text-xs font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
                       >
-                        Change File
+                        {tr("Change File")}
                       </button>
                     </div>
                   </div>
@@ -426,13 +427,13 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <form onSubmit={handleDecryptSubmit} className="space-y-5">
                   <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                     <Unlock className="w-3.5 h-3.5" />
-                    <span>Unlock Configuration</span>
+                    <span>{tr("Unlock Configuration")}</span>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label htmlFor="decrypt-password-field" className="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                        Required Decryption Passphrase
+                        {tr("Required Decryption Passphrase")}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">
@@ -443,9 +444,9 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                           id="decrypt-password-field"
                           value={decryptPassword}
                           onChange={(e) => setDecryptPassword(e.target.value)}
-                          placeholder="Type security password..."
+                          placeholder={tr("Type security password...")}
                           required
-                          className="w-full pl-10 pr-10 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors font-mono"
+                          className="w-full ps-10 pe-10 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors font-mono"
                         />
                         <button
                           type="button"
@@ -465,7 +466,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                       className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-650/40 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       {decryptLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Unlock className="w-4 h-4" />}
-                      Unlock PDF File
+                      {tr("Unlock PDF File")}
                     </button>
                   </div>
                 </form>

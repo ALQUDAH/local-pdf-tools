@@ -23,6 +23,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import '../lib/pdfjs';
 import { PDFDocument } from 'pdf-lib';
 
+import { tr } from '../i18n';
 interface GrayscaleToolProps {
   onBack: () => void;
 }
@@ -49,7 +50,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
 
   const handleFileDrop = async (selectedFile: File) => {
     setLoading(true);
-    setStatusText('Reading PDF content...');
+    setStatusText(tr("Reading PDF content..."));
     setSuccess(false);
 
     try {
@@ -68,7 +69,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
       setPreviewPage(1);
     } catch (err) {
       console.error(err);
-      alert('Could not parse PDF. Secure or corrupted structures cannot compile local frames.');
+      alert(tr("Could not parse PDF. Secure or corrupted structures cannot compile local frames."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -198,7 +199,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
   const handleCompile = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText('Compiling modified pages...');
+    setStatusText(tr("Compiling modified pages..."));
     
     try {
       // 1. Create a fresh pdf-lib destination doc
@@ -211,7 +212,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
 
       // 3. Render and process each frame to compressed JPEG blobs
       for (let i = 1; i <= totalPages; i++) {
-        setStatusText(`Rendering & Filter-stamping Page ${i} of ${totalPages}...`);
+        setStatusText(tr("Rendering & Filter-stamping Page {0} of {1}...", i, totalPages));
         
         const page = await doc.getPage(i);
         const viewport = page.getViewport({ scale: scale });
@@ -281,7 +282,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
         });
       }
 
-      setStatusText('Saving final file bytes...');
+      setStatusText(tr("Saving final file bytes..."));
       const savedBytes = await outPdf.save();
       const cleanName = file.name.replace('.pdf', '') + '_grayscale.pdf';
 
@@ -289,7 +290,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to compile compressed grayscale layers. Ensure security flags are unencrypted.');
+      alert(tr("Failed to compile compressed grayscale layers. Ensure security flags are unencrypted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -310,6 +311,8 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-grayscale-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -317,10 +320,10 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-emerald-500 animate-pulse" /> Grayscale & Monochrome Converter
+              <Sparkles className="w-6 h-6 text-emerald-500 animate-pulse" /> {tr("Grayscale & Monochrome Converter")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Reduce printer ink usage, remove visual color noise, or convert scanned documents into clean monochrome layouts.
+              {tr("Reduce printer ink usage, remove visual color noise, or convert scanned documents into clean monochrome layouts.")}
             </p>
           </div>
         </div>
@@ -334,7 +337,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
             id="btn-grayscale-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 font-bold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Change Document
+            {tr("Change Document")}
           </button>
         )}
       </div>
@@ -344,10 +347,8 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
         <Dropzone
           onFilesSelected={(files) => handleFileDrop(files[0])}
           multiple={false}
-          title="Drop PDF to convert to Grayscale"
-          description="
-            Upload document to apply ink-saving monochrome photocopy matrixes, desaturate standard layouts, and compress size locally.
-          "
+          title={tr("Drop PDF to convert to Grayscale")}
+          description={tr("Upload document to apply ink-saving monochrome photocopy matrixes, desaturate standard layouts, and compress size locally.")}
         />
       ) : (
         /* Workspace Editor Panel */
@@ -357,46 +358,46 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-5 shadow-xs">
               <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Shader Options
+                {tr("Shader Options")}
               </h3>
 
               <div className="space-y-3">
                 <button
                   type="button"
                   onClick={() => setFilterType('grayscale')}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-start cursor-pointer ${
                     filterType === 'grayscale'
                       ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
                       : 'border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <span>Premium Grayscale</span>
+                  <span>{tr("Premium Grayscale")}</span>
                   <div className="w-3.5 h-3.5 rounded-full bg-slate-400 border border-white" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFilterType('monochrome')}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-start cursor-pointer ${
                     filterType === 'monochrome'
                       ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
                       : 'border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <span>Monochrome Photocopy</span>
+                  <span>{tr("Monochrome Photocopy")}</span>
                   <div className="w-3.5 h-3.5 rounded-full bg-black border border-white" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFilterType('tint')}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all text-start cursor-pointer ${
                     filterType === 'tint'
                       ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
                       : 'border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-950/60 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  <span>Color Branding Tint</span>
+                  <span>{tr("Color Branding Tint")}</span>
                   <div className={`w-3.5 h-3.5 rounded-full border border-white`} style={{ backgroundColor: tintColor }} />
                 </button>
               </div>
@@ -404,13 +405,13 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
               {/* Dynamic Sub-Sliders */}
               <div className="border-t border-slate-100 dark:border-slate-850 pt-4 space-y-4">
                 <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                  <Sliders className="w-3.5 h-3.5" /> Adjust Parameters
+                  <Sliders className="w-3.5 h-3.5" /> {tr("Adjust Parameters")}
                 </h4>
 
                 {filterType === 'monochrome' && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                      <span>Monochrome Threshold</span>
+                      <span>{tr("Monochrome Threshold")}</span>
                       <span className="font-mono">{threshold}</span>
                     </div>
                     <input
@@ -421,14 +422,14 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
                       onChange={(e) => setThreshold(Number(e.target.value))}
                       className="w-full accent-emerald-500 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer"
                     />
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500">Lower makes document darker; higher yields cleaner margins and brighter canvas areas.</p>
+                    <p className="text-[9px] text-slate-400 dark:text-slate-500">{tr("Lower makes document darker; higher yields cleaner margins and brighter canvas areas.")}</p>
                   </div>
                 )}
 
                 {filterType === 'tint' && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                      <span>Select Tint Hue</span>
+                      <span>{tr("Select Tint Hue")}</span>
                     </div>
                     <input
                       type="color"
@@ -441,7 +442,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                    <span>Width Resolution Scale</span>
+                    <span>{tr("Width Resolution Scale")}</span>
                     <span>{(scale * 100).toFixed(0)}%</span>
                   </div>
                   <input
@@ -453,12 +454,12 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
                     onChange={(e) => setScale(Number(e.target.value))}
                     className="w-full accent-emerald-500 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer"
                   />
-                  <p className="text-[9px] text-slate-400 dark:text-slate-500">Scale the width dimensions. Lower ratios yield tiny file sizes.</p>
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500">{tr("Scale the width dimensions. Lower ratios yield tiny file sizes.")}</p>
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400">
-                    <span>Compression Quality</span>
+                    <span>{tr("Compression Quality")}</span>
                     <span>{(quality * 100).toFixed(0)}%</span>
                   </div>
                   <input
@@ -477,19 +478,19 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
             {/* Run compile action block */}
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-850 text-white space-y-4 shadow-sm">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 flex items-center justify-between">
-                <span>Active File</span>
-                <span className="text-emerald-400">Private Sandbox</span>
+                <span>{tr("Active File")}</span>
+                <span className="text-emerald-400">{tr("Private Sandbox")}</span>
               </div>
               
               <div>
                 <span className="block text-xs font-bold text-slate-200 truncate">{file.name}</span>
-                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} Pages • {formatFileSize(file.size)}</span>
+                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} {tr("Pages •")} {formatFileSize(file.size)}</span>
               </div>
 
               {success ? (
                 <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-xl flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span className="font-bold">Grayscale PDF downloaded!</span>
+                  <span className="font-bold">{tr("Grayscale PDF downloaded!")}</span>
                 </div>
               ) : (
                 <button
@@ -497,7 +498,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
                   id="btn-grayscale-compile"
                   className="w-full text-center py-3 bg-emerald-600 hover:bg-emerald-500 font-extrabold text-sm rounded-xl transition-all flex items-center justify-center gap-2 text-white cursor-pointer hover:shadow-md active:scale-98"
                 >
-                  <Download className="w-4 h-4" /> Convert & Download
+                  <Download className="w-4 h-4" /> {tr("Convert & Download")}
                 </button>
               )}
             </div>
@@ -507,7 +508,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
           <div className="lg:col-span-3 space-y-6">
             <div className="p-6 bg-slate-100 dark:bg-slate-950 rounded-3xl border border-slate-150 dark:border-slate-900 flex flex-col items-center justify-center overflow-auto min-h-[480px] shadow-inner relative">
               <div className="absolute top-4 left-4 flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 px-2.5 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold">
-                <Eye className="w-3.5 h-3.5 text-emerald-500" /> Live Preview Frame • Page {previewPage} of {file.pageCount}
+                <Eye className="w-3.5 h-3.5 text-emerald-500" /> {tr("Live Preview Frame • Page")} {previewPage} {tr("of")} {file.pageCount}
               </div>
 
               <div className="bg-white p-2 rounded-2xl border border-slate-250 dark:border-slate-800 shadow-md max-w-full overflow-hidden my-6">
@@ -522,26 +523,26 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
                   disabled={previewPage === 1}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous Frame
+                  {tr("Previous Frame")}
                 </button>
-                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2">Page {previewPage} of {file.pageCount}</span>
+                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2">{tr("Page")} {previewPage} {tr("of")} {file.pageCount}</span>
                 <button
                   type="button"
                   onClick={() => setPreviewPage(prev => Math.min(file.pageCount, prev + 1))}
                   disabled={previewPage === file.pageCount}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Next Frame
+                  {tr("Next Frame")}
                 </button>
               </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 rounded-2xl p-4 flex gap-3 text-xs text-left leading-relaxed">
+            <div className="bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 rounded-2xl p-4 flex gap-3 text-xs text-start leading-relaxed">
               <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-500" />
               <div>
-                <span className="font-extrabold text-slate-700 dark:text-slate-200">Local Privacy Architecture Secured:</span>
+                <span className="font-extrabold text-slate-700 dark:text-slate-200">{tr("Local Privacy Architecture Secured:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  Page-by-page color filtration is completely computed natively inside your sandbox container browser canvas contexts. Your source data or processed pixels are never uploaded to our hosting servers, remaining 100% compliant and private.
+                  {tr("Page-by-page color filtration is completely computed natively inside your sandbox container browser canvas contexts. Your source data or processed pixels are never uploaded to our hosting servers, remaining 100% compliant and private.")}
                 </p>
               </div>
             </div>
@@ -555,7 +556,7 @@ export default function GrayscaleTool({ onBack }: GrayscaleToolProps) {
             <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Applying pixel transformations...</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("Applying pixel transformations...")}</p>
             </div>
           </div>
         </div>

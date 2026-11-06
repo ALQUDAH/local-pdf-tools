@@ -9,6 +9,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, splitPdf, parsePageRanges, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface SplitToolProps {
   onBack: () => void;
 }
@@ -31,7 +32,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
   const handleFileSelected = async (newRawFiles: File[]) => {
     if (newRawFiles.length === 0) return;
     setLoading(true);
-    setStatusText('Reading single PDF document details...');
+    setStatusText(tr("Reading single PDF document details..."));
     setSuccess(false);
 
     try {
@@ -57,7 +58,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
       setRangeInput(`1-${Math.min(pageCount, 3)}`);
     } catch (err) {
       console.error(err);
-      alert('Error parsing the PDF. The file may be password protected or corrupted.');
+      alert(tr("Error parsing the PDF. The file may be password protected or corrupted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -139,7 +140,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
   const handleSplit = async () => {
     if (!file || selectedPages.length === 0) return;
     setLoading(true);
-    setStatusText('Extracting pages client-side...');
+    setStatusText(tr("Extracting pages client-side..."));
     setSuccess(false);
 
     try {
@@ -151,7 +152,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to split file. Check your specified bounds.');
+      alert(tr("Failed to split file. Check your specified bounds."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -174,18 +175,18 @@ export default function SplitTool({ onBack }: SplitToolProps) {
           id="btn-split-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-full font-semibold">
-          100% Client-Side
+          {tr("100% Client-Side")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Split PDF Pages</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Split PDF Pages")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Specify page coordinates or select visually to carve out custom documents.
+            {tr("Specify page coordinates or select visually to carve out custom documents.")}
           </p>
         </div>
 
@@ -196,8 +197,8 @@ export default function SplitTool({ onBack }: SplitToolProps) {
               id="split-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to extract pages"
-              description="Drop file here to view page count and carve customized subsets."
+              title={tr("Upload PDF to extract pages")}
+              description={tr("Drop file here to view page count and carve customized subsets.")}
             />
           </div>
         )}
@@ -206,7 +207,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-indigo-500 animate-spin shrink-0" />
-            <span>{statusText || 'Processing...'}</span>
+            <span>{statusText || tr("Processing...")}</span>
           </div>
         )}
 
@@ -215,7 +216,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
           <div className="mb-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 flex items-center gap-3 text-sm text-emerald-600 dark:text-emerald-400">
             <CheckCircle className="w-5 h-5 shrink-0" />
             <div>
-              <span className="font-semibold">Successfully Split!</span> Extracted sub-document has been downloaded.
+              <span className="font-semibold">{tr("Successfully Split!")}</span> {tr("Extracted sub-document has been downloaded.")}
             </div>
           </div>
         )}
@@ -226,8 +227,8 @@ export default function SplitTool({ onBack }: SplitToolProps) {
             <div className="lg:col-span-5 space-y-6">
               <div className="p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-3">
                 <div className="flex items-start justify-between min-w-0">
-                  <div className="truncate pr-4">
-                    <p className="text-[10px] font-bold font-mono tracking-widest text-slate-400 uppercase">Target Document</p>
+                  <div className="truncate pe-4">
+                    <p className="text-[10px] font-bold font-mono tracking-widest text-slate-400 uppercase">{tr("Target Document")}</p>
                     <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{file.name}</h4>
                     <p className="text-xs text-slate-500 mt-0.5">{formatSize(file.size)}</p>
                   </div>
@@ -236,12 +237,12 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                     id="btn-split-change"
                     className="text-xs font-semibold px-2.5 py-1 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-lg transition-all cursor-pointer"
                   >
-                    Change
+                    {tr("Change")}
                   </button>
                 </div>
                 <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800/60 flex items-center justify-between text-xs font-semibold text-slate-500">
-                  <span>Total Pages:</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-100">{file.pageCount} pages</span>
+                  <span>{tr("Total Pages:")}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-100">{file.pageCount} {tr("pages")}</span>
                 </div>
               </div>
 
@@ -249,12 +250,12 @@ export default function SplitTool({ onBack }: SplitToolProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-1.5 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                   <Sliders className="w-3.5 h-3.5" />
-                  <span>Define Page Extract Ranges</span>
+                  <span>{tr("Define Page Extract Ranges")}</span>
                 </div>
 
                 <div className="space-y-3">
                   <label htmlFor="range-selection-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400">
-                    Range Syntax (e.g., <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-indigo-500 font-bold">1-3, 5</code>)
+                    {tr("Range Syntax (e.g.,")} <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-indigo-500 font-bold">1-3, 5</code>)
                   </label>
                   <input
                     type="text"
@@ -271,7 +272,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                       id="btn-split-all-preset"
                       className="text-xs font-semibold px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors cursor-pointer"
                     >
-                      Extract All
+                      {tr("Extract All")}
                     </button>
                     <button
                       type="button"
@@ -279,7 +280,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                       id="btn-split-odd-preset"
                       className="text-xs font-semibold px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors cursor-pointer"
                     >
-                      Odd Pages Only
+                      {tr("Odd Pages Only")}
                     </button>
                     <button
                       type="button"
@@ -287,7 +288,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                       id="btn-split-even-preset"
                       className="text-xs font-semibold px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors cursor-pointer"
                     >
-                      Even Pages Only
+                      {tr("Even Pages Only")}
                     </button>
                   </div>
                 </div>
@@ -297,7 +298,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
               <div className="flex gap-2.5 p-3 rounded-xl bg-orange-500/5 text-orange-600 dark:text-orange-400 text-xs border border-orange-500/10">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 <span className="leading-normal">
-                  Toggle selection checkboxes inside the grid view to easily include or exclude individual sheets.
+                  {tr("Toggle selection checkboxes inside the grid view to easily include or exclude individual sheets.")}
                 </span>
               </div>
 
@@ -309,15 +310,15 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                 className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Extract Selected Pages ({selectedPages.length})
+                {tr("Extract Selected Pages (")}{selectedPages.length})
               </button>
             </div>
 
             {/* Visual Checklist Column (Right) */}
             <div className="lg:col-span-7 space-y-4">
               <div className="flex items-center justify-between text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                <span>Selectable Pages Grid</span>
-                <span>Sorted</span>
+                <span>{tr("Selectable Pages Grid")}</span>
+                <span>{tr("Sorted")}</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 p-4 border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10 rounded-xl max-h-[500px] overflow-y-auto">
@@ -341,7 +342,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                         <div className="w-full aspect-[3/4] mb-2 rounded bg-white overflow-hidden shadow-xs border border-slate-100 select-none">
                           <img
                             src={previewUrl}
-                            alt={`Preview page ${index + 1}`}
+                            alt={tr("Preview page {0}", index + 1)}
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
@@ -360,7 +361,7 @@ export default function SplitTool({ onBack }: SplitToolProps) {
                           <Square className="w-4 h-4 text-slate-400 shrink-0" />
                         )}
                         <span className={`text-[11px] font-bold ${isChecked ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                          Page {index + 1}
+                          {tr("Page")} {index + 1}
                         </span>
                       </div>
                     </button>

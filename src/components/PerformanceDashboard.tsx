@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, X } from 'lucide-react';
 
+import { tr } from '../i18n';
 export default function PerformanceDashboard() {
   const [memory, setMemory] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +33,7 @@ export default function PerformanceDashboard() {
       <button 
         onClick={() => setIsOpen(true)}
         className="fixed bottom-4 left-4 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-slate-700/50 p-3 rounded-full shadow-lg z-[100] text-slate-200 transition-all group"
-        title="Show Performance Metrics"
+        title={tr("Show Performance Metrics")}
       >
         <Activity className="w-5 h-5 text-emerald-400 group-hover:animate-pulse" />
       </button>
@@ -48,36 +49,36 @@ export default function PerformanceDashboard() {
         <X className="w-4 h-4" />
       </button>
       
-      <div className="flex items-center gap-2 mb-3 border-b border-slate-700/50 pb-2 pr-6">
+      <div className="flex items-center gap-2 mb-3 border-b border-slate-700/50 pb-2 pe-6">
         <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Performance Metrics</h3>
+        <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-300">{tr("Performance Metrics")}</h3>
       </div>
       
       <div className="space-y-4">
         <div>
-          <div className="text-[9px] text-slate-400 font-mono uppercase tracking-wider mb-0.5">Current RAM Usage</div>
+          <div className="text-[9px] text-slate-400 font-mono uppercase tracking-wider mb-0.5">{tr("Current RAM Usage")}</div>
           <div className="text-xl font-mono font-medium text-emerald-400 flex items-baseline gap-1">
             {memory !== null ? (
               <>
-                {memory} <span className="text-xs text-slate-500 font-sans normal-case uppercase tracking-wider">MB</span>
+                {memory} <span className="text-xs text-slate-500 font-sans normal-case uppercase tracking-wider">{tr("MB")}</span>
               </>
             ) : (
-              <span className="text-xs text-slate-500">API config unavailable</span>
+              <span className="text-xs text-slate-500">{tr("API config unavailable")}</span>
             )}
           </div>
         </div>
         
         <div>
-          <div className="text-[9px] text-slate-400 font-mono uppercase tracking-wider mb-0.5">Est. Generation Time</div>
+          <div className="text-[9px] text-slate-400 font-mono uppercase tracking-wider mb-0.5">{tr("Est. Generation Time")}</div>
           <div className="text-xl font-mono font-medium text-indigo-400 flex items-baseline gap-1">
-            ~1.2s <span className="text-xs text-slate-500 font-sans normal-case uppercase tracking-wider">/ 10MB</span>
+            ~1.2s <span className="text-xs text-slate-500 font-sans normal-case uppercase tracking-wider">{tr("/ 10MB")}</span>
           </div>
         </div>
       </div>
       
       <div className="mt-4 pt-3 border-t border-slate-700/50">
         <p className="text-[9px] text-slate-500 leading-relaxed">
-          Browser client-side processing limits depend on device system allocation limits.
+          {tr("Browser client-side processing limits depend on device system allocation limits.")}
         </p>
       </div>
     </div>

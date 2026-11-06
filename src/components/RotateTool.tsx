@@ -26,6 +26,7 @@ import { fileToArrayBuffer, getPdfDetails, rotatePdfPages, downloadFile } from '
 import Dropzone from './Dropzone';
 import JSZip from 'jszip';
 
+import { tr } from '../i18n';
 interface RotateToolProps {
   onBack: () => void;
 }
@@ -49,7 +50,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
   const handleFilesSelected = async (newRawFiles: File[]) => {
     if (newRawFiles.length === 0) return;
     setLoading(true);
-    setStatusText('Reading uploaded PDFs...');
+    setStatusText(tr("Reading uploaded PDFs..."));
     setSuccess(false);
 
     try {
@@ -80,7 +81,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
       });
     } catch (err) {
       console.error(err);
-      alert('Error parsing some PDF structure details.');
+      alert(tr("Error parsing some PDF structure details."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -93,7 +94,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
     // If we only have 1 slide previews, but page count is higher, lazily load deep page thumbnails!
     if (targetFile.previews.length < Math.min(targetFile.pageCount, 40)) {
       setLoading(true);
-      setStatusText(`Loading detailed thumbnails for "${targetFile.name}"...`);
+      setStatusText(tr("Loading detailed thumbnails for \"{0}\"...", targetFile.name));
       try {
         const { previews } = await getPdfDetails(targetFile.arrayBuffer, 40);
         setFiles((prev) =>
@@ -207,7 +208,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
   const handleApplyRotations = async () => {
     if (files.length === 0) return;
     setLoading(true);
-    setStatusText('Generating modified document sheets...');
+    setStatusText(tr("Generating modified document sheets..."));
 
     try {
       if (files.length === 1) {
@@ -224,13 +225,13 @@ export default function RotateTool({ onBack }: RotateToolProps) {
         // Multi-File Batch ZIP packer
         const zip = new JSZip();
         for (const file of files) {
-          setStatusText(`Applying page rotation vectors for "${file.name}"...`);
+          setStatusText(tr("Applying page rotation vectors for \"{0}\"...", file.name));
           const fileRotations = rotations[file.id] || {};
           const modifiedBytes = await rotatePdfPages(file.arrayBuffer, fileRotations);
           zip.file(`${file.name.replace(/\.pdf$/i, '')}_rotated.pdf`, modifiedBytes);
         }
 
-        setStatusText('Compressing all processed files into single ZIP archive...');
+        setStatusText(tr("Compressing all processed files into single ZIP archive..."));
         const zipContent = await zip.generateAsync({ type: 'uint8array' });
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         downloadFile(zipContent, `rotated_batch_${timestamp}.zip`, 'application/zip');
@@ -238,7 +239,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to rotate and save PDF sheets. Verify files are unencrypted.');
+      alert(tr("Failed to rotate and save PDF sheets. Verify files are unencrypted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -271,14 +272,14 @@ export default function RotateTool({ onBack }: RotateToolProps) {
           id="btn-rotate-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-            ZIP-Stream Compression
+            {tr("ZIP-Stream Compression")}
           </span>
           <span className="text-xs font-mono px-3 py-1 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-full font-semibold">
-            100% Client-Side
+            {tr("100% Client-Side")}
           </span>
         </div>
       </div>
@@ -286,9 +287,9 @@ export default function RotateTool({ onBack }: RotateToolProps) {
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Rotate PDF Pages</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Rotate PDF Pages")}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Correct upside-down pages, adjust scanner orientations, or apply bulk rotations across multiple documents simultaneously.
+              {tr("Correct upside-down pages, adjust scanner orientations, or apply bulk rotations across multiple documents simultaneously.")}
             </p>
           </div>
 
@@ -296,29 +297,29 @@ export default function RotateTool({ onBack }: RotateToolProps) {
           {files.length > 1 && (
             <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700 rounded-xl shrink-0 self-start">
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase px-2 font-mono">
-                All Files:
+                {tr("All Files:")}
               </span>
               <button
                 onClick={() => rotateAllInAllFiles('cw')}
                 id="btn-global-cw"
                 className="px-2.5 py-1 bg-white hover:bg-slate-55 dark:bg-slate-905 dark:hover:bg-slate-850 hover:shadow-xs text-slate-705 dark:text-slate-300 text-xs font-semibold rounded-lg flex items-center gap-1 transition-all cursor-pointer"
-                title="Rotate ALL pages in ALL documents clockwise by 90 degrees"
+                title={tr("Rotate ALL pages in ALL documents clockwise by 90 degrees")}
               >
-                <RotateCw className="w-3 h-3 text-sky-505" /> +90° All
+                <RotateCw className="w-3 h-3 text-sky-505" /> {tr("+90° All")}
               </button>
               <button
                 onClick={() => rotateAllInAllFiles('ccw')}
                 id="btn-global-ccw"
                 className="px-2.5 py-1 bg-white hover:bg-slate-55 dark:bg-slate-905 dark:hover:bg-slate-850 hover:shadow-xs text-slate-705 dark:text-slate-300 text-xs font-semibold rounded-lg flex items-center gap-1 transition-all cursor-pointer"
-                title="Rotate ALL pages in ALL documents counter-clockwise by 90 degrees"
+                title={tr("Rotate ALL pages in ALL documents counter-clockwise by 90 degrees")}
               >
-                <RotateCcw className="w-3 h-3 text-sky-505" /> -90° All
+                <RotateCcw className="w-3 h-3 text-sky-505" /> {tr("-90° All")}
               </button>
               <button
                 onClick={resetAllRotations}
                 id="btn-global-reset"
                 className="p-1 px-2 hover:bg-rose-500/10 text-rose-500 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-                title="Reset all rotations on all pages"
+                title={tr("Reset all rotations on all pages")}
               >
                 <Undo className="w-3.5 h-3.5" />
               </button>
@@ -332,8 +333,8 @@ export default function RotateTool({ onBack }: RotateToolProps) {
             id="rotate-dropzone"
             onFilesSelected={handleFilesSelected}
             multiple={true}
-            title={files.length > 0 ? "Add more PDFs to batch" : "Upload one or many PDFs to rotate"}
-            description="Upload documents to adjust paper layouts. Processing occurs safe inside your browser."
+            title={files.length > 0 ? tr("Add more PDFs to batch") : tr("Upload one or many PDFs to rotate")}
+            description={tr("Upload documents to adjust paper layouts. Processing occurs safe inside your browser.")}
           />
         </div>
 
@@ -341,7 +342,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-sky-500/5 border border-sky-500/10 flex items-center gap-4 text-sm text-slate-750 dark:text-slate-305">
             <Loader2 className="w-5 h-5 text-sky-500 animate-spin shrink-0" />
-            <span>{statusText || 'Analyzing document layouts...'}</span>
+            <span>{statusText || tr("Analyzing document layouts...")}</span>
           </div>
         )}
 
@@ -351,10 +352,10 @@ export default function RotateTool({ onBack }: RotateToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Saved!</span>{' '}
+                <span className="font-semibold">{tr("Successfully Saved!")}</span>{' '}
                 {files.length > 1
-                  ? 'Your processed batch ZIP package is ready and downloaded.'
-                  : 'Your adjusted printable PDF has been generated and downloaded.'}
+                  ? tr("Your processed batch ZIP package is ready and downloaded.")
+                  : tr("Your adjusted printable PDF has been generated and downloaded.")}
               </span>
             </div>
             <button
@@ -362,7 +363,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
               id="btn-rotate-reset"
               className="px-3 py-1.5 bg-slate-105 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Reset
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Reset")}
             </button>
           </div>
         )}
@@ -374,10 +375,10 @@ export default function RotateTool({ onBack }: RotateToolProps) {
             {/* Left Box: Batch File Navigator (4/12 col) */}
             <div className="lg:col-span-4 space-y-3">
               <h3 className="text-xs font-bold font-mono tracking-wider text-slate-400 uppercase select-none">
-                Batch Registry ({files.length})
+                {tr("Batch Registry (")}{files.length})
               </h3>
               
-              <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-[480px] overflow-y-auto pe-1">
                 {files.map((file) => {
                   const active = file.id === selectedFileId;
                   const modified = isDocModified(file.id);
@@ -398,7 +399,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                         <div className="relative shrink-0">
                           <img
                             src={file.previews[0]}
-                            alt="thumb"
+                            alt={tr("thumb")}
                             referrerPolicy="no-referrer"
                             className="w-8 h-11 object-cover rounded border border-slate-200/50 dark:border-slate-800 bg-white"
                           />
@@ -414,7 +415,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
 
                       {/* File Details */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold truncate pr-2 font-sans">
+                        <p className="text-xs font-bold truncate pe-2 font-sans">
                           {file.name}
                         </p>
                         <p className="text-[10px] font-mono text-slate-400 dark:text-slate-550 mt-0.5">
@@ -426,7 +427,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                       <div className="flex items-center gap-1.5 shrink-0">
                         {modified && (
                           <span className="text-[9px] font-bold px-1.5 py-0.5 bg-sky-500/15 text-sky-600 dark:text-sky-400 rounded-md">
-                            Adjusted
+                            {tr("Adjusted")}
                           </span>
                         )}
                         <button
@@ -436,7 +437,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                           }}
                           id={`btn-remove-from-batch-${file.id}`}
                           className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
-                          title="Remove file"
+                          title={tr("Remove file")}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -458,7 +459,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-sky-500" />
                       <span className="text-xs font-bold font-mono text-slate-500 uppercase truncate max-w-xs sm:max-w-md">
-                        {activeFile.name} pages customization
+                        {activeFile.name} {tr("pages customization")}
                       </span>
                     </div>
 
@@ -468,21 +469,21 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                         id={`btn-file-cw-${activeFile.id}`}
                         className="px-2 py-1 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                       >
-                        <RotateCw className="w-3 h-3" /> Rotate File CW
+                        <RotateCw className="w-3 h-3" /> {tr("Rotate File CW")}
                       </button>
                       <button
                         onClick={() => rotateAllInFile(activeFile.id, 'ccw')}
                         id={`btn-file-ccw-${activeFile.id}`}
                         className="px-2 py-1 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                       >
-                        <RotateCcw className="w-3 h-3" /> Rotate File CCW
+                        <RotateCcw className="w-3 h-3" /> {tr("Rotate File CCW")}
                       </button>
                       <button
                         onClick={() => resetFileRotations(activeFile.id)}
                         id={`btn-file-reset-${activeFile.id}`}
                         className="px-2 py-1 text-rose-500 hover:bg-rose-500/10 text-[11px] font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                       >
-                        <Undo className="w-3.5 h-3.5" /> Clear file
+                        <Undo className="w-3.5 h-3.5" /> {tr("Clear file")}
                       </button>
                     </div>
                   </div>
@@ -506,14 +507,14 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                             {thumb ? (
                               <img
                                 src={thumb}
-                                alt={`Page ${index + 1}`}
+                                alt={tr("Page {0}", index + 1)}
                                 style={{ transform: `rotate(${rotation}deg)` }}
                                 className="w-full h-full object-contain transition-transform duration-300 pointer-events-none select-none bg-white font-sans text-[8px] flex items-center text-center justify-center text-slate-450"
                                 referrerPolicy="no-referrer"
                               />
                             ) : (
                               <div className="text-slate-405 font-bold text-[10px] select-none font-mono">
-                                Thumbnail {index + 1}
+                                {tr("Thumbnail")} {index + 1}
                               </div>
                             )}
                             
@@ -535,7 +536,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                               onClick={() => rotatePage(activeFile.id, index, 'ccw')}
                               id={`btn-rotate-ccw-${activeFile.id}-${index}`}
                               className="p-1 px-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-150 dark:border-slate-750/30 rounded text-slate-500 dark:text-slate-350 cursor-pointer"
-                              title="Rotate 90 degrees CCW"
+                              title={tr("Rotate 90 degrees CCW")}
                             >
                               <RotateCcw className="w-3 h-3" />
                             </button>
@@ -543,7 +544,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                               onClick={() => rotatePage(activeFile.id, index, 'cw')}
                               id={`btn-rotate-cw-${activeFile.id}-${index}`}
                               className="p-1 px-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-150 dark:border-slate-750/30 rounded text-slate-500 dark:text-slate-350 cursor-pointer"
-                              title="Rotate 90 degrees CW"
+                              title={tr("Rotate 90 degrees CW")}
                             >
                               <RotateCw className="w-3 h-3" />
                             </button>
@@ -557,10 +558,10 @@ export default function RotateTool({ onBack }: RotateToolProps) {
                 <div className="p-8 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-center text-slate-400 select-none py-16">
                   <Info className="w-8 h-8 text-slate-350 mb-2" />
                   <p className="text-sm font-semibold text-slate-500 dark:text-slate-450">
-                    No Document Selected
+                    {tr("No Document Selected")}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
-                    Upload documents or select one from the batch navigator list.
+                    {tr("Upload documents or select one from the batch navigator list.")}
                   </p>
                 </div>
               )}
@@ -577,7 +578,7 @@ export default function RotateTool({ onBack }: RotateToolProps) {
               id="btn-rotate-clear-all-workspace"
               className="text-xs font-bold text-rose-500 hover:text-rose-600 cursor-pointer transition-colors"
             >
-              Clear Workspace
+              {tr("Clear Workspace")}
             </button>
 
             <button
@@ -588,8 +589,8 @@ export default function RotateTool({ onBack }: RotateToolProps) {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               {files.length > 1
-                ? `Apply Rotations & Download ZIP (${files.length} PDFs)`
-                : 'Apply Rotations & Download PDF'}
+                ? tr("Apply Rotations & Download ZIP ({0} PDFs)", files.length)
+                : tr("Apply Rotations & Download PDF")}
             </button>
           </div>
         )}

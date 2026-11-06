@@ -9,6 +9,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, getPdfMetadata, updatePdfMetadata, downloadFile, PdfMetadata } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface MetadataToolProps {
   onBack: () => void;
 }
@@ -60,7 +61,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
       setMetadata(existingMeta);
     } catch (err) {
       console.error(err);
-      alert('Error viewing PDF structure and parsing metadata fields.');
+      alert(tr("Error viewing PDF structure and parsing metadata fields."));
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to rewrite custom metadata tags into the PDF file structure.');
+      alert(tr("Failed to rewrite custom metadata tags into the PDF file structure."));
     } finally {
       setLoading(false);
     }
@@ -109,18 +110,18 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
           id="btn-metadata-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-          Pro Metadata Editor
+          {tr("Pro Metadata Editor")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Edit PDF Metadata</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Edit PDF Metadata")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Read, modify, and assign standard document headers like Title, Creator, Author, and indexing Keywords for pristine SEO.
+            {tr("Read, modify, and assign standard document headers like Title, Creator, Author, and indexing Keywords for pristine SEO.")}
           </p>
         </div>
 
@@ -131,8 +132,8 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               id="metadata-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to extract metadata properties"
-              description="Once uploaded, current metadata fields will parse instantly into matching input cells below."
+              title={tr("Upload PDF to extract metadata properties")}
+              description={tr("Once uploaded, current metadata fields will parse instantly into matching input cells below.")}
             />
           </div>
         )}
@@ -140,7 +141,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
         {loading && (
           <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-305 mb-6">
             <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
-            <span>Scanning catalogs and reading dictionary object descriptors...</span>
+            <span>{tr("Scanning catalogs and reading dictionary object descriptors...")}</span>
           </div>
         )}
 
@@ -149,7 +150,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Metatagged!</span> Your revised metadata-stamped document has been compiled and downloaded.
+                <span className="font-semibold">{tr("Successfully Metatagged!")}</span> {tr("Your revised metadata-stamped document has been compiled and downloaded.")}
               </span>
             </div>
             <button
@@ -157,7 +158,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               id="btn-metadata-reset"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -169,7 +170,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
             <div className="space-y-6">
               <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
                 <Sliders className="w-3.5 h-3.5" />
-                <span>Selected Document</span>
+                <span>{tr("Selected Document")}</span>
               </div>
 
               <div className="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-150 dark:border-slate-800 rounded-xl space-y-4">
@@ -177,7 +178,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
                   {file.previews.length > 0 ? (
                     <img
                       src={file.previews[0]}
-                      alt="Cover Screen"
+                      alt={tr("Cover Screen")}
                       referrerPolicy="no-referrer"
                       className="w-16 h-22 object-cover rounded-md shadow-md border border-slate-200 bg-white shrink-0"
                     />
@@ -190,7 +191,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
                     <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{file.name}</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">{formatSize(file.size)}</p>
                     <span className="text-xs font-bold px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded inline-block text-slate-600 dark:text-slate-300 mt-2">
-                      {file.pageCount} Pages Loaded
+                      {file.pageCount} {tr("Pages Loaded")}
                     </span>
                   </div>
                 </div>
@@ -202,7 +203,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
                     id="btn-metadata-change-file"
                     className="text-xs font-semibold text-violet-500 hover:text-violet-600 cursor-pointer"
                   >
-                    Change File
+                    {tr("Change File")}
                   </button>
                 </div>
               </div>
@@ -210,10 +211,10 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               {/* Informative tips box */}
               <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/10 space-y-2 text-xs">
                 <h5 className="font-bold text-violet-750 dark:text-violet-300 flex items-center gap-1">
-                  <Heart className="w-3.5 h-3.5 shrink-0" /> Why Edit Metadata?
+                  <Heart className="w-3.5 h-3.5 shrink-0" /> {tr("Why Edit Metadata?")}
                 </h5>
                 <p className="text-slate-500 dark:text-slate-450 leading-relaxed">
-                  Proper catalog identifiers like subject details and keywords greatly refine document SEO rankings, ensure consistent reference indexes across system storage engines, and block identity leaks in file properties.
+                  {tr("Proper catalog identifiers like subject details and keywords greatly refine document SEO rankings, ensure consistent reference indexes across system storage engines, and block identity leaks in file properties.")}
                 </p>
               </div>
             </div>
@@ -222,20 +223,20 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold font-mono tracking-widest text-slate-400 uppercase mb-2">
                 <Settings className="w-3.5 h-3.5" />
-                <span>Edit Document Fields</span>
+                <span>{tr("Edit Document Fields")}</span>
               </div>
 
               {/* Title Input */}
               <div className="space-y-1.5">
                 <label htmlFor="meta-title-field" className="block text-xs font-bold text-slate-600 dark:text-slate-450 flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-violet-505" /> Document Title
+                  <FileText className="w-3.5 h-3.5 text-violet-505" /> {tr("Document Title")}
                 </label>
                 <input
                   type="text"
                   id="meta-title-field"
                   value={metadata.title}
                   onChange={(e) => setMetadata({ ...metadata, title: e.target.value })}
-                  placeholder="e.g. Q2 Financial Statement"
+                  placeholder={tr("e.g. Q2 Financial Statement")}
                   className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-violet-500 focus:outline-none text-slate-800 dark:text-slate-100 font-medium"
                 />
               </div>
@@ -243,14 +244,14 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               {/* Author Input */}
               <div className="space-y-1.5">
                 <label htmlFor="meta-author-field" className="block text-xs font-bold text-slate-600 dark:text-slate-450 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-violet-505" /> Author / Creator
+                  <User className="w-3.5 h-3.5 text-violet-505" /> {tr("Author / Creator")}
                 </label>
                 <input
                   type="text"
                   id="meta-author-field"
                   value={metadata.author}
                   onChange={(e) => setMetadata({ ...metadata, author: e.target.value })}
-                  placeholder="e.g. John Doe Consulting"
+                  placeholder={tr("e.g. John Doe Consulting")}
                   className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-violet-500 focus:outline-none text-slate-800 dark:text-slate-100 font-medium"
                 />
               </div>
@@ -258,14 +259,14 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               {/* Subject Input */}
               <div className="space-y-1.5">
                 <label htmlFor="meta-subject-field" className="block text-xs font-bold text-slate-600 dark:text-slate-450 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-violet-505" /> Document Subject
+                  <BookOpen className="w-3.5 h-3.5 text-violet-505" /> {tr("Document Subject")}
                 </label>
                 <input
                   type="text"
                   id="meta-subject-field"
                   value={metadata.subject}
                   onChange={(e) => setMetadata({ ...metadata, subject: e.target.value })}
-                  placeholder="e.g. Corporate Earnings & Assets Analysis"
+                  placeholder={tr("e.g. Corporate Earnings & Assets Analysis")}
                   className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-violet-500 focus:outline-none text-slate-800 dark:text-slate-100 font-medium"
                 />
               </div>
@@ -273,14 +274,14 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               {/* Keywords Input */}
               <div className="space-y-1.5">
                 <label htmlFor="meta-keywords-field" className="block text-xs font-bold text-slate-600 dark:text-slate-450 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-violet-505" /> Keywords (Comma Separated)
+                  <Key className="w-3.5 h-3.5 text-violet-505" /> {tr("Keywords (Comma Separated)")}
                 </label>
                 <input
                   type="text"
                   id="meta-keywords-field"
                   value={metadata.keywords}
                   onChange={(e) => setMetadata({ ...metadata, keywords: e.target.value })}
-                  placeholder="e.g. taxes, annual, financial-report"
+                  placeholder={tr("e.g. taxes, annual, financial-report")}
                   className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-violet-500 focus:outline-none text-slate-800 dark:text-slate-100 font-medium"
                 />
               </div>
@@ -289,27 +290,27 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label htmlFor="meta-creator-field" className="block text-xs font-bold text-slate-600 dark:text-slate-401">
-                    Application / Creator
+                    {tr("Application / Creator")}
                   </label>
                   <input
                     type="text"
                     id="meta-creator-field"
                     value={metadata.creator}
                     onChange={(e) => setMetadata({ ...metadata, creator: e.target.value })}
-                    placeholder="e.g. Adobe InDesign"
+                    placeholder={tr("e.g. Adobe InDesign")}
                     className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:border-violet-500 focus:outline-none leading-normal font-sans"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="meta-producer-field" className="block text-xs font-bold text-slate-600 dark:text-slate-401">
-                    Producer Engine
+                    {tr("Producer Engine")}
                   </label>
                   <input
                     type="text"
                     id="meta-producer-field"
                     value={metadata.producer}
                     onChange={(e) => setMetadata({ ...metadata, producer: e.target.value })}
-                    placeholder="e.g. pdf-lib bundle tool"
+                    placeholder={tr("e.g. pdf-lib bundle tool")}
                     className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:border-violet-500 focus:outline-none leading-normal font-sans"
                   />
                 </div>
@@ -323,7 +324,7 @@ export default function MetadataTool({ onBack }: MetadataToolProps) {
                 className="w-full mt-4 py-3 bg-violet-600 hover:bg-violet-505 disabled:bg-violet-650/40 text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-white" />}
-                Rewrite & Save Metadata Tags
+                {tr("Rewrite & Save Metadata Tags")}
               </button>
             </div>
           </form>

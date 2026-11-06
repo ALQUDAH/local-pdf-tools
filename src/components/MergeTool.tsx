@@ -36,6 +36,7 @@ import { fileToArrayBuffer, getPdfDetails, mergePdfs, downloadFile } from '../li
 import Dropzone from './Dropzone';
 import JSZip from 'jszip';
 
+import { tr } from '../i18n';
 interface MergeToolProps {
   onBack: () => void;
 }
@@ -91,7 +92,7 @@ function SortableFileItem({ file, formatSize, onRemove, index, totalLength, onMo
       {file.previews.length > 0 ? (
         <img
           src={file.previews[0]}
-          alt="Cover"
+          alt={tr("Cover")}
           referrerPolicy="no-referrer"
           className="w-11 h-15 object-cover rounded shadow-xs border border-slate-200 dark:border-slate-800 shrink-0 select-none bg-white font-sans text-[8px] flex items-center text-center justify-center text-slate-400 pointer-events-none"
         />
@@ -107,7 +108,7 @@ function SortableFileItem({ file, formatSize, onRemove, index, totalLength, onMo
           {file.name}
         </p>
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-          {formatSize(file.size)} • {file.pageCount} {file.pageCount === 1 ? 'page' : 'pages'}
+          {formatSize(file.size)} • {file.pageCount} {file.pageCount === 1 ? tr("page") : tr("pages")}
         </p>
       </div>
 
@@ -190,7 +191,7 @@ function SortableGroupFileItem({ file, formatSize, groups, currentGroupId, onFol
       {file.previews.length > 0 ? (
         <img
           src={file.previews[0]}
-          alt="Cover"
+          alt={tr("Cover")}
           referrerPolicy="no-referrer"
           className="w-8 h-11 object-cover rounded shadow-xs border border-slate-200 dark:border-slate-800 shrink-0 select-none bg-white pointer-events-none"
         />
@@ -221,7 +222,7 @@ function SortableGroupFileItem({ file, formatSize, groups, currentGroupId, onFol
         >
           {groups.map((g) => (
             <option key={g.id} value={g.id}>
-              Set Folder: {g.name}
+              {tr("Set Folder:")} {g.name}
             </option>
           ))}
         </select>
@@ -233,7 +234,7 @@ function SortableGroupFileItem({ file, formatSize, groups, currentGroupId, onFol
             disabled={idxInGroup === 0}
             id={`btn-gr-up-${file.id}`}
             className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 disabled:opacity-20 cursor-pointer"
-            title="Move Up in Group"
+            title={tr("Move Up in Group")}
           >
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
@@ -242,7 +243,7 @@ function SortableGroupFileItem({ file, formatSize, groups, currentGroupId, onFol
             disabled={idxInGroup === groupFilesLength - 1}
             id={`btn-gr-down-${file.id}`}
             className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 disabled:opacity-20 cursor-pointer"
-            title="Move Down in Group"
+            title={tr("Move Down in Group")}
           >
             <ArrowDown className="w-3.5 h-3.5" />
           </button>
@@ -250,7 +251,7 @@ function SortableGroupFileItem({ file, formatSize, groups, currentGroupId, onFol
             onClick={() => onRemove(file.id)}
             id={`btn-group-remove-${file.id}`}
             className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
-            title="Remove from project"
+            title={tr("Remove from project")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -339,7 +340,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
 
   const handleFilesSelected = async (newRawFiles: File[]) => {
     setLoading(true);
-    setStatusText('Reading uploaded PDFs...');
+    setStatusText(tr("Reading uploaded PDFs..."));
     setSuccess(false);
 
     try {
@@ -369,7 +370,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
       setFileGroupMap((prev) => ({ ...prev, ...newGroupMap }));
     } catch (err) {
       console.error(err);
-      alert('Error parsing some PDF files. Secure password-protected or corrupted files might fail to render Cover previews, but will load.');
+      alert(tr("Error parsing some PDF files. Secure password-protected or corrupted files might fail to render Cover previews, but will load."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -462,7 +463,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
   const handleMergeSingle = async () => {
     if (files.length < 2) return;
     setLoading(true);
-    setStatusText('Merging document content client-side...');
+    setStatusText(tr("Merging document content client-side..."));
     
     try {
       const buffers = files.map((f) => f.arrayBuffer);
@@ -475,7 +476,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Error during merging. Ensure files are not corrupted.');
+      alert(tr("Error during merging. Ensure files are not corrupted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -486,12 +487,12 @@ export default function MergeTool({ onBack }: MergeToolProps) {
     // Audit groups with 2 or more files
     const validGroups = groups.filter((g) => getFilesForGroup(g.id).length >= 2);
     if (validGroups.length === 0) {
-      alert('Please ensure you have configured at least one Merge Group containing 2 or more PDF files.');
+      alert(tr("Please ensure you have configured at least one Merge Group containing 2 or more PDF files."));
       return;
     }
 
     setLoading(true);
-    setStatusText('Initializing Batch PDF Merger...');
+    setStatusText(tr("Initializing Batch PDF Merger..."));
     
     try {
       const zip = new JSZip();
@@ -501,7 +502,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
         const groupFiles = getFilesForGroup(group.id);
         const buffers = groupFiles.map((f) => f.arrayBuffer);
         
-        setStatusText(`Merging documents for ${group.name} [${groupFiles.length} files]...`);
+        setStatusText(tr("Merging documents for {0} [{1} files]...", group.name, groupFiles.length));
         const mergedBytes = await mergePdfs(buffers);
         
         const cleanName = group.name.replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'Merged_Group';
@@ -510,18 +511,18 @@ export default function MergeTool({ onBack }: MergeToolProps) {
       }
 
       if (compiledCount > 0) {
-        setStatusText('Compressing merged PDFs into single ZIP archive...');
+        setStatusText(tr("Compressing merged PDFs into single ZIP archive..."));
         const zipBytes = await zip.generateAsync({ type: 'uint8array' });
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         
         downloadFile(zipBytes, `batch_merged_${timestamp}.zip`, 'application/zip');
         setSuccess(true);
       } else {
-        alert('No groups met the criteria.');
+        alert(tr("No groups met the criteria."));
       }
     } catch (err) {
       console.error(err);
-      alert('Batch merge operation failed. Verify that all PDFs are unencrypted.');
+      alert(tr("Batch merge operation failed. Verify that all PDFs are unencrypted."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -537,14 +538,14 @@ export default function MergeTool({ onBack }: MergeToolProps) {
           id="btn-merge-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono px-3 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-semibold">
-            JSZip Accelerated
+            {tr("JSZip Accelerated")}
           </span>
           <span className="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-            100% Client-Side
+            {tr("100% Client-Side")}
           </span>
         </div>
       </div>
@@ -552,9 +553,9 @@ export default function MergeTool({ onBack }: MergeToolProps) {
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Merge PDF Files</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Merge PDF Files")}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Combine multiple documents into a single professional PDF, or arrange them into custom batch groupings for parallel merges. Drag and drop items to reorder.
+              {tr("Combine multiple documents into a single professional PDF, or arrange them into custom batch groupings for parallel merges. Drag and drop items to reorder.")}
             </p>
           </div>
 
@@ -572,7 +573,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              Standard (All-in-1)
+              {tr("Standard (All-in-1)")}
             </button>
             <button
               onClick={() => {
@@ -587,7 +588,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              Batch Groups
+              {tr("Batch Groups")}
             </button>
           </div>
         </div>
@@ -598,7 +599,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
             id="merge-dropzone"
             onFilesSelected={handleFilesSelected}
             multiple={true}
-            title={mergeMode === 'batch' ? "Upload multiple PDFs for Batch groups" : "Upload multiple PDFs to merge"}
+            title={mergeMode === 'batch' ? tr("Upload multiple PDFs for Batch groups") : tr("Upload multiple PDFs to merge")}
           />
         </div>
 
@@ -606,7 +607,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
         {loading && (
           <div className="mb-6 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
             <Loader2 className="w-5 h-5 text-indigo-500 animate-spin shrink-0" />
-            <span>{statusText || 'Processing...'}</span>
+            <span>{statusText || tr("Processing...")}</span>
           </div>
         )}
 
@@ -616,9 +617,9 @@ export default function MergeTool({ onBack }: MergeToolProps) {
             <CheckCircle className="w-5 h-5 shrink-0" />
             <div>
               <span className="font-semibold">
-                {mergeMode === 'batch' ? 'All Groups Successfully Merged!' : 'Successfully Merged!'}
+                {mergeMode === 'batch' ? tr("All Groups Successfully Merged!") : tr("Successfully Merged!")}
               </span>{' '}
-              Your processed file package has been generated and downloaded.
+              {tr("Your processed file package has been generated and downloaded.")}
             </div>
           </div>
         )}
@@ -628,21 +629,21 @@ export default function MergeTool({ onBack }: MergeToolProps) {
           <div className="mb-6 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-slate-400">
-                Setup Batches & File Assignments
+                {tr("Setup Batches & File Assignments")}
               </h3>
               <button
                 onClick={addNewGroup}
                 id="btn-add-batch-group"
                 className="px-2.5 py-1 text-xs font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Merge Group
+                <Plus className="w-3.5 h-3.5" /> {tr("Add Merge Group")}
               </button>
             </div>
             
             <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 rounded-xl flex items-start gap-2.5">
               <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
               <p className="text-xs text-slate-500 dark:text-slate-400 select-none">
-                Assign files into designated merge folders. Groups with <strong>2 or more</strong> files will be combined individually. Files belonging to different groups will merge simultaneously and package into a final single ZIP download.
+                {tr("Assign files into designated merge folders. Groups with")} <strong>{tr("2 or more")}</strong> {tr("files will be combined individually. Files belonging to different groups will merge simultaneously and package into a final single ZIP download.")}
               </p>
             </div>
           </div>
@@ -656,8 +657,8 @@ export default function MergeTool({ onBack }: MergeToolProps) {
             {mergeMode === 'single' && (
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                  <span>Selected Documents ({files.length})</span>
-                  <span>Order Placement</span>
+                  <span>{tr("Selected Documents (")}{files.length})</span>
+                  <span>{tr("Order Placement")}</span>
                 </div>
 
                 <div className="border border-slate-100 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
@@ -708,10 +709,10 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                             onChange={(e) => renameGroup(group.id, e.target.value)}
                             id={`input-group-name-${group.id}`}
                             className="text-sm font-bold bg-transparent border-b border-transparent focus:border-indigo-505 hover:border-slate-300 dark:hover:border-slate-700 focus:outline-none text-slate-800 dark:text-slate-200 py-0.5 px-1 font-sans rounded-xs max-w-[170px]"
-                            placeholder="Group Name"
+                            placeholder={tr("Group Name")}
                           />
                           <span className="text-[10px] font-bold font-mono px-2 py-0.5 bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full">
-                            {groupFiles.length} {groupFiles.length === 1 ? 'file' : 'files'}
+                            {groupFiles.length} {groupFiles.length === 1 ? tr("file") : tr("files")}
                           </span>
                         </div>
 
@@ -721,7 +722,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                             id={`btn-delete-group-${group.id}`}
                             className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
                           >
-                            <Trash2 className="w-3.5 h-3.5" /> Delete Group
+                            <Trash2 className="w-3.5 h-3.5" /> {tr("Delete Group")}
                           </button>
                         )}
                       </div>
@@ -757,7 +758,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                         </div>
                       ) : (
                         <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-600 font-sans font-medium">
-                          No files configured in this group folder. Slide some above or change assignments.
+                          {tr("No files configured in this group folder. Slide some above or change assignments.")}
                         </div>
                       )}
                     </div>
@@ -773,7 +774,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                 id="btn-merge-add-more"
                 className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-700 text-sm font-semibold rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <FilePlus2 className="w-4 h-4" /> Add More Files
+                <FilePlus2 className="w-4 h-4" /> {tr("Add More Files")}
               </button>
 
               {mergeMode === 'single' ? (
@@ -784,7 +785,7 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Merge {files.length} PDFs
+                  {tr("Merge")} {files.length} {tr("PDFs")}
                 </button>
               ) : (
                 <button
@@ -794,14 +795,14 @@ export default function MergeTool({ onBack }: MergeToolProps) {
                   className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
-                  Merge groups into ZIP archive
+                  {tr("Merge groups into ZIP archive")}
                 </button>
               )}
             </div>
           </div>
         ) : (
           <div className="text-center py-12 text-slate-400 dark:text-slate-600">
-            No files uploaded yet. Select at least 2 PDF files up to begin.
+            {tr("No files uploaded yet. Select at least 2 PDF files up to begin.")}
           </div>
         )}
       </div>

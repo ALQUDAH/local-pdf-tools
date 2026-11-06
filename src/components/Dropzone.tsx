@@ -6,6 +6,7 @@
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
 import { UploadCloud, File, AlertTriangle } from 'lucide-react';
 
+import { tr } from '../i18n';
 interface DropzoneProps {
   onFilesSelected: (files: File[]) => void;
   multiple?: boolean;
@@ -19,7 +20,7 @@ export default function Dropzone({
   onFilesSelected,
   multiple = true,
   title = "Drag & drop PDF files here",
-  description = "or click to browse your local device. 100% private, files never leave your system.",
+  description,
   id = "pdf-dropzone",
   accept = "application/pdf"
 }: DropzoneProps) {
@@ -56,9 +57,9 @@ export default function Dropzone({
 
     if (validFiles.length === 0) {
       if (accept === "application/pdf") {
-        setError("Please select only valid PDF files (.pdf)");
+        setError(tr("Please select only valid PDF files (.pdf)"));
       } else {
-        setError(`Please select valid files. Expected: ${accept}`);
+        setError(tr("Please select valid files. Expected: {0}", accept));
       }
       return;
     }
@@ -129,7 +130,7 @@ export default function Dropzone({
           {title}
         </h3>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md">
-          {description}
+          {description ?? tr("or click to browse your local device. 100% private, files never leave your system.")}
         </p>
 
         {error && (

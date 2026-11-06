@@ -3,6 +3,7 @@ import { ArrowLeft, Frame, Loader2, CheckCircle, FileText } from 'lucide-react';
 import { addMarginPdf, downloadFile, fileToArrayBuffer } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface MarginToolProps {
   onBack: () => void;
 }
@@ -28,7 +29,7 @@ export default function MarginTool({ onBack }: MarginToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to add margins.');
+      alert(tr("Failed to add margins."));
     } finally {
       setLoading(false);
     }
@@ -41,7 +42,7 @@ export default function MarginTool({ onBack }: MarginToolProps) {
           onClick={onBack}
           className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
       </div>
 
@@ -49,10 +50,10 @@ export default function MarginTool({ onBack }: MarginToolProps) {
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 flex items-center gap-2">
             <Frame className="w-6 h-6 text-fuchsia-500" />
-            Add Margins
+            {tr("Add Margins")}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Add extra white space around your document contents for binding or hole punching.
+            {tr("Add extra white space around your document contents for binding or hole punching.")}
           </p>
         </div>
 
@@ -60,8 +61,8 @@ export default function MarginTool({ onBack }: MarginToolProps) {
           <Dropzone
             onFilesSelected={(files) => setFile(files[0])}
             multiple={false}
-            title="Drop PDF to add margins"
-            description="Upload the document you want to pad with extra space."
+            title={tr("Drop PDF to add margins")}
+            description={tr("Upload the document you want to pad with extra space.")}
           />
         ) : (
           <div className="space-y-6">
@@ -72,20 +73,20 @@ export default function MarginTool({ onBack }: MarginToolProps) {
                 </div>
                 <div>
                   <p className="font-semibold text-slate-800 dark:text-slate-200">{file.name}</p>
-                  <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} {tr("MB")}</p>
                 </div>
               </div>
               <button
                 onClick={() => { setFile(null); setSuccess(false); }}
                 className="text-xs font-semibold text-rose-500 hover:text-rose-600"
               >
-                Change File
+                {tr("Change File")}
               </button>
             </div>
             
             <div className="space-y-3">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Margin Size (percentage of page)
+                {tr("Margin Size (percentage of page)")}
               </label>
               <div className="flex items-center gap-4">
                 <input 
@@ -105,7 +106,7 @@ export default function MarginTool({ onBack }: MarginToolProps) {
             {success ? (
               <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium">File successfully padded and downloaded!</span>
+                <span className="font-medium">{tr("File successfully padded and downloaded!")}</span>
               </div>
             ) : (
               <button
@@ -114,7 +115,7 @@ export default function MarginTool({ onBack }: MarginToolProps) {
                 className="w-full py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Frame className="w-5 h-5" />}
-                Add Margins
+                {tr("Add Margins")}
               </button>
             )}
           </div>

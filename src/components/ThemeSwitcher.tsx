@@ -7,6 +7,7 @@ import React from 'react';
 import { Sun, Moon, Laptop, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { tr } from '../i18n';
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface ThemeSwitcherProps {
@@ -21,19 +22,19 @@ export default function ThemeSwitcher({ currentMode, onChange, labels = {} }: Th
       id: 'light',
       label: labels.light ?? 'Light',
       icon: Sun,
-      tooltip: 'Constant light-colored workspace interface'
+      tooltip: tr("Constant light-colored workspace interface")
     },
     {
       id: 'system',
       label: labels.system ?? 'System',
       icon: Laptop,
-      tooltip: 'Synchronizes automatically with your system preference'
+      tooltip: tr("Synchronizes automatically with your system preference")
     },
     {
       id: 'dark',
       label: labels.dark ?? 'Dark',
       icon: Moon,
-      tooltip: 'Protected eye-safe low light canvas'
+      tooltip: tr("Protected eye-safe low light canvas")
     }
   ];
 

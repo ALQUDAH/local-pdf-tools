@@ -9,6 +9,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, stampSignatureOnPdf, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface SignToolProps {
   onBack: () => void;
 }
@@ -106,7 +107,7 @@ export default function SignTool({ onBack }: SignToolProps) {
       setSelectedPageIndex(0);
     } catch (err) {
       console.error(err);
-      alert('Could not view PDF layout structure.');
+      alert(tr("Could not view PDF layout structure."));
     } finally {
       setLoading(false);
     }
@@ -261,7 +262,7 @@ export default function SignTool({ onBack }: SignToolProps) {
     if (!file) return;
     const signatureImg = getSignatureDataUrl();
     if (!signatureImg) {
-      alert('Please write, type, or upload a signature to stamp first.');
+      alert(tr("Please write, type, or upload a signature to stamp first."));
       return;
     }
 
@@ -284,7 +285,7 @@ export default function SignTool({ onBack }: SignToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to stamp signature to PDF structure. Ensure file does not have copy locks.');
+      alert(tr("Failed to stamp signature to PDF structure. Ensure file does not have copy locks."));
     } finally {
       setLoading(false);
     }
@@ -308,18 +309,18 @@ export default function SignTool({ onBack }: SignToolProps) {
           id="btn-sign-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-full font-semibold">
-          Pro ESIGN Engine
+          {tr("Pro ESIGN Engine")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6 animate-fade-in">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Electronic Signature</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Electronic Signature")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Draw handwritten stamps, enter sleek dynamic script typography, or insert transparent scans directly onto pages.
+            {tr("Draw handwritten stamps, enter sleek dynamic script typography, or insert transparent scans directly onto pages.")}
           </p>
         </div>
 
@@ -330,8 +331,8 @@ export default function SignTool({ onBack }: SignToolProps) {
               id="sign-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to burn custom signatures"
-              description="Upload files to authorize corporate audits, legal bindings, or form agreements securely."
+              title={tr("Upload PDF to burn custom signatures")}
+              description={tr("Upload files to authorize corporate audits, legal bindings, or form agreements securely.")}
             />
           </div>
         )}
@@ -339,7 +340,7 @@ export default function SignTool({ onBack }: SignToolProps) {
         {loading && (
           <div className="p-4 rounded-xl bg-sky-500/5 border border-sky-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300 mb-6">
             <Loader2 className="w-5 h-5 text-sky-500 animate-spin" />
-            <span>Embedding security credentials and stamping PNG channels onto page matrix...</span>
+            <span>{tr("Embedding security credentials and stamping PNG channels onto page matrix...")}</span>
           </div>
         )}
 
@@ -348,7 +349,7 @@ export default function SignTool({ onBack }: SignToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <span>
-                <span className="font-semibold">Successfully Signed!</span> Your secure signatory copy has been processed and and downloaded.
+                <span className="font-semibold">{tr("Successfully Signed!")}</span> {tr("Your secure signatory copy has been processed and and downloaded.")}
               </span>
             </div>
             <button
@@ -356,7 +357,7 @@ export default function SignTool({ onBack }: SignToolProps) {
               id="btn-sign-reset"
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Start New
+              <RefreshCw className="w-3.5 h-3.5" /> {tr("Start New")}
             </button>
           </div>
         )}
@@ -368,10 +369,10 @@ export default function SignTool({ onBack }: SignToolProps) {
             <div className="lg:col-span-5 space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                  1. Placement Target Map
+                  {tr("1. Placement Target Map")}
                 </span>
                 <span className="text-xs font-semibold text-slate-400">
-                  Click on page to place
+                  {tr("Click on page to place")}
                 </span>
               </div>
 
@@ -381,7 +382,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                 {/* Page Index Switcher */}
                 <div className="w-full flex items-center justify-between">
                   <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                    Document sheet: <span className="text-slate-950 dark:text-white font-mono font-bold">#{selectedPageIndex + 1}</span> of {file.pageCount}
+                    {tr("Document sheet:")} <span className="text-slate-950 dark:text-white font-mono font-bold">#{selectedPageIndex + 1}</span> {tr("of")} {file.pageCount}
                   </div>
                   <div className="flex gap-1.5">
                     <button
@@ -390,7 +391,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                       onClick={() => setSelectedPageIndex((prev) => Math.max(0, prev - 1))}
                       className="px-2.5 py-1 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-750 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-md font-bold disabled:opacity-40"
                     >
-                      Prev
+                      {tr("Prev")}
                     </button>
                     <button
                       type="button"
@@ -398,7 +399,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                       onClick={() => setSelectedPageIndex((prev) => Math.min(file.pageCount - 1, prev + 1))}
                       className="px-2.5 py-1 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-750 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-md font-bold disabled:opacity-40"
                     >
-                      Next
+                      {tr("Next")}
                     </button>
                   </div>
                 </div>
@@ -412,7 +413,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                   {file.previews[selectedPageIndex] ? (
                     <img
                       src={file.previews[selectedPageIndex]}
-                      alt="Stamp coordinate sheet canvas renderer"
+                      alt={tr("Stamp coordinate sheet canvas renderer")}
                       referrerPolicy="no-referrer"
                       className="w-full h-auto pointer-events-none block"
                     />
@@ -434,33 +435,33 @@ export default function SignTool({ onBack }: SignToolProps) {
                     >
                       <img
                         src={generatedPreviewImage}
-                        alt="Signature Floating Stamp Marker"
+                        alt={tr("Signature Floating Stamp Marker")}
                         referrerPolicy="no-referrer"
                         className="w-full h-auto object-contain brightness-95"
                       />
                       {/* Anchor anchor */}
                       <span className="absolute -top-4 -left-1 px-1 bg-sky-500 text-[8px] font-bold text-white rounded scale-75 whitespace-nowrap">
-                        Signature Anchor
+                        {tr("Signature Anchor")}
                       </span>
                     </div>
                   )}
                 </div>
 
                 <div className="w-full text-[10px] text-center text-slate-450 flex items-center gap-1 justify-center italic">
-                  <HelpCircle className="w-3.5 h-3.5" /> Hover and click/tap anywhere on the preview sheet to assign custom alignment.
+                  <HelpCircle className="w-3.5 h-3.5" /> {tr("Hover and click/tap anywhere on the preview sheet to assign custom alignment.")}
                 </div>
               </div>
 
               {/* Adjusters */}
               <div className="space-y-4 bg-slate-50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-100 dark:border-slate-850">
                 <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                  Alignment Geometry Slider
+                  {tr("Alignment Geometry Slider")}
                 </span>
                 
                 {/* Horizontal */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                    <label htmlFor="sign-posX-slider">Horizontal Distance (X)</label>
+                    <label htmlFor="sign-posX-slider">{tr("Horizontal Distance (X)")}</label>
                     <span className="font-mono text-sky-550">{xPercent}%</span>
                   </div>
                   <input
@@ -477,7 +478,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                 {/* Vertical */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                    <label htmlFor="sign-posY-slider">Vertical Distance (Y)</label>
+                    <label htmlFor="sign-posY-slider">{tr("Vertical Distance (Y)")}</label>
                     <span className="font-mono text-sky-550">{yPercent}%</span>
                   </div>
                   <input
@@ -494,8 +495,8 @@ export default function SignTool({ onBack }: SignToolProps) {
                 {/* Scale Width */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                    <label htmlFor="sign-width-slider">Signature Size / Width</label>
-                    <span className="font-mono text-sky-550">{widthPercent}% of page</span>
+                    <label htmlFor="sign-width-slider">{tr("Signature Size / Width")}</label>
+                    <span className="font-mono text-sky-550">{widthPercent}{tr("% of page")}</span>
                   </div>
                   <input
                     type="range"
@@ -516,14 +517,14 @@ export default function SignTool({ onBack }: SignToolProps) {
               {/* Creator tab toggle */}
               <div className="space-y-3">
                 <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                  2. Create Signature Stamp
+                  {tr("2. Create Signature Stamp")}
                 </span>
 
                 <div className="grid grid-cols-3 gap-2.5 p-1 bg-slate-100 dark:bg-slate-950/60 rounded-xl">
                   {[
-                    { id: 'draw', label: 'Draw Pad', icon: PenTool },
-                    { id: 'type', label: 'Type Text', icon: Type },
-                    { id: 'upload', label: 'Upload PNG', icon: Upload },
+                    { id: 'draw', label: tr("Draw Pad"), icon: PenTool },
+                    { id: 'type', label: tr("Type Text"), icon: Type },
+                    { id: 'upload', label: tr("Upload PNG"), icon: Upload },
                   ].map((mode) => {
                     const Icon = mode.icon;
                     return (
@@ -550,13 +551,13 @@ export default function SignTool({ onBack }: SignToolProps) {
               {signMode !== 'upload' && (
                 <div className="space-y-3">
                   <span className="block text-xs font-bold font-mono tracking-widest text-slate-400 uppercase">
-                    Select Ink Color
+                    {tr("Select Ink Color")}
                   </span>
                   <div className="flex gap-4">
                     {[
-                      { value: '#0F172A', label: 'Slate Black', bg: 'bg-slate-900' },
-                      { value: '#1E3A8A', label: 'Ink Blue', bg: 'bg-blue-900' },
-                      { value: '#7F1D1D', label: 'Docu Red', bg: 'bg-rose-900' },
+                      { value: '#0F172A', label: tr("Slate Black"), bg: 'bg-slate-900' },
+                      { value: '#1E3A8A', label: tr("Ink Blue"), bg: 'bg-blue-900' },
+                      { value: '#7F1D1D', label: tr("Docu Red"), bg: 'bg-rose-900' },
                     ].map((color) => (
                       <button
                         key={color.value}
@@ -585,7 +586,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
-                        Sign below using mouse or touchpad controller
+                        {tr("Sign below using mouse or touchpad controller")}
                       </span>
                       <button
                         type="button"
@@ -593,7 +594,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                         id="btn-draw-clear"
                         className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" /> Clear Pad
+                        <Trash2 className="w-3.5 h-3.5" /> {tr("Clear Pad")}
                       </button>
                     </div>
 
@@ -620,14 +621,14 @@ export default function SignTool({ onBack }: SignToolProps) {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label htmlFor="sign-typed-input" className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                        Enter signature letters
+                        {tr("Enter signature letters")}
                       </label>
                       <input
                         type="text"
                         id="sign-typed-input"
                         value={typedName}
                         onChange={(e) => setTypedName(e.target.value)}
-                        placeholder="e.g. Marie J. Sklodowska"
+                        placeholder={tr("e.g. Marie J. Sklodowska")}
                         className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-305 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium rounded-xl leading-normal focus:outline-none focus:border-sky-500"
                         maxLength={40}
                       />
@@ -636,7 +637,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                     {/* Font Selector Cards */}
                     <div className="space-y-2 pt-1">
                       <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                        Choose Calligraphy Typography Style
+                        {tr("Choose Calligraphy Typography Style")}
                       </span>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {SCRIPT_FONTS.map((font) => (
@@ -645,7 +646,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                             type="button"
                             onClick={() => setSelectedFont(font.value)}
                             id={`btn-scriptfont-${font.name.replace(/\s+/g, '')}`}
-                            className={`p-3 rounded-xl border text-left flex flex-col justify-between h-20 transition-all cursor-pointer ${
+                            className={`p-3 rounded-xl border text-start flex flex-col justify-between h-20 transition-all cursor-pointer ${
                               selectedFont === font.value
                                 ? 'border-sky-500 bg-white dark:bg-slate-900 ring-2 ring-sky-500/20'
                                 : 'border-slate-200 dark:border-slate-805 bg-white dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -656,7 +657,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                               style={{ fontFamily: font.value, color: inkColor }} 
                               className="text-lg truncate select-none block"
                             >
-                              {typedName || 'John Doe'}
+                              {typedName || tr("John Doe")}
                             </span>
                           </button>
                         ))}
@@ -669,7 +670,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                 {signMode === 'upload' && (
                   <div className="space-y-4">
                     <span className="block text-xs font-bold text-slate-600 dark:text-slate-400">
-                      Upload transparent PNG of scan written sign
+                      {tr("Upload transparent PNG of scan written sign")}
                     </span>
 
                     {!uploadedSignatureUrl ? (
@@ -683,10 +684,10 @@ export default function SignTool({ onBack }: SignToolProps) {
                         />
                         <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                         <span className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                          Choose signature image file
+                          {tr("Choose signature image file")}
                         </span>
                         <span className="block text-[10px] text-slate-450 mt-1">
-                          PNG formats with transparent backgrounds work best.
+                          {tr("PNG formats with transparent backgrounds work best.")}
                         </span>
                       </div>
                     ) : (
@@ -694,12 +695,12 @@ export default function SignTool({ onBack }: SignToolProps) {
                         <div className="flex items-center gap-3">
                           <img
                             src={uploadedSignatureUrl}
-                            alt="Uploaded client signature item"
+                            alt={tr("Uploaded client signature item")}
                             referrerPolicy="no-referrer"
                             className="h-10 w-24 object-contain border border-slate-100 rounded bg-slate-50"
                           />
                           <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold font-mono">
-                            Signature loaded successfully
+                            {tr("Signature loaded successfully")}
                           </span>
                         </div>
                         <button
@@ -707,7 +708,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                           onClick={() => setUploadedSignatureUrl(null)}
                           className="text-xs font-bold text-rose-500 hover:text-rose-600"
                         >
-                          Delete
+                          {tr("Delete")}
                         </button>
                       </div>
                     )}
@@ -724,7 +725,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                   <div className="min-w-0">
                     <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{file.name}</h4>
                     <span className="block text-xs text-slate-500 dark:text-slate-400 font-semibold font-mono">
-                      {formatSize(file.size)} • {file.pageCount} Pages Loaded
+                      {formatSize(file.size)} • {file.pageCount} {tr("Pages Loaded")}
                     </span>
                   </div>
                 </div>
@@ -734,7 +735,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                   id="btn-sign-change-file"
                   className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-750 hover:bg-slate-50 rounded-lg cursor-pointer"
                 >
-                  Change File
+                  {tr("Change File")}
                 </button>
               </div>
 
@@ -747,7 +748,7 @@ export default function SignTool({ onBack }: SignToolProps) {
                 className="w-full py-4 bg-sky-600 hover:bg-sky-505 disabled:bg-sky-650/40 text-white text-sm font-semibold rounded-2xl shadow-md tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-white shrink-0" />}
-                Burn Signatures & Download Protected Copy
+                {tr("Burn Signatures & Download Protected Copy")}
               </button>
             </div>
           </div>

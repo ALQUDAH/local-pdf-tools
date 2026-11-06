@@ -9,6 +9,7 @@ import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, renderAllPdfPages, downloadFile } from '../lib/pdfUtils';
 import Dropzone from './Dropzone';
 
+import { tr } from '../i18n';
 interface ImgConvertToolProps {
   onBack: () => void;
 }
@@ -32,7 +33,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
   const handleFileSelected = async (newRawFiles: File[]) => {
     if (newRawFiles.length === 0) return;
     setLoading(true);
-    setStatusText('Loading PDF elements into memory...');
+    setStatusText(tr("Loading PDF elements into memory..."));
     setSuccess(false);
     setImages([]);
 
@@ -53,7 +54,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
 
       // Immediately kick off high-quality rendering of ALL pages
       setLoading(true);
-      setStatusText('Rendering all pages to high resolution images...');
+      setStatusText(tr("Rendering all pages to high resolution images..."));
       setRenderedProgress({ current: 0, total: pageCount });
 
       const renderedImages = await renderAllPdfPages(arrayBuffer, (current, total) => {
@@ -64,7 +65,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Error rendering PDF. High security PDFs or invalid structures might fail.');
+      alert(tr("Error rendering PDF. High security PDFs or invalid structures might fail."));
       setFile(null);
     } finally {
       setLoading(false);
@@ -106,18 +107,18 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
           id="btn-image-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-          100% Client-Side
+          {tr("100% Client-Side")}
         </span>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">Convert PDF to Images</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">{tr("Convert PDF to Images")}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Extract every sheet of a PDF into high-resolution JPG images. Perfect for presentations or web formatting.
+            {tr("Extract every sheet of a PDF into high-resolution JPG images. Perfect for presentations or web formatting.")}
           </p>
         </div>
 
@@ -128,8 +129,8 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
               id="imgconvert-dropzone"
               onFilesSelected={handleFileSelected}
               multiple={false}
-              title="Upload PDF to render images"
-              description="Upload a document to extract full-page 2.0x scale raster assets."
+              title={tr("Upload PDF to render images")}
+              description={tr("Upload a document to extract full-page 2.0x scale raster assets.")}
             />
           </div>
         )}
@@ -139,13 +140,13 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
           <div className="mb-6 p-5 rounded-xl bg-violet-500/5 border border-violet-500/10 space-y-3">
             <div className="flex items-center gap-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
               <Loader2 className="w-5 h-5 text-violet-500 animate-spin shrink-0" />
-              <span>{statusText || 'Rendering canvases...'}</span>
+              <span>{statusText || tr("Rendering canvases...")}</span>
             </div>
             {renderedProgress.total > 0 && (
               <div className="w-full space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  <span>Converting sheets</span>
-                  <span>{renderedProgress.current} of {renderedProgress.total}</span>
+                  <span>{tr("Converting sheets")}</span>
+                  <span>{renderedProgress.current} {tr("of")} {renderedProgress.total}</span>
                 </div>
                 <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
@@ -164,7 +165,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 shrink-0" />
               <div>
-                <span className="font-semibold">Conversion Complete!</span> Generated {images.length} High-Resolution JPG page elements.
+                <span className="font-semibold">{tr("Conversion Complete!")}</span> {tr("Generated")} {images.length} {tr("High-Resolution JPG page elements.")}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -173,14 +174,14 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
                 id="btn-images-download-all"
                 className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5" /> Download All Pages
+                <Download className="w-3.5 h-3.5" /> {tr("Download All Pages")}
               </button>
               <button
                 onClick={resetTool}
                 id="btn-images-reset"
                 className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs transition-colors font-semibold flex items-center gap-1 cursor-pointer"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Clear
+                <RefreshCw className="w-3.5 h-3.5" /> {tr("Clear")}
               </button>
             </div>
           </div>
@@ -196,7 +197,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
                   {file.name} ({formatSize(file.size)})
                 </span>
               </div>
-              <span className="text-xs text-slate-500 font-semibold">{images.length} images ready</span>
+              <span className="text-xs text-slate-500 font-semibold">{images.length} {tr("images ready")}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 p-4 bg-slate-50 dark:bg-slate-950/20 rounded-2xl border border-slate-100 dark:border-slate-800/60 max-h-[600px] overflow-y-auto">
@@ -209,12 +210,12 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
                   <div className="relative aspect-[3/4] rounded bg-slate-100 overflow-hidden shadow-inner border border-slate-100/50">
                     <img
                       src={imgSrc}
-                      alt={`Converted Page ${index + 1}`}
+                      alt={tr("Converted Page {0}", index + 1)}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                     />
                     <div className="absolute top-2 left-2 px-2 py-0.5 bg-slate-900/80 text-white rounded font-mono text-[10px] uppercase font-bold select-none">
-                      Page {index + 1}
+                      {tr("Page")} {index + 1}
                     </div>
                   </div>
 
@@ -223,7 +224,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
                     id={`btn-download-single-${index + 1}`}
                     className="mt-3 w-full py-1.5 bg-slate-100 hover:bg-violet-600 dark:bg-slate-850 hover:text-white text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5" /> Download JPG
+                    <Download className="w-3.5 h-3.5" /> {tr("Download JPG")}
                   </button>
                 </div>
               ))}
@@ -233,7 +234,7 @@ export default function ImgConvertTool({ onBack }: ImgConvertToolProps) {
 
         {!loading && images.length === 0 && (
           <div className="text-center py-12 text-slate-400 dark:text-slate-600">
-            Select a PDF document. High-resolution rasterization is done entirely using local canvas engines.
+            {tr("Select a PDF document. High-resolution rasterization is done entirely using local canvas engines.")}
           </div>
         )}
       </div>

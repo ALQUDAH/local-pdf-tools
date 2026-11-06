@@ -30,6 +30,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import '../lib/pdfjs';
 import JSZip from 'jszip';
 
+import { tr } from '../i18n';
 interface BatchConverterToolProps {
   onBack: () => void;
 }
@@ -391,7 +392,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
       });
 
       if (totalAdded === 0) {
-        alert('No converted files ready to download.');
+        alert(tr("No converted files ready to download."));
         setZipLoading(false);
         return;
       }
@@ -408,7 +409,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
       URL.revokeObjectURL(downloadUrl);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate ZIP compilation. Individual downloads remain accessible.');
+      alert(tr("Failed to generate ZIP compilation. Individual downloads remain accessible."));
     } finally {
       setZipLoading(false);
     }
@@ -425,10 +426,10 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
           id="btn-batch-back"
           className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {tr("Back to Dashboard")}
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-600/10 text-violet-600 dark:text-violet-400 rounded-full font-bold flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-violet-500 animate-pulse" /> Dual Engines Enabled
+          <Sparkles className="w-3 h-3 text-violet-500 animate-pulse" /> {tr("Dual Engines Enabled")}
         </span>
       </div>
 
@@ -440,10 +441,10 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">
-                  High-Speed Batch Converter
+                  {tr("High-Speed Batch Converter")}
                 </h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Upload multiple PDF documents or heavy images and convert them standardly in bulk instantly.
+                  {tr("Upload multiple PDF documents or heavy images and convert them standardly in bulk instantly.")}
                 </p>
               </div>
               {files.length > 0 && (
@@ -452,7 +453,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                   disabled={isProcessing}
                   className="text-xs font-semibold py-1.5 px-3 border border-slate-205 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 text-slate-600 dark:text-slate-400 rounded-xl transition-all cursor-pointer disabled:opacity-40"
                 >
-                  Clear Queue
+                  {tr("Clear Queue")}
                 </button>
               )}
             </div>
@@ -462,8 +463,8 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
               id="batchconvert-dropzone"
               onFilesSelected={handleFilesSelected}
               multiple={true}
-              title="Add PDF or Image files to convert in batch"
-              description="Supports PDF, PNG, JPG, JPEG, and WEBP files"
+              title={tr("Add PDF or Image files to convert in batch")}
+              description={tr("Supports PDF, PNG, JPG, JPEG, and WEBP files")}
             />
 
             {/* Render queue table / files details list */}
@@ -471,11 +472,11 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
               <div className="mt-6 border border-slate-100 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-2xs">
                 <div className="bg-slate-50/50 dark:bg-slate-950/40 px-5 py-3 border-b border-slate-105 dark:border-slate-850/60 flex items-center justify-between">
                   <span className="text-xs font-bold font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <Files className="w-4 h-4 text-slate-400" /> Convert Queue ({files.length} Files)
+                    <Files className="w-4 h-4 text-slate-400" /> {tr("Convert Queue (")}{files.length} {tr("Files)")}
                   </span>
                   {successCount > 0 && (
                     <span className="text-xs px-2.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-                      {successCount} / {files.length} Converted
+                      {successCount} / {files.length} {tr("Converted")}
                     </span>
                   )}
                 </div>
@@ -498,7 +499,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                           {file.thumbnail ? (
                             <img 
                               src={file.thumbnail} 
-                              alt="preview" 
+                              alt={tr("preview")} 
                               className="w-full h-full object-cover" 
                               referrerPolicy="no-referrer"
                             />
@@ -526,7 +527,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                           {/* Render processing error banner if occurred */}
                           {file.status === 'error' && (
                             <p className="text-[10px] text-rose-500 font-medium mt-1 select-none flex items-center gap-1">
-                              <AlertCircle className="w-3.5 h-3.5" /> {file.errorMessage || 'Conversion failed.'}
+                              <AlertCircle className="w-3.5 h-3.5" /> {file.errorMessage || tr("Conversion failed.")}
                             </p>
                           )}
 
@@ -550,22 +551,22 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                         <div className="flex items-center gap-2">
                           {file.status === 'pending' && (
                             <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                              Pending
+                              {tr("Pending")}
                             </span>
                           )}
                           {file.status === 'processing' && (
                             <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded-full animate-pulse flex items-center gap-1">
-                              <Loader2 className="w-3 h-3 animate-spin" /> Processing
+                              <Loader2 className="w-3 h-3 animate-spin" /> {tr("Processing")}
                             </span>
                           )}
                           {file.status === 'success' && (
                             <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5" /> Output Ready
+                              <Check className="w-3.5 h-3.5" /> {tr("Output Ready")}
                             </span>
                           )}
                           {file.status === 'error' && (
                             <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full">
-                              Failed
+                              {tr("Failed")}
                             </span>
                           )}
                         </div>
@@ -578,9 +579,9 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                                 key={cIdx}
                                 onClick={() => handleDownloadSingle(cf)}
                                 className="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-amber-500 dark:hover:border-amber-400 hover:text-amber-600 px-2 py-1 transition-all flex items-center gap-1 cursor-pointer"
-                                title={`Download: ${cf.name}`}
+                                title={tr("Download: {0}", cf.name)}
                               >
-                                <Download className="w-2.5 h-2.5" /> Download {file.convertedFiles!.length > 1 ? `P.${cIdx + 1}` : cf.name.split('.').pop()?.toUpperCase()}
+                                <Download className="w-2.5 h-2.5" /> {tr("Download")} {file.convertedFiles!.length > 1 ? `P.${cIdx + 1}` : cf.name.split('.').pop()?.toUpperCase()}
                               </button>
                             ))}
                           </div>
@@ -591,7 +592,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                           <button
                             onClick={() => removeFile(file.id)}
                             className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-rose-500 text-slate-400 rounded-lg transition-colors cursor-pointer self-end"
-                            title="Remove from queue"
+                            title={tr("Remove from queue")}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -607,12 +608,12 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             {!isProcessing && files.length === 0 && (
               <div className="text-center py-16 text-slate-400 dark:text-slate-600 flex flex-col items-center">
                 <FileCode className="w-12 h-12 text-slate-200 dark:text-slate-800 mb-3 animate-pulse" />
-                <p className="text-sm">Queue is empty. Select multiple digital assets to convert above.</p>
+                <p className="text-sm">{tr("Queue is empty. Select multiple digital assets to convert above.")}</p>
                 <div className="mt-4 flex flex-wrap gap-2 justify-center text-[11px] font-mono text-slate-500 max-w-sm">
-                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">PDF to JPG</span>
-                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">PDF to PNG</span>
-                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">Images to PDF</span>
-                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">WEBP to JPEG</span>
+                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">{tr("PDF to JPG")}</span>
+                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">{tr("PDF to PNG")}</span>
+                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">{tr("Images to PDF")}</span>
+                  <span className="px-2 py-1 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-850">{tr("WEBP to JPEG")}</span>
                 </div>
               </div>
             )}
@@ -626,14 +627,14 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
               <Settings className="w-4.5 h-4.5 text-slate-500" />
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
-                Compilation Settings
+                {tr("Compilation Settings")}
               </h3>
             </div>
 
             {/* Target format selection */}
             <div className="space-y-2">
               <label className="block text-xs font-bold font-mono text-slate-400 uppercase">
-                Target Output Format
+                {tr("Target Output Format")}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {(['pdf', 'jpg', 'png'] as OutputFormat[]).map((fmt) => (
@@ -649,7 +650,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                   >
                     <span className="uppercase text-sm">{fmt}</span>
                     <span className="text-[9px] font-normal opacity-70">
-                      {fmt === 'pdf' ? 'Vector' : 'Raster'}
+                      {fmt === 'pdf' ? tr("Vector") : tr("Raster")}
                     </span>
                   </button>
                 ))}
@@ -660,7 +661,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             {targetFormat === 'jpg' && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold font-mono text-slate-400 uppercase">
-                  <span>JPEG Compression</span>
+                  <span>{tr("JPEG Compression")}</span>
                   <span className="text-slate-650 dark:text-slate-350">{Math.round(quality * 100)}%</span>
                 </div>
                 <input
@@ -673,8 +674,8 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                   className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-650"
                 />
                 <div className="flex justify-between text-[10px] text-slate-400">
-                  <span>Balanced</span>
-                  <span>Max Quality</span>
+                  <span>{tr("Balanced")}</span>
+                  <span>{tr("Max Quality")}</span>
                 </div>
               </div>
             )}
@@ -683,7 +684,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             {(targetFormat === 'jpg' || targetFormat === 'png') && (
               <div className="space-y-3">
                 <label className="block text-xs font-bold font-mono text-slate-400 uppercase">
-                  PDF Page Render Scale
+                  {tr("PDF Page Render Scale")}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[1.0, 1.5, 2.0].map((sc) => (
@@ -697,12 +698,12 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                           : 'border-slate-202 dark:border-slate-850 hover:border-slate-300 hover:bg-slate-50/40 dark:hover:bg-slate-950 text-slate-500'
                       }`}
                     >
-                      {sc === 1.0 ? '1.0x (Web)' : sc === 1.5 ? '1.5x (Crisp)' : '2.0x (Print)'}
+                      {sc === 1.0 ? tr("1.0x (Web)") : sc === 1.5 ? tr("1.5x (Crisp)") : tr("2.0x (Print)")}
                     </button>
                   ))}
                 </div>
                 <p className="text-[10px] text-slate-400 leading-relaxed">
-                  Adjusting the output scale factor controls visual density and resultant file sizes. 1.5x scale balances speed with extreme legibility.
+                  {tr("Adjusting the output scale factor controls visual density and resultant file sizes. 1.5x scale balances speed with extreme legibility.")}
                 </p>
               </div>
             )}
@@ -711,11 +712,11 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-101 dark:border-slate-852/40 flex gap-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
               <Info className="w-5 h-5 text-violet-500 shrink-0" />
               <div>
-                <span className="font-semibold text-slate-700 dark:text-slate-300 block mb-0.5">Bulk Conversion Tips</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300 block mb-0.5">{tr("Bulk Conversion Tips")}</span>
                 {targetFormat === 'pdf' ? (
-                  <span>Images automatically wrap into beautiful standalone single-page PDFs. Uploaded PDF elements are formatted as native pass-through vectors.</span>
+                  <span>{tr("Images automatically wrap into beautiful standalone single-page PDFs. Uploaded PDF elements are formatted as native pass-through vectors.")}</span>
                 ) : (
-                  <span>Unpacks multi-page PDFs page by page into a flat series of high-quality `. {targetFormat}` image assets. Perfect for web publication.</span>
+                  <span>{tr("Unpacks multi-page PDFs page by page into a flat series of high-quality `.")} {targetFormat}{tr("` image assets. Perfect for web publication.")}</span>
                 )}
               </div>
             </div>
@@ -731,12 +732,12 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                    Converting {successCount} / {files.length}...
+                    {tr("Converting")} {successCount} / {files.length}...
                   </>
                 ) : (
                   <>
                     <Play className="w-4.5 h-4.5 fill-current" />
-                    Convert all queue
+                    {tr("Convert all queue")}
                   </>
                 )}
               </button>
@@ -751,12 +752,12 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
                   {zipLoading ? (
                     <>
                       <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                      Bundling Zip archive...
+                      {tr("Bundling Zip archive...")}
                     </>
                   ) : (
                     <>
                       <FolderArchive className="w-4.5 h-4.5" />
-                      Download all as ZIP
+                      {tr("Download all as ZIP")}
                     </>
                   )}
                 </button>
@@ -767,7 +768,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
             {successCount === files.length && files.length > 0 && !isProcessing && (
               <div className="p-3.5 bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 rounded-2xl border border-emerald-500/10 text-center text-xs font-semibold flex items-center justify-center gap-2 animate-bounce">
                 <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>Bulk Conversion Successful!</span>
+                <span>{tr("Bulk Conversion Successful!")}</span>
               </div>
             )}
 

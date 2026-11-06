@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-11-06
+
+### Added
+- **Every tool screen is now available in Arabic** (1,000+ strings), with right-to-left layouts. Switching language updates the open tool instantly.
+- Lightweight `tr()` translation system with on-demand language catalogs; see the translation guide in CONTRIBUTING.md.
+- Browser tests for Arabic tool screens and live language switching.
+
+### Fixed
+- Icon-only back buttons in six tools now have accessible labels.
+- Protect PDF help text described the old custom format; it now explains standard password protection.
+
 ## [1.1.0] - 2026-11-06
 
 ### Added

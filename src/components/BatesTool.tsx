@@ -24,6 +24,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import '../lib/pdfjs';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 
+import { tr } from '../i18n';
 interface BatesToolProps {
   onBack: () => void;
 }
@@ -50,7 +51,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
 
   const handleFileDrop = async (selectedFile: File) => {
     setLoading(true);
-    setStatusText('Reading case documents...');
+    setStatusText(tr("Reading case documents..."));
     setSuccess(false);
 
     try {
@@ -69,7 +70,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
       setPreviewPage(1);
     } catch (err) {
       console.error(err);
-      alert('Could not parse PDF. Secure or corrupted structures cannot compile local frames.');
+      alert(tr("Could not parse PDF. Secure or corrupted structures cannot compile local frames."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -202,7 +203,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
   const handleApplyBates = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText('Stamping case files sequentially...');
+    setStatusText(tr("Stamping case files sequentially..."));
 
     try {
       const pdfDoc = await PDFDocument.load(file.arrayBuffer, { ignoreEncryption: true });
@@ -265,7 +266,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
         });
       });
 
-      setStatusText('Saving stamped PDF sequence...');
+      setStatusText(tr("Saving stamped PDF sequence..."));
       const savedBytes = await pdfDoc.save();
       const cleanName = file.name.replace('.pdf', '') + '_stamped.pdf';
 
@@ -273,7 +274,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      alert('Could not apply Bates stamps onto PDF layers.');
+      alert(tr("Could not apply Bates stamps onto PDF layers."));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -294,6 +295,8 @@ export default function BatesTool({ onBack }: BatesToolProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
+            aria-label={tr("Back to Dashboard")}
+            title={tr("Back to Dashboard")}
             id="btn-bates-back"
             className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-350 rounded-xl cursor-pointer"
           >
@@ -301,10 +304,10 @@ export default function BatesTool({ onBack }: BatesToolProps) {
           </button>
           <div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <Hash className="w-6 h-6 text-emerald-500" /> Bates Numbering & Legal Stamp
+              <Hash className="w-6 h-6 text-emerald-500" /> {tr("Bates Numbering & Legal Stamp")}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Stamp structured legal, commercial, or medical indexing series (e.g., LIT-CASE-000042) sequentially across multi-page corporate files.
+              {tr("Stamp structured legal, commercial, or medical indexing series (e.g., LIT-CASE-000042) sequentially across multi-page corporate files.")}
             </p>
           </div>
         </div>
@@ -318,7 +321,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
             id="btn-bates-reset"
             className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-600 dark:text-slate-400 hover:text-rose-500 font-extrabold font-mono text-xs rounded-xl transition-colors cursor-pointer border border-transparent dark:border-slate-800"
           >
-            Change Document
+            {tr("Change Document")}
           </button>
         )}
       </div>
@@ -327,10 +330,8 @@ export default function BatesTool({ onBack }: BatesToolProps) {
         <Dropzone
           onFilesSelected={(files) => handleFileDrop(files[0])}
           multiple={false}
-          title="Drop PDF to place Bates stamps"
-          description="
-            Formulate prefixes, serial pad sizes, starting indexes, and positioning. Processing compiles completely locally.
-          "
+          title={tr("Drop PDF to place Bates stamps")}
+          description={tr("Formulate prefixes, serial pad sizes, starting indexes, and positioning. Processing compiles completely locally.")}
         />
       ) : (
         /* Workspace layout */
@@ -340,12 +341,12 @@ export default function BatesTool({ onBack }: BatesToolProps) {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-2xl p-5 space-y-5 shadow-xs">
               <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                <Settings className="w-4 h-4 text-emerald-500" /> Series Parameters
+                <Settings className="w-4 h-4 text-emerald-500" /> {tr("Series Parameters")}
               </h3>
 
               <div className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Series Prefix Word</label>
+                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Series Prefix Word")}</label>
                   <input
                     type="text"
                     value={prefix}
@@ -355,7 +356,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Series Suffix Word</label>
+                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Series Suffix Word")}</label>
                   <input
                     type="text"
                     value={suffix}
@@ -366,7 +367,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Start Num</label>
+                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Start Num")}</label>
                     <input
                       type="number"
                       min="1"
@@ -376,7 +377,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Digit Pad Width</label>
+                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Digit Pad Width")}</label>
                     <input
                       type="number"
                       min="2"
@@ -389,9 +390,9 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                 </div>
 
                 <div className="space-y-1 pt-1.5 border-t border-slate-100 dark:border-slate-850">
-                  <span className="block text-[10px] font-bold font-mono uppercase text-slate-400">Template Stamp Preview</span>
+                  <span className="block text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Template Stamp Preview")}</span>
                   <p className="p-2.5 bg-slate-50 dark:bg-slate-950 text-xs font-bold font-mono border border-slate-100 dark:border-slate-800 rounded-xl text-center text-rose-600 truncate">
-                    {generateBatesString(0) || '[skipped page first]'}
+                    {generateBatesString(0) || tr("[skipped page first]")}
                   </p>
                 </div>
               </div>
@@ -399,28 +400,28 @@ export default function BatesTool({ onBack }: BatesToolProps) {
               {/* Set multi-page placements */}
               <div className="border-t border-slate-100 dark:border-slate-850 pt-4 space-y-4">
                 <h4 className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                  <Sliders className="w-3.5 h-3.5" /> Adjust Coordinates
+                  <Sliders className="w-3.5 h-3.5" /> {tr("Adjust Coordinates")}
                 </h4>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Page placement Position</label>
+                  <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Page placement Position")}</label>
                   <select
                     value={position}
                     onChange={(e: any) => setPosition(e.target.value)}
                     className="w-full text-xs font-bold p-2.5 border border-slate-100 dark:border-slate-800 dark:bg-slate-950 rounded-xl cursor-pointer"
                   >
-                    <option value="top-right">Top-Right Margins</option>
-                    <option value="top-center">Top-Center Margins</option>
-                    <option value="top-left">Top-Left Margins</option>
-                    <option value="bottom-right">Bottom-Right Margins</option>
-                    <option value="bottom-center">Bottom-Center Margins</option>
-                    <option value="bottom-left">Bottom-Left Margins</option>
+                    <option value="top-right">{tr("Top-Right Margins")}</option>
+                    <option value="top-center">{tr("Top-Center Margins")}</option>
+                    <option value="top-left">{tr("Top-Left Margins")}</option>
+                    <option value="bottom-right">{tr("Bottom-Right Margins")}</option>
+                    <option value="bottom-center">{tr("Bottom-Center Margins")}</option>
+                    <option value="bottom-left">{tr("Bottom-Left Margins")}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Font size</label>
+                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Font size")}</label>
                     <input
                       type="number"
                       min="6"
@@ -431,7 +432,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">Stamp color</label>
+                    <label className="text-[10px] font-bold font-mono uppercase text-slate-400">{tr("Stamp color")}</label>
                     <input
                       type="color"
                       value={fontColor}
@@ -448,7 +449,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                     onChange={(e) => setSkipFirstPage(e.target.checked)}
                     className="w-4 h-4 text-emerald-600 rounded border-slate-100 dark:border-slate-800 focus:ring-emerald-500"
                   />
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Skip First Page Title</span>
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{tr("Skip First Page Title")}</span>
                 </label>
               </div>
             </div>
@@ -456,19 +457,19 @@ export default function BatesTool({ onBack }: BatesToolProps) {
             {/* Apply and run stamp processes */}
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-850 text-white space-y-4 shadow-sm">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 flex justify-between">
-                <span>Active File</span>
-                <span className="text-emerald-400">Legal Stamping</span>
+                <span>{tr("Active File")}</span>
+                <span className="text-emerald-400">{tr("Legal Stamping")}</span>
               </div>
               
               <div>
                 <span className="block text-xs font-bold text-slate-200 truncate">{file.name}</span>
-                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} Pages • {file.pageCount} stamps queued</span>
+                <span className="block text-[10px] text-slate-400 mt-0.5">{file.pageCount} {tr("Pages •")} {file.pageCount} {tr("stamps queued")}</span>
               </div>
 
               {success ? (
                 <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-xl flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span className="font-bold">Bates document exported!</span>
+                  <span className="font-bold">{tr("Bates document exported!")}</span>
                 </div>
               ) : (
                 <button
@@ -476,7 +477,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                   id="btn-bates-compile"
                   className="w-full text-center py-3 bg-emerald-600 hover:bg-emerald-500 font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-2 text-white cursor-pointer uppercase font-mono tracking-widest"
                 >
-                  <Hash className="w-4 h-4" /> Stamp & Download
+                  <Hash className="w-4 h-4" /> {tr("Stamp & Download")}
                 </button>
               )}
             </div>
@@ -488,7 +489,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
             <div className="p-6 bg-slate-100 dark:bg-slate-950 rounded-3xl border border-slate-150 dark:border-slate-900 flex flex-col items-center justify-center overflow-auto min-h-[480px] shadow-inner relative">
               
               <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 px-2.5 py-1 text-[10px] font-mono text-slate-500 rounded-full font-bold shadow-xs">
-                <Eye className="w-3.5 h-3.5 text-emerald-500 animate-pulse" /> Real-time Stamp Guide • Page {previewPage} of {file.pageCount}
+                <Eye className="w-3.5 h-3.5 text-emerald-500 animate-pulse" /> {tr("Real-time Stamp Guide • Page")} {previewPage} {tr("of")} {file.pageCount}
               </div>
 
               <div className="bg-white p-2 rounded-2xl border border-slate-250 dark:border-slate-800 shadow-md max-w-full overflow-hidden my-6">
@@ -503,16 +504,16 @@ export default function BatesTool({ onBack }: BatesToolProps) {
                   disabled={previewPage === 1}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous page
+                  {tr("Previous page")}
                 </button>
-                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">Page {previewPage} of {file.pageCount}</span>
+                <span className="text-xs font-bold text-slate-550 dark:text-slate-400 px-2 font-mono">{tr("Page")} {previewPage} {tr("of")} {file.pageCount}</span>
                 <button
                   type="button"
                   onClick={() => setPreviewPage(prev => Math.min(file.pageCount, prev + 1))}
                   disabled={previewPage === file.pageCount}
                   className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-850 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Next page
+                  {tr("Next page")}
                 </button>
               </div>
             </div>
@@ -520,9 +521,9 @@ export default function BatesTool({ onBack }: BatesToolProps) {
             <div className="bg-emerald-500/5 text-emerald-800 dark:text-emerald-400 border border-emerald-500/10 rounded-2xl p-4 flex gap-3 text-xs leading-relaxed text-left">
               <Type className="w-5 h-5 shrink-0 text-emerald-500" />
               <div>
-                <span className="font-extrabold text-slate-700 dark:text-slate-200">Legal indexing vector standards:</span>
+                <span className="font-extrabold text-slate-700 dark:text-slate-200">{tr("Legal indexing vector standards:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  Bates indexing utilizes embedded TrueType vectors which are fully scale-independent. Your final document preserves maximum visual fidelity and alignment accuracy when compressed, reviewed, printed, or compiled across standard document architectures.
+                  {tr("Bates indexing utilizes embedded TrueType vectors which are fully scale-independent. Your final document preserves maximum visual fidelity and alignment accuracy when compressed, reviewed, printed, or compiled across standard document architectures.")}
                 </p>
               </div>
             </div>
@@ -536,7 +537,7 @@ export default function BatesTool({ onBack }: BatesToolProps) {
             <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
             <div>
               <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{statusText}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Applying Bates vectors sequentially...</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{tr("Applying Bates vectors sequentially...")}</p>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CloudOff, ArrowLeft } from 'lucide-react';
 
+import { tr } from '../i18n';
 interface NotSupportedClientSideToolProps {
   title: string;
   onBack: () => void;
@@ -13,10 +14,10 @@ export default function NotSupportedClientSideTool({ title, onBack }: NotSupport
         <CloudOff className="w-8 h-8" />
       </div>
       <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 mb-2">
-        {title} Requires a Server API
+        {title} {tr("Requires a Server API")}
       </h2>
       <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-lg leading-relaxed">
-        This application operates strictly in your browser (client-side) to ensure your privacy and data security. Operations like <strong>{title}</strong> require heavy computational tools, external document parsing packages, or proprietary formats (like Microsoft Office) which cannot be processed entirely in-browser. 
+        {tr("This application operates strictly in your browser (client-side) to ensure your privacy and data security. Operations like")} <strong>{title}</strong> {tr("require heavy computational tools, external document parsing packages, or proprietary formats (like Microsoft Office) which cannot be processed entirely in-browser.")} 
       </p>
       
       <div className="flex gap-4">
@@ -25,7 +26,7 @@ export default function NotSupportedClientSideTool({ title, onBack }: NotSupport
           className="flex items-center gap-2 px-5 py-2.5 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-50 dark:hover:bg-slate-700 transition"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="font-semibold text-sm">Return to Tools</span>
+          <span className="font-semibold text-sm">{tr("Return to Tools")}</span>
         </button>
       </div>
     </div>
