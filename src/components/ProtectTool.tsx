@@ -6,7 +6,8 @@
 import { useState, FormEvent } from 'react';
 import { ArrowLeft, CheckCircle, FileCode, Lock, Unlock, KeyRound, Eye, EyeOff, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { PDFFile } from '../types';
-import { fileToArrayBuffer, getPdfDetails, protectPdf, unprotectPdf, downloadFile } from '../lib/pdfUtils';
+import { fileToArrayBuffer, getPdfDetails, unprotectPdf, downloadFile } from '../lib/pdfUtils';
+import { encryptPdf, decryptPdf, WrongPasswordError } from '../lib/qpdf';
 import Dropzone from './Dropzone';
 
 interface ProtectToolProps {
@@ -68,7 +69,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
     }
   };
 
-  // Carry out military-grade lock and download
+  // Encrypt with standard PDF AES-256 encryption (opens in any PDF reader with the password)
   const handleEncryptSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!fileToEncrypt || !encryptPassword) return;
@@ -76,10 +77,10 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
     setEncryptSuccess(false);
 
     try {
-      const protectedBytes = await protectPdf(fileToEncrypt.arrayBuffer, encryptPassword);
+      const protectedBytes = await encryptPdf(fileToEncrypt.arrayBuffer, encryptPassword);
       
       const baseName = fileToEncrypt.name.replace(/\.pdf$/i, '');
-      const filename = `${baseName}.secured.pdf`;
+      const filename = `${baseName}_protected.pdf`;
       
       downloadFile(protectedBytes, filename, 'application/pdf');
       setEncryptSuccess(true);
@@ -109,16 +110,28 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
 
     try {
       const arrayBuffer = await fileToArrayBuffer(fileToDecrypt);
-      const decryptedBytes = await unprotectPdf(arrayBuffer, decryptPassword);
-      
-      const newName = fileToDecrypt.name.replace(/\.secured\.pdf$/i, '_unlocked.pdf');
-      const finalName = newName.endsWith('.pdf') ? newName : `${newName}.pdf`;
+      let decryptedBytes: Uint8Array;
+      const header = new TextDecoder().decode(new Uint8Array(arrayBuffer, 0, Math.min(1024, arrayBuffer.byteLength)));
+      if (header.includes('%PDF-')) {
+        // Standard password-protected PDF
+        decryptedBytes = await decryptPdf(arrayBuffer, decryptPassword);
+      } else {
+        // Legacy ".secured.pdf" files created by older versions of this app
+        decryptedBytes = await unprotectPdf(arrayBuffer, decryptPassword);
+      }
+
+      const baseName = fileToDecrypt.name.replace(/(\.secured)?\.pdf$/i, '').replace(/_protected$/i, '');
+      const finalName = `${baseName}_unlocked.pdf`;
 
       downloadFile(decryptedBytes, finalName, 'application/pdf');
       setDecryptSuccess(true);
     } catch (err) {
       console.error(err);
-      setDecryptionError('Incorrect decryption passphrase. Please try again.');
+      setDecryptionError(
+        err instanceof WrongPasswordError || (err as Error)?.name === 'OperationError'
+          ? 'Incorrect password. Please try again.'
+          : 'Could not unlock this file. It may be damaged or use an unsupported encryption method.'
+      );
     } finally {
       setDecryptLoading(false);
     }
@@ -149,7 +162,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full font-semibold">
-          100% Client-Side AES-256
+          100% Client-Side · AES-256
         </span>
       </div>
 
@@ -159,7 +172,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
           <div>
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-50 tracking-tight">PDF Security Suite</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Secure PDF contents using AES-GCM, or unlock them without passing data to remote servers.
+              Add a password to a PDF (standard AES-256, opens in any PDF reader), or remove a password you know. Files never leave your device.
             </p>
           </div>
           <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-800">
@@ -197,7 +210,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 onFilesSelected={handleEncryptFileSelected}
                 multiple={false}
                 title="Drop PDF to Lock"
-                description="Upload a document to encrypt it with AES-GCM standard key parameters."
+                description="Upload a PDF to protect it with a password."
               />
             )}
 
@@ -213,7 +226,7 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 shrink-0" />
                   <div>
-                    <span className="font-semibold">Successfully Locked!</span> Encrypted <strong>.secured.pdf</strong> has been downloaded.
+                    <span className="font-semibold">Successfully Locked!</span> Your password-protected PDF has been downloaded. It opens in any PDF reader with the password.
                   </div>
                 </div>
                 <button
@@ -337,15 +350,15 @@ export default function ProtectTool({ onBack, initialMode = 'encrypt' }: Protect
                 id="decrypt-dropzone"
                 onFilesSelected={handleDecryptFileSelected}
                 multiple={false}
-                title="Upload encrypted PDF (.secured.pdf) to standard PDF"
-                description="Upload the securely locked file to reverse AES wrappers client-side."
+                title="Upload a password-protected PDF"
+                description="Enter its password to save an unlocked copy."
               />
             )}
 
             {decryptLoading && (
               <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300">
                 <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-                <span>Decrypting AES cipher blocks in-browser...</span>
+                <span>Unlocking in your browser...</span>
               </div>
             )}
 

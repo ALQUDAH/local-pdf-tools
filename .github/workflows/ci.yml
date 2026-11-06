@@ -25,3 +25,15 @@ jobs:
           PORT=3000 npm start &
           for i in $(seq 1 20); do curl -sf http://localhost:3000/api/health && break; sleep 1; done
           curl -sf http://localhost:3000/ | grep -q '<div id="root">'
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --trace off
