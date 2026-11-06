@@ -1,0 +1,6 @@
+{
+  "name": "Client-Side PDF Tools",
+  "description": "A powerful, 100% offline client-side PDF utility for merging, splitting, converting, and protecting PDF files entirely in your browser.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
