@@ -22,3 +22,10 @@ app/
 # Playwright
 test-results/
 playwright-report/
+
+# Desktop app build output
+desktop/web/
+desktop/server.mjs
+desktop/icon.png
+desktop/node_modules/
+release/

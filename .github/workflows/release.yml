@@ -44,3 +44,11 @@ jobs:
             --title "v$VERSION" \
             --notes-file release-notes.md \
             --latest
+
+  desktop:
+    needs: release
+    uses: ./.github/workflows/desktop.yml
+    with:
+      tag: v${{ inputs.version }}
+    permissions:
+      contents: write

@@ -1,6 +1,6 @@
 {
   "name": "local-pdf-tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Free, open-source, privacy-first PDF toolkit. 30+ tools (merge, split, compress, OCR, sign, redact, edit...) that run entirely in your browser.",
   "private": true,
   "type": "module",
@@ -47,7 +47,10 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "test": "playwright test"
+    "test": "playwright test",
+    "desktop:build": "node scripts/build-desktop.mjs",
+    "desktop": "npm run desktop:build && electron desktop",
+    "desktop:dist": "npm run desktop:build && electron-builder"
   },
   "dependencies": {
     "@google/genai": "^2.32.0",
@@ -74,6 +77,8 @@
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^6.2.1",
     "autoprefixer": "^10.6.2",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
     "esbuild": "^0.28.2",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",

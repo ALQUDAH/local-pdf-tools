@@ -1,0 +1,19 @@
+{
+  "name": "local-pdf-tools",
+  "productName": "Local PDF Tools",
+  "version": "1.1.0",
+  "description": "30+ PDF tools that run entirely on your computer. Your files never leave your device.",
+  "homepage": "https://github.com/ALQUDAH/local-pdf-tools",
+  "author": {
+    "name": "ALQUDAH",
+    "email": "8654990+ALQUDAH@users.noreply.github.com"
+  },
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "main.mjs",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  },
+  "desktopName": "local-pdf-tools.desktop"
+}

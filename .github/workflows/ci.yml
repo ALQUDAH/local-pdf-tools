@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # The Electron binary is only needed for `npm run desktop`; electron-builder downloads its own
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
 jobs:
   build:
     runs-on: ubuntu-latest

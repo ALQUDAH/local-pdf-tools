@@ -11,6 +11,11 @@ updates:
       # Keep Node types in line with the supported Node.js runtime (see .nvmrc)
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+  - package-ecosystem: npm
+    directory: /desktop
+    schedule:
+      interval: weekly
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

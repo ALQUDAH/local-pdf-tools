@@ -1,0 +1,78 @@
+name: Desktop apps
+
+on:
+  # Called by the Release workflow to attach installers to a release
+  workflow_call:
+    inputs:
+      tag:
+        description: Release tag to upload installers to
+        type: string
+        required: true
+  # Manual run: installers are kept as workflow artifacts
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - desktop/**
+      - electron-builder.yml
+      - scripts/build-desktop.mjs
+      - server.ts
+
+permissions:
+  contents: write
+
+env:
+  # The Electron binary is only needed for `npm run desktop`; electron-builder downloads its own
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+            args: --win nsis --x64
+          - os: macos-latest
+            name: macos-arm64
+            args: --mac dmg --arm64
+          - os: macos-latest
+            name: macos-x64
+            args: --mac dmg --x64
+            cpu: x64
+          - os: ubuntu-latest
+            name: linux
+            args: --linux AppImage deb --x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run desktop:build
+      - name: Add native modules for the target CPU
+        if: matrix.cpu
+        working-directory: desktop
+        run: npm install --omit=dev --no-audit --no-fund --cpu=${{ matrix.cpu }} --os=darwin
+      - name: Package
+        run: npx electron-builder ${{ matrix.args }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: Collect installers
+        shell: bash
+        run: |
+          mkdir -p out
+          find release -maxdepth 1 -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} out/ \;
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.name }}
+          path: out/*
+      - name: Upload to release
+        if: inputs.tag != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ inputs.tag }}" out/* --clobber

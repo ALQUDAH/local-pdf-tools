@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-11-06
+
+### Added
+- **Desktop app** for Windows, macOS (Apple Silicon and Intel) and Linux. All 40 tools work offline, including the Office converters. Installers are attached to every GitHub release.
+- **Installable web app (PWA):** install it from the browser; browser tools work offline after the first visit.
+- **Arabic** translation with right-to-left layout for the dashboard, plus a language switch.
+- Self-hostable OCR: the Tesseract engine is now served by the app, and `VITE_TESSDATA_URL` / `VITE_OCR_FONT_URL` let you serve language data and fonts yourself.
+- Automated browser tests (Playwright) for 12 tools, checking that browser tools make no external requests.
+
+### Fixed
+- **Protect PDF** now creates standard AES-256 password-protected PDFs that open in any PDF reader. Previously it produced a custom `.secured.pdf` file only this app could open.
+- **Unlock PDF** now removes passwords from standard encrypted PDFs (old `.secured.pdf` files still open).
+
+### Changed
+- Upgraded to Vite 8 and @vitejs/plugin-react 6.
+
 ## [1.0.0] - 2026-11-06
 
 First public release of Local PDF Tools: 30+ PDF tools that run entirely in your browser. Your files never leave your device.

@@ -1,6 +1,7 @@
 # ---- build ----
 FROM node:22-alpine AS build
 WORKDIR /app
+ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .

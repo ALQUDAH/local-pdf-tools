@@ -687,7 +687,18 @@ app.get("/api/health", (req, res) => {
 // VITE DEV SERVER AND PRODUCTION SERVING MIDDLEWARES
 // ----------------------------------------------------
 
-async function startServer() {
+export interface StartOptions {
+  port?: number;
+  host?: string;
+  /** Folder with the built web app (production only). Defaults to ./dist */
+  distPath?: string;
+}
+
+/** Starts the HTTP server. Resolves with the port it listens on (useful with port 0). */
+export async function startServer(options: StartOptions = {}): Promise<{ port: number }> {
+  const port = options.port ?? PORT;
+  const host = options.host ?? HOST;
+
   if (process.env.NODE_ENV !== "production") {
     // Development Mode: Mount Vite Middleware
     const { createServer: createViteServer } = await import("vite");
@@ -699,17 +710,28 @@ async function startServer() {
     console.log("Vite development middleware loaded.");
   } else {
     // Production Mode: Serve Compiled dist static files
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = options.distPath ?? path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
-    console.log("Production static files serving configuration established.");
   }
-  
-  app.listen(PORT, HOST, () => {
-    console.log(`Local PDF Tools running at http://localhost:${PORT}`);
+
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, host, () => {
+      const address = server.address();
+      const actualPort = typeof address === "object" && address ? address.port : port;
+      console.log(`Local PDF Tools running at http://localhost:${actualPort}`);
+      resolve({ port: actualPort });
+    });
+    server.on("error", reject);
   });
 }
 
-startServer();
+// Start automatically unless embedded (the desktop app sets LPT_EMBEDDED and calls startServer itself)
+if (!process.env.LPT_EMBEDDED) {
+  startServer().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

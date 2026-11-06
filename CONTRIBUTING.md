@@ -22,6 +22,15 @@ Before opening a PR:
 ```bash
 npm run typecheck
 npm run build
+npx playwright install chromium   # first time only
+npm test                          # browser tests
+```
+
+Working on the desktop app:
+
+```bash
+npm run desktop        # build and launch it
+npm run desktop:dist   # build an installer for your OS into release/
 ```
 
 ## Adding a new tool
@@ -33,7 +42,9 @@ npm run build
    - add an entry to `TOOLS` (title, description, icon, colors)
    - add the id to the right group in `TOOL_GROUPS`
    - add a `case` in `renderActiveTool()`
-4. Update the feature table in `README.md`.
+4. Add the Arabic title and description to `toolsAr` in `src/i18n.tsx` (or leave it and we'll help).
+5. Add a browser test in `tests/tools.spec.ts`.
+6. Update the feature table in `README.md`.
 
 If you need PDF.js, import `'../lib/pdfjs'` next to your `pdfjs-dist` import so the locally bundled worker is configured.
 
