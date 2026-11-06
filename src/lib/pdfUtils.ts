@@ -5,10 +5,8 @@
 
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
+import './pdfjs';
 
-// Check if version is available, fallback to a standard version if needed
-const pdfjsVersion = pdfjsLib.version || '6.0.227';
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.mjs`;
 
 /**
  * Sanitizes a string, replacing or removing characters that cannot be encoded by standard PDF fonts 

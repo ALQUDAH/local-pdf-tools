@@ -322,7 +322,7 @@ export default function OrganizeTool({ onBack }: OrganizeToolProps) {
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-semibold">
-          iLovePDF Organize Engine
+          Local Organize Engine
         </span>
       </div>
 

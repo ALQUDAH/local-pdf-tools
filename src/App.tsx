@@ -46,42 +46,42 @@ import {
   Filter
 } from 'lucide-react';
 import { ActiveTool } from './types';
-import MergeTool from './components/MergeTool';
-import SplitTool from './components/SplitTool';
-import ImgConvertTool from './components/ImgConvertTool';
-import ProtectTool from './components/ProtectTool';
-import ImagesToPdfTool from './components/ImagesToPdfTool';
-import RotateTool from './components/RotateTool';
-import OrganizeTool from './components/OrganizeTool';
-import AddPageNumbersTool from './components/AddPageNumbersTool';
-import CompressTool from './components/CompressTool';
-import WatermarkTool from './components/WatermarkTool';
-import MetadataTool from './components/MetadataTool';
-import SignTool from './components/SignTool';
-import OcrTool from './components/OcrTool';
-import NUpTool from './components/NUpTool';
-import OverlayTool from './components/OverlayTool';
-import FormFillerTool from './components/FormFillerTool';
+const MergeTool = React.lazy(() => import('./components/MergeTool'));
+const SplitTool = React.lazy(() => import('./components/SplitTool'));
+const ImgConvertTool = React.lazy(() => import('./components/ImgConvertTool'));
+const ProtectTool = React.lazy(() => import('./components/ProtectTool'));
+const ImagesToPdfTool = React.lazy(() => import('./components/ImagesToPdfTool'));
+const RotateTool = React.lazy(() => import('./components/RotateTool'));
+const OrganizeTool = React.lazy(() => import('./components/OrganizeTool'));
+const AddPageNumbersTool = React.lazy(() => import('./components/AddPageNumbersTool'));
+const CompressTool = React.lazy(() => import('./components/CompressTool'));
+const WatermarkTool = React.lazy(() => import('./components/WatermarkTool'));
+const MetadataTool = React.lazy(() => import('./components/MetadataTool'));
+const SignTool = React.lazy(() => import('./components/SignTool'));
+const OcrTool = React.lazy(() => import('./components/OcrTool'));
+const NUpTool = React.lazy(() => import('./components/NUpTool'));
+const OverlayTool = React.lazy(() => import('./components/OverlayTool'));
+const FormFillerTool = React.lazy(() => import('./components/FormFillerTool'));
 
 const ScannedDocumentTool = React.lazy(() => import('./components/ScannedDocumentTool'));
-import BatchConverterTool from './components/BatchConverterTool';
-import ExtractorTool from './components/ExtractorTool';
-import CompareTool from './components/CompareTool';
-import GrayscaleTool from './components/GrayscaleTool';
-import CropTool from './components/CropTool';
-import FormBuilderTool from './components/FormBuilderTool';
-import BatesTool from './components/BatesTool';
-import RedactTool from './components/RedactTool';
+const BatchConverterTool = React.lazy(() => import('./components/BatchConverterTool'));
+const ExtractorTool = React.lazy(() => import('./components/ExtractorTool'));
+const CompareTool = React.lazy(() => import('./components/CompareTool'));
+const GrayscaleTool = React.lazy(() => import('./components/GrayscaleTool'));
+const CropTool = React.lazy(() => import('./components/CropTool'));
+const FormBuilderTool = React.lazy(() => import('./components/FormBuilderTool'));
+const BatesTool = React.lazy(() => import('./components/BatesTool'));
+const RedactTool = React.lazy(() => import('./components/RedactTool'));
 import ThemeSwitcher, { ThemeMode } from './components/ThemeSwitcher';
 
-import FlattenTool from './components/FlattenTool';
-import RepairTool from './components/RepairTool';
-import ResizeTool from './components/ResizeTool';
-import MarginTool from './components/MarginTool';
+const FlattenTool = React.lazy(() => import('./components/FlattenTool'));
+const RepairTool = React.lazy(() => import('./components/RepairTool'));
+const ResizeTool = React.lazy(() => import('./components/ResizeTool'));
+const MarginTool = React.lazy(() => import('./components/MarginTool'));
 import PerformanceDashboard from './components/PerformanceDashboard';
 import NotSupportedClientSideTool from './components/NotSupportedClientSideTool';
-import ConvertTool from './components/ConvertTool';
-import EditPdfTool from './components/EditPdfTool';
+const ConvertTool = React.lazy(() => import('./components/ConvertTool'));
+const EditPdfTool = React.lazy(() => import('./components/EditPdfTool'));
 
 interface ToolDefinition {
   id: ActiveTool;
@@ -704,16 +704,7 @@ export default function App() {
       case 'overlay':
         return <OverlayTool onBack={() => setActiveTool('dashboard')} />;
       case 'scanner':
-        return (
-          <React.Suspense fallback={
-            <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-center max-w-2xl mx-auto my-12 animate-fade-in">
-              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-slate-500 font-medium dark:text-slate-400">Loading Document Scanner...</p>
-            </div>
-          }>
-            <ScannedDocumentTool onBack={() => setActiveTool('dashboard')} />
-          </React.Suspense>
-        );
+        return <ScannedDocumentTool onBack={() => setActiveTool('dashboard')} />;
       case 'formfiller':
         return <FormFillerTool onBack={() => setActiveTool('dashboard')} />;
       case 'batchconverter':
@@ -844,7 +835,7 @@ export default function App() {
               Manipulate PDFs entirely inside your browser.
             </h1>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-              A free, feature-rich equivalent to iLovePDF that compiles your documents locally. WebAssembly and Javascript engines process files in-memory; nothing is ever uploaded to any servers.
+              A free, open-source PDF toolkit that processes your documents locally. 30+ tools run in-memory in your browser, so your files never leave your device. The few Office and translation converters are clearly marked and only work with a server you host yourself.
             </p>
           </div>
         </div>
@@ -1128,7 +1119,14 @@ export default function App() {
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 md:px-8 pt-8 md:pt-12">
-        {renderActiveTool()}
+        <React.Suspense fallback={
+          <div className="flex flex-col items-center justify-center p-12 text-center my-12" role="status" aria-live="polite">
+            <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-slate-500 font-medium dark:text-slate-400">Loading tool...</p>
+          </div>
+        }>
+          {renderActiveTool()}
+        </React.Suspense>
       </main>
 
       {/* Floating Performance Dashboard */}

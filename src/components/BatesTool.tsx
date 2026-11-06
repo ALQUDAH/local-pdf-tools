@@ -21,6 +21,7 @@ import { PDFFile } from '../types';
 import Dropzone from './Dropzone';
 import { fileToArrayBuffer, getPdfDetails, downloadFile, sanitizeForWinAnsi, getNormalizedDrawingArgs } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 
 interface BatesToolProps {

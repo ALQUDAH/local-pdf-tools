@@ -173,7 +173,7 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full font-semibold">
-          iLovePDF Watermark Engine
+          Local Watermark Engine
         </span>
       </div>
 

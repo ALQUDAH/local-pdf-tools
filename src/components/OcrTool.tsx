@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { PDFFile } from '../types';
 import { fileToArrayBuffer, getPdfDetails, downloadFile, sanitizeForWinAnsi } from '../lib/pdfUtils';

@@ -24,6 +24,7 @@ import { PDFFile } from '../types';
 import Dropzone from './Dropzone';
 import { fileToArrayBuffer, getPdfDetails, downloadFile, getNormalizedDrawingArgs } from '../lib/pdfUtils';
 import * as pdfjsLib from 'pdfjs-dist';
+import '../lib/pdfjs';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { Rnd } from 'react-rnd';
 
@@ -253,7 +254,6 @@ export default function RedactTool({ onBack }: RedactToolProps) {
     setStatusText('Burning solid blackout vectors into PDF structures...');
 
     try {
-      console.log("Loading original byte stream...");
       const pdfDoc = await PDFDocument.load(new Uint8Array(file.arrayBuffer), { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
 
@@ -283,9 +283,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
       });
 
       setStatusText('Rasterizing to flatten text payloads permanently...');
-      console.log("Saving intermediate PDF with redaction boxes...");
       const intermediateBytes = await pdfDoc.save();
-      console.log("Intermediate bytes length:", intermediateBytes.length);
 
       const pagesWithRedactions = new Set<number>();
       redactions.forEach(r => pagesWithRedactions.add(r.page - 1));
@@ -293,23 +291,19 @@ export default function RedactTool({ onBack }: RedactToolProps) {
       let finalSavedBytes = intermediateBytes;
 
       if (pagesWithRedactions.size > 0) {
-        console.log("Loading intermediate bytes into pdfjsLib...");
         // pdf.js can detach the underlying ArrayBuffer during worker processing, 
         // so we fiercely clone the bytes before passing it.
         const clone1 = new Uint8Array(intermediateBytes.length);
         clone1.set(intermediateBytes);
         const pdfJsDoc = await pdfjsLib.getDocument({ data: clone1 }).promise;
 
-        console.log("Loading intermediate bytes into pdf-lib finalPdfDoc...");
         const clone2 = new Uint8Array(intermediateBytes.length);
         clone2.set(intermediateBytes);
         const finalPdfDoc = await PDFDocument.load(clone2, { ignoreEncryption: true });
-        console.log("Loaded intermediate documents");
 
         const sortedPages = Array.from(pagesWithRedactions).sort((a, b) => b - a);
 
         for (const pageIdx of sortedPages) {
-          console.log(`Flattening page ${pageIdx}`);
           const pdfPage = await pdfJsDoc.getPage(pageIdx + 1);
           
           const originalViewport = pdfPage.getViewport({ scale: 1.0 });
@@ -336,14 +330,12 @@ export default function RedactTool({ onBack }: RedactToolProps) {
           }
         }
         
-        console.log("Saving final PDF...");
         finalSavedBytes = await finalPdfDoc.save();
       }
 
       setStatusText('Encrypting compliance hashes...');
       const cleanName = file.name.replace('.pdf', '') + '_redacted.pdf';
 
-      console.log("Downloading file...");
       downloadFile(finalSavedBytes, cleanName, 'application/pdf');
       setSuccess(true);
     } catch (err: any) {

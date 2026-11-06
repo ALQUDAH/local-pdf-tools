@@ -105,7 +105,7 @@ export default function AddPageNumbersTool({ onBack }: AddPageNumbersToolProps) 
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
         <span className="text-xs font-mono px-3 py-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-full font-semibold">
-          iLovePDF Page Numbering
+          Local Page Numbering
         </span>
       </div>
 
