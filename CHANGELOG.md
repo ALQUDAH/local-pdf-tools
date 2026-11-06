@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- **Arabic text in server-generated PDFs.** Word, PowerPoint, Excel and HTML → PDF and Translate PDF failed with "WinAnsi cannot encode" on any Arabic text, including translations into Arabic, the default target language. They now embed the Vazirmatn font (SIL OFL, bundled with the app, so nothing is downloaded) only when needed. Letters are joined correctly and harakat sit in the right place. Mixed Arabic/English lines are ordered with the Unicode Bidirectional Algorithm, and right-to-left paragraphs are right-aligned. Text copied from the output PDFs gives back the original letters.
+- Characters no bundled font covers (for example Chinese in an Office file) are shown as "?" instead of failing the whole conversion.
+- PowerPoint and HTML → PDF now decode entities such as `&amp;` instead of printing them.
+
 ## [1.2.0] - 2026-11-06
 
 ### Added

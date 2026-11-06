@@ -5,7 +5,8 @@ import multer from "multer";
 import { PDFParse } from "pdf-parse";
 import dns from "dns/promises";
 import net from "net";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
+import { PdfTextWriter, isRtl } from "./server/pdfText";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import exceljs from "exceljs";
 import pptxgen from "pptxgenjs";
@@ -22,6 +23,27 @@ const HOST = process.env.HOST || "0.0.0.0";
 // Header-safe base filename (Content-Disposition only accepts a limited charset)
 function safeBaseName(name: string): string {
   return name.replace(/\.\w+$/, "").replace(/[^\w.\- ]+/g, "_").slice(0, 120) || "document";
+}
+
+// Decode the entities that appear in Office XML text nodes (&amp; &lt; &#1575; ...)
+function decodeXmlEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi, (m, e: string) => {
+    const lower = e.toLowerCase();
+    if (lower.startsWith("#x")) return safeFromCodePoint(parseInt(lower.slice(2), 16), m);
+    if (lower.startsWith("#")) return safeFromCodePoint(parseInt(lower.slice(1), 10), m);
+    return ({ amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" } as Record<string, string>)[lower] ?? m;
+  });
+}
+
+// XML entities plus the few named HTML entities common in page text
+function decodeHtmlEntities(text: string): string {
+  return decodeXmlEntities(text.replace(/&nbsp;/gi, " ").replace(/&(mdash|ndash|hellip|laquo|raquo);/gi, (_m, e: string) =>
+    ({ mdash: "—", ndash: "–", hellip: "…", laquo: "«", raquo: "»" } as Record<string, string>)[e.toLowerCase()]
+  ));
+}
+
+function safeFromCodePoint(cp: number, fallback: string): string {
+  return Number.isInteger(cp) && cp >= 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : fallback;
 }
 
 // Extract plain text (whole document + per page) from a PDF buffer
@@ -76,30 +98,6 @@ const upload = multer({
 // Configure JSON and text body parsers
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
-// Helper: Wrap text to page width
-function wrapText(text: string, width: number, fontSize: number, font: any): string[] {
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = "";
-  
-  for (const word of words) {
-    const testLine = currentLine ? currentLine + " " + word : word;
-    const testWidth = font.widthOfTextAtSize(testLine, fontSize);
-    if (testWidth > width) {
-      if (currentLine) {
-        lines.push(currentLine);
-      }
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  }
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-  return lines;
-}
 
 // ----------------------------------------------------
 // API ROUTES FOR PDF CONVERSIONS
@@ -238,8 +236,7 @@ app.post("/api/convert/word-to-pdf", upload.single("file"), async (req, res) => 
     const text = result.value || "";
     
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const writer = await PdfTextWriter.create(pdfDoc, text);
     
     let page = pdfDoc.addPage([595.27, 841.89]); // A4 Dimension
     const { width, height } = page.getSize();
@@ -248,11 +245,11 @@ app.post("/api/convert/word-to-pdf", upload.single("file"), async (req, res) => 
     let y = height - margin;
     
     // Title
-    page.drawText("DOCX Document Content", {
+    writer.draw(page, "DOCX Document Content", {
       x: margin,
       y: y,
       size: 16,
-      font: fontBold,
+      bold: true,
       color: rgb(0.12, 0.22, 0.45)
     });
     y -= 35;
@@ -265,18 +262,18 @@ app.post("/api/convert/word-to-pdf", upload.single("file"), async (req, res) => 
         continue;
       }
       
-      const lines = wrapText(trimmed, contentWidth, 11, font);
+      const lines = writer.wrap(trimmed, contentWidth, 11);
       for (const line of lines) {
         if (y < margin + 20) {
           page = pdfDoc.addPage([595.27, 841.89]);
           y = height - margin;
         }
         
-        page.drawText(line, {
+        writer.draw(page, line, {
           x: margin,
           y: y,
           size: 11,
-          font: font,
+          maxWidth: contentWidth,
           color: rgb(0.15, 0.15, 0.15)
         });
         y -= 16;
@@ -303,8 +300,6 @@ app.post("/api/convert/powerpoint-to-pdf", upload.single("file"), async (req, re
     }
     
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
     const zip = await JSZip.loadAsync(req.file.buffer);
     const slides: { num: number; text: string }[] = [];
@@ -315,16 +310,17 @@ app.post("/api/convert/powerpoint-to-pdf", upload.single("file"), async (req, re
         const content = await zip.files[filename].async("text");
         
         const matches = [...content.matchAll(/<a:t>([^<]*)<\/a:t>/g)];
-        const slideText = matches.map(m => m[1]).join(" ").trim();
+        const slideText = matches.map(m => decodeXmlEntities(m[1])).join(" ").trim();
         slides.push({ num, text: slideText });
       }
     }
     
     slides.sort((a, b) => a.num - b.num);
+    const writer = await PdfTextWriter.create(pdfDoc, slides.map((s) => s.text).join(" "));
     
     if (slides.length === 0) {
       const page = pdfDoc.addPage([841.89, 595.27]); // Landscape A4
-      page.drawText("No slide contents extracted", { x: 50, y: 300, font, size: 14 });
+      writer.draw(page, "No slide contents extracted", { x: 50, y: 300, size: 14 });
     } else {
       for (const slide of slides) {
         const page = pdfDoc.addPage([841.89, 595.27]);
@@ -341,23 +337,23 @@ app.post("/api/convert/powerpoint-to-pdf", upload.single("file"), async (req, re
           color: rgb(0.97, 0.98, 0.99)
         });
         
-        page.drawText(`Slide ${slide.num}`, {
+        writer.draw(page, `Slide ${slide.num}`, {
           x: 60,
           y: height - 60,
           size: 20,
-          font: fontBold,
+          bold: true,
           color: rgb(0.12, 0.22, 0.45)
         });
         
-        const lines = wrapText(slide.text, width - 120, 12, font);
+        const lines = writer.wrap(slide.text, width - 120, 12);
         let y = height - 100;
         for (const line of lines) {
           if (y < 60) break;
-          page.drawText(line, {
+          writer.draw(page, line, {
             x: 60,
             y: y,
             size: 12,
-            font: font,
+            maxWidth: width - 120,
             color: rgb(0.2, 0.2, 0.2)
           });
           y -= 20;
@@ -384,44 +380,55 @@ app.post("/api/convert/excel-to-pdf", upload.single("file"), async (req, res) =>
     }
     
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
     const workbook = new exceljs.Workbook();
     // exceljs declares its own Buffer type that clashes with @types/node; a Node Buffer works at runtime
     await workbook.xlsx.load(req.file.buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
     
-    workbook.worksheets.forEach((sheet) => {
+    // Collect the rows first so the Arabic font is embedded only when a sheet needs it
+    const sheets = workbook.worksheets.map((sheet) => {
+      const rows: { text: string; header: boolean }[] = [];
+      sheet.eachRow((row, rowNumber) => {
+        const values: string[] = [];
+        row.eachCell((cell) => {
+          values.push(cell.text || String(cell.value || ""));
+        });
+        rows.push({ text: values.join("  |  "), header: rowNumber === 1 });
+      });
+      return { name: sheet.name || "Grid Sheet", rows };
+    });
+    const writer = await PdfTextWriter.create(
+      pdfDoc,
+      sheets.map((s) => s.name + " " + s.rows.map((r) => r.text).join(" ")).join(" ")
+    );
+    
+    sheets.forEach((sheet) => {
       let page = pdfDoc.addPage([841.89, 595.27]); // Landscape A4 for wide spacing
       const { width, height } = page.getSize();
       let y = height - 55;
       
-      page.drawText(sheet.name || "Grid Sheet", {
+      writer.draw(page, sheet.name, {
         x: 35,
         y: y,
         size: 18,
-        font: fontBold,
+        bold: true,
+        maxWidth: width - 70,
         color: rgb(0.1, 0.45, 0.3)
       });
       y -= 35;
       
-      sheet.eachRow((row, rowNumber) => {
+      sheet.rows.forEach((row) => {
         if (y < 45) {
           page = pdfDoc.addPage([841.89, 595.27]);
           y = height - 55;
         }
         
-        const values: string[] = [];
-        row.eachCell((cell) => {
-          values.push(cell.text || String(cell.value || ""));
-        });
-        
-        const rowText = values.join("  |  ");
-        page.drawText(rowText.slice(0, 160), {
+        writer.draw(page, Array.from(row.text).slice(0, 160).join(""), {
           x: 35,
           y: y,
           size: 10,
-          font: rowNumber === 1 ? fontBold : font,
+          bold: row.header,
+          maxWidth: width - 70,
           color: rgb(0.18, 0.18, 0.18)
         });
         
@@ -477,8 +484,7 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
     }
     
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const writer = await PdfTextWriter.create(pdfDoc, decodeHtmlEntities(html.replace(/<[^>]*>/g, " ")));
     
     let page = pdfDoc.addPage([595.27, 841.89]);
     const { width, height } = page.getSize();
@@ -493,15 +499,16 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
     while ((match = regex.exec(html)) !== null) {
       found = true;
       const tag = match[1].toLowerCase();
-      const rawText = match[2].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+      const rawText = decodeHtmlEntities(match[2].replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim();
       if (!rawText) continue;
       
       const isHeading = tag === "h1" || tag === "h2";
       const fontSize = isHeading ? (tag === "h1" ? 18 : 14) : 10;
-      const currentFont = isHeading ? fontBold : font;
       const color = isHeading ? rgb(0.1, 0.15, 0.35) : rgb(0.2, 0.2, 0.2);
+      const indent = tag === "li" ? 15 : 0;
+      const boxWidth = width - 100 - indent;
       
-      const lines = wrapText(rawText, width - 100, fontSize, currentFont);
+      const lines = writer.wrap(rawText, boxWidth, fontSize, isHeading);
       
       for (const line of lines) {
         if (y < margin + 25) {
@@ -509,11 +516,13 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
           y = height - margin;
         }
         
-        page.drawText(line, {
-          x: tag === "li" ? margin + 15 : margin,
+        // List items are indented on the side the text starts from
+        writer.draw(page, line, {
+          x: isRtl(rawText) ? margin : margin + indent,
           y: y,
           size: fontSize,
-          font: currentFont,
+          bold: isHeading,
+          maxWidth: boxWidth,
           color: color
         });
         y -= (fontSize + 8);
@@ -523,14 +532,14 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
     
     if (!found) {
       // Plain text render
-      const textToRender = html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-      const lines = wrapText(textToRender, width - 100, 11, font);
+      const textToRender = decodeHtmlEntities(html.replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim();
+      const lines = writer.wrap(textToRender, width - 100, 11);
       for (const line of lines) {
         if (y < margin + 25) {
           page = pdfDoc.addPage([595.27, 841.89]);
           y = height - margin;
         }
-        page.drawText(line, { x: margin, y: y, size: 11, font, color: rgb(0.2, 0.2, 0.2) });
+        writer.draw(page, line, { x: margin, y: y, size: 11, maxWidth: width - 100, color: rgb(0.2, 0.2, 0.2) });
         y -= 16;
       }
     }
@@ -623,8 +632,8 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
     
     // Compile into translated PDF document
     const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const title = `Translated Document (${targetLang})`;
+    const writer = await PdfTextWriter.create(pdfDoc, title + " " + translatedText);
     
     let page = pdfDoc.addPage([595.27, 841.89]);
     const { width, height } = page.getSize();
@@ -632,11 +641,12 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
     const contentWidth = width - (margin * 2);
     let y = height - margin;
     
-    page.drawText(`Translated Document (${targetLang})`, {
+    writer.draw(page, title, {
       x: margin,
       y: y,
       size: 15,
-      font: fontBold,
+      bold: true,
+      maxWidth: contentWidth,
       color: rgb(0.12, 0.43, 0.24)
     });
     y -= 30;
@@ -649,18 +659,18 @@ app.post("/api/convert/translate-pdf", upload.single("file"), async (req, res) =
         continue;
       }
       
-      const lines = wrapText(trimmed, contentWidth, 10, font);
+      const lines = writer.wrap(trimmed, contentWidth, 10);
       for (const line of lines) {
         if (y < margin + 25) {
           page = pdfDoc.addPage([595.27, 841.89]);
           y = height - margin;
         }
         
-        page.drawText(line, {
+        writer.draw(page, line, {
           x: margin,
           y: y,
           size: 10,
-          font: font,
+          maxWidth: contentWidth,
           color: rgb(0.16, 0.16, 0.16)
         });
         y -= 15;

@@ -27,5 +27,6 @@ playwright-report/
 desktop/web/
 desktop/server.mjs
 desktop/icon.png
+desktop/fonts/
 desktop/node_modules/
 release/

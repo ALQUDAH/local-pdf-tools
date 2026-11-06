@@ -27,6 +27,7 @@
     "src",
     "tests",
     "server.ts",
+    "server",
     "vite.config.ts",
     "playwright.config.ts"
   ]

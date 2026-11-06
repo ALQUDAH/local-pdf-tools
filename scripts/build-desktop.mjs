@@ -19,7 +19,9 @@ run(
     '--outfile=desktop/server.mjs --log-level=warning'
 );
 
-// 3. Icon and version
+// 3. Fonts the server embeds in generated PDFs (Arabic support), icon and version
+fs.rmSync(path.join(desktop, 'fonts'), { recursive: true, force: true });
+fs.cpSync(path.join(root, 'assets/fonts'), path.join(desktop, 'fonts'), { recursive: true });
 fs.copyFileSync(path.join(root, 'public/pwa-512.png'), path.join(desktop, 'icon.png')); // window icon
 fs.mkdirSync(path.join(desktop, 'build'), { recursive: true });
 fs.copyFileSync(path.join(root, 'public/pwa-512.png'), path.join(desktop, 'build/icon.png')); // installer icons
