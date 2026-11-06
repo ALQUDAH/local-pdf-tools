@@ -55,7 +55,7 @@
   "dependencies": {
     "@google/genai": "^2.32.0",
     "docx": "^9.15.1",
-    "dotenv": "^17.2.3",
+    "dotenv": "^18.0.9",
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
     "jszip": "^3.10.2",
@@ -80,8 +80,8 @@
     "electron": "^45.2.3",
     "electron-builder": "^26.18.0",
     "esbuild": "^0.28.2",
-    "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
+    "lucide-react": "^1.70.0",
+    "motion": "^14.10.0",
     "pdfjs-dist": "^6.0.227",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -96,6 +96,6 @@
     "workbox-window": "^7.4.1"
   },
   "overrides": {
-    "@types/node": "$@types/node"
+    "@types/node": "^22.14.0"
   }
 }
