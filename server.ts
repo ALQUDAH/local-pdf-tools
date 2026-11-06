@@ -215,7 +215,7 @@ app.post("/api/convert/pdf-to-excel", upload.single("file"), async (req, res) =>
       }
     });
     
-    const excelBuffer = await workbook.xlsx.writeBuffer() as Buffer;
+    const excelBuffer = Buffer.from(await workbook.xlsx.writeBuffer());
     
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_converted.xlsx"`);
@@ -387,7 +387,8 @@ app.post("/api/convert/excel-to-pdf", upload.single("file"), async (req, res) =>
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
     const workbook = new exceljs.Workbook();
-    await workbook.xlsx.load(req.file.buffer);
+    // exceljs declares its own Buffer type that clashes with @types/node; a Node Buffer works at runtime
+    await workbook.xlsx.load(req.file.buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
     
     workbook.worksheets.forEach((sheet) => {
       let page = pdfDoc.addPage([841.89, 595.27]); // Landscape A4 for wide spacing

@@ -1,0 +1,221 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// Lightweight, dependency-free i18n. English is the source language; add a language by
+// adding a dictionary below with the same keys. Missing keys fall back to English.
+
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import type { ActiveTool } from './types';
+
+export type Lang = 'en' | 'ar';
+
+export const LANGUAGES: { id: Lang; label: string; dir: 'ltr' | 'rtl' }[] = [
+  { id: 'en', label: 'English', dir: 'ltr' },
+  { id: 'ar', label: 'العربية', dir: 'rtl' },
+];
+
+const en = {
+  'app.name': 'Local PDF Tools',
+  'app.tagline': '100% Client-Side Privacy',
+  'nav.searchTools': 'Search tools',
+  'nav.focusSearch': 'Focus search (/ or ⌘K)',
+  'nav.backToSearch': 'Back to tools search',
+  'nav.language': 'Language',
+  'theme.light': 'Light',
+  'theme.system': 'System',
+  'theme.dark': 'Dark',
+  'hero.badge': '100% Secure Local Sandbox',
+  'hero.title': 'Manipulate PDFs entirely inside your browser.',
+  'hero.body':
+    'A free, open-source PDF toolkit that processes your documents locally. 30+ tools run in-memory in your browser, so your files never leave your device. The few Office and translation converters are clearly marked and only work with a server you host yourself.',
+  'search.placeholder': 'Search 40+ PDF tools by name or description... (e.g., merge, compress, protect, ocr)',
+  'search.aria': 'Search PDF tools by name or description',
+  'search.clear': 'Clear',
+  'search.clearTitle': 'Clear search (Esc)',
+  'search.press': 'Press',
+  'search.or': 'or',
+  'search.found': '{n} found',
+  'search.tools': '{n} tools',
+  'filter.category': 'Category:',
+  'filter.all': 'All Tools ({n})',
+  'filter.pinned': 'Pinned ({n})',
+  'empty.title': 'No tools found',
+  'empty.noMatch': 'No PDF utilities matched "{q}".',
+  'empty.noCategory': 'No tools in this category.',
+  'empty.popular': 'Popular searches:',
+  'empty.reset': 'Reset Filters',
+  'results.search': 'Search Results ({n})',
+  'results.pinned': 'Pinned Utilities',
+  'results.matching': 'matching "{q}"',
+  'results.clear': 'Clear filters',
+  'pin.add': 'Pin utility to top',
+  'pin.remove': 'Unpin utility',
+  'local.title': 'How does it stay local?',
+  'local.body':
+    "When you drop a PDF, it is read directly into your browser's memory. Merging, splitting, OCR, encryption and every other browser tool run on your own device with WebAssembly and JavaScript, and the result is saved straight to your disk. No uploads, no telemetry, no server logs.",
+  'loading.tool': 'Loading tool...',
+  'tool.untranslated': 'This tool is not translated yet.',
+} as const;
+
+export type MessageKey = keyof typeof en;
+
+const ar: Partial<Record<MessageKey, string>> = {
+  'app.name': 'أدوات PDF المحلية',
+  'app.tagline': 'خصوصية كاملة على جهازك',
+  'nav.searchTools': 'ابحث في الأدوات',
+  'nav.focusSearch': 'البحث (/ أو ⌘K)',
+  'nav.backToSearch': 'العودة إلى البحث في الأدوات',
+  'nav.language': 'اللغة',
+  'theme.light': 'فاتح',
+  'theme.system': 'النظام',
+  'theme.dark': 'داكن',
+  'hero.badge': 'آمن 100% وعلى جهازك',
+  'hero.title': 'عدّل ملفات PDF بالكامل داخل متصفحك.',
+  'hero.body':
+    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. أكثر من 30 أداة تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. أدوات تحويل Office والترجمة القليلة مُعلَّمة بوضوح، ولا تعمل إلا مع خادم تستضيفه بنفسك.',
+  'search.placeholder': 'ابحث في أكثر من 40 أداة PDF بالاسم أو الوصف... (مثل: دمج، ضغط، حماية، OCR)',
+  'search.aria': 'ابحث في أدوات PDF بالاسم أو الوصف',
+  'search.clear': 'مسح',
+  'search.clearTitle': 'مسح البحث (Esc)',
+  'search.press': 'اضغط',
+  'search.or': 'أو',
+  'search.found': '{n} نتيجة',
+  'search.tools': '{n} أداة',
+  'filter.category': 'الفئة:',
+  'filter.all': 'كل الأدوات ({n})',
+  'filter.pinned': 'المثبّتة ({n})',
+  'empty.title': 'لا توجد أدوات',
+  'empty.noMatch': 'لا توجد أدوات تطابق "{q}".',
+  'empty.noCategory': 'لا توجد أدوات في هذه الفئة.',
+  'empty.popular': 'عمليات بحث شائعة:',
+  'empty.reset': 'إعادة ضبط الفلاتر',
+  'results.search': 'نتائج البحث ({n})',
+  'results.pinned': 'الأدوات المثبّتة',
+  'results.matching': 'تطابق "{q}"',
+  'results.clear': 'مسح الفلاتر',
+  'pin.add': 'تثبيت الأداة في الأعلى',
+  'pin.remove': 'إلغاء التثبيت',
+  'local.title': 'كيف تبقى ملفاتك على جهازك؟',
+  'local.body':
+    'عندما تضيف ملف PDF، يُقرأ مباشرة في ذاكرة متصفحك. الدمج والتقسيم والتعرّف الضوئي على النصوص والتشفير وكل أدوات المتصفح الأخرى تعمل على جهازك باستخدام WebAssembly وJavaScript، وتُحفظ النتيجة مباشرة على جهازك. لا رفع للملفات، ولا تتبّع، ولا سجلات على أي خادم.',
+  'loading.tool': 'جارٍ تحميل الأداة...',
+  'tool.untranslated': 'هذه الأداة غير مترجمة بعد.',
+};
+
+const groupNamesAr: Record<string, { name: string; short: string }> = {
+  'Organize Documents': { name: 'تنظيم المستندات', short: 'تنظيم' },
+  'Edit & Modify': { name: 'التحرير والتعديل', short: 'تحرير' },
+  'Convert & Optimize': { name: 'التحويل والتحسين', short: 'تحويل' },
+  'Analysis & Extraction': { name: 'التحليل والاستخراج', short: 'تحليل و OCR' },
+  'Security & Protection': { name: 'الأمان والحماية', short: 'أمان' },
+  'Server API Required (Convert From PDF)': { name: 'تتطلب خادمًا (تحويل من PDF)', short: 'PDF إلى Office' },
+  'Server API Required (Convert To PDF)': { name: 'تتطلب خادمًا (تحويل إلى PDF)', short: 'Office إلى PDF' },
+};
+
+const toolsAr: Partial<Record<ActiveTool, { title: string; description: string }>> = {
+  crop: { title: 'قص الصفحات والهوامش', description: 'قص الهوامش أو إزالة الترويسات أو اقتطاع أجزاء مخصصة من صفحة واحدة أو عدة صفحات بشكل مرئي.' },
+  formbuilder: { title: 'منشئ النماذج التفاعلية', description: 'أضف حقول نص قابلة للتعبئة ومربعات اختيار تفاعلية مباشرة على النماذج الممسوحة ضوئيًا.' },
+  bates: { title: 'ترقيم بيتس والختم القانوني', description: 'اختم أرقامًا تسلسلية قانونية (مثل LIT-CASE-000001) على المستندات متعددة الصفحات.' },
+  flatten: { title: 'تسطيح PDF', description: 'حوّل حقول النماذج التفاعلية والتعليقات إلى طبقات نصية ثابتة غير قابلة للتعديل.' },
+  repair: { title: 'إصلاح PDF', description: 'حاول استعادة ملفات PDF التالفة أو المعطوبة وإعادة بنائها تلقائيًا عبر إعادة إنشاء جداول المراجع.' },
+  resize: { title: 'تغيير حجم الصفحات', description: 'وحّد أبعاد الصفحات، وغيّر حجم المحتوى بدقة إلى مقاسات A4 أو Letter أو Legal.' },
+  addmargin: { title: 'إضافة هوامش', description: 'صغّر المحتوى الداخلي مع الحفاظ على حجم الورقة لإضافة هوامش بيضاء واسعة للطباعة أو التجليد.' },
+  redact: { title: 'الحجب الدائم', description: 'أخفِ البيانات الخاصة أو المقاطع الحساسة بشكل دائم ولا رجعة فيه.' },
+  compare: { title: 'مقارنة مرئية وفروقات', description: 'قارن ملفي PDF جنبًا إلى جنب. يبرز تعديلات الفقرات وتغيّرات التخطيط والمراجعات، دون اتصال بالإنترنت.' },
+  grayscale: { title: 'تدرّج رمادي وأحادي اللون', description: 'وفّر حبر الطابعة: حوّل ألوان المستند إلى الرمادي أو طبّق فلاتر تباين عالٍ مثل آلات النسخ.' },
+  extractor: { title: 'استخراج النص والتخطيط', description: 'استخرج محتوى PDF صفحة بصفحة مع الحفاظ على تباعد النص، أو حوّله إلى Markdown أو JSON منظم.' },
+  batchconverter: { title: 'المحوّل الدفعي', description: 'حوّل عدة ملفات دفعة واحدة: ارفع أي مزيج من ملفات PDF أو الصور، واختر صيغة الإخراج (PDF أو JPG أو PNG)، ونزّلها في ملف ZIP واحد.' },
+  formfiller: { title: 'تعبئة النماذج التفاعلية', description: 'يكتشف حقول النماذج التفاعلية تلقائيًا: اكتب الإجابات، وحدّد مربعات الاختيار والقوائم المنسدلة، أو أضف أختامًا مخصصة.' },
+  merge: { title: 'دمج PDF', description: 'اجمع عدة مستندات وأعد ترتيب صفحاتها في ملف PDF واحد.' },
+  split: { title: 'تقسيم PDF', description: 'استخرج صفحات أو نطاقات محددة (مثل 1-3، 5) إلى مستند جديد.' },
+  compress: { title: 'ضغط PDF', description: 'قلّل حجم الملف بشكل كبير داخل المتصفح عبر ضغط الصور المضمّنة.' },
+  images: { title: 'PDF إلى صور', description: 'حوّل كل صفحة من PDF إلى صورة JPG عالية الجودة قابلة للتنزيل.' },
+  imagestopdf: { title: 'صور إلى PDF', description: 'اجمع الصور العمودية والأفقية أو النماذج الممسوحة في ملف PDF واحد.' },
+  rotate: { title: 'تدوير PDF', description: 'دوّر صفحات مفردة أو جميع الصفحات. صحّح المسوحات المقلوبة أو المائلة.' },
+  organize: { title: 'تنظيم PDF', description: 'أعد ترتيب الصفحات أو احذفها أو كرّرها أو أدرج صفحات فارغة بشكل مرئي.' },
+  pagenumbers: { title: 'إضافة أرقام الصفحات', description: 'اختر موضع الترقيم وصيغته، وتخطَّ صفحات الغلاف في التقارير.' },
+  protect: { title: 'حماية PDF', description: 'أضف كلمة مرور إلى ملف PDF بتشفير AES-256 القياسي، ويفتح في أي قارئ PDF.' },
+  watermark: { title: 'علامة مائية', description: 'أضف أختامًا أمنية بشكل مائل أو في المنتصف أو في شبكة متكررة، مع التحكم في الكثافة والخط.' },
+  metadata: { title: 'تعديل البيانات الوصفية', description: 'عدّل العنوان والمؤلف والكلمات المفتاحية وبيانات النشر الخاصة بالمستند.' },
+  sign: { title: 'توقيع PDF', description: 'ارسم توقيعك بخط اليد، أو اكتبه بخط مزخرف، أو ارفع صورة توقيع شفافة على صفحات محددة.' },
+  ocr: { title: 'التعرّف الضوئي على النصوص (OCR)', description: 'تعرّف على النصوص في المستندات الممسوحة ضوئيًا داخل متصفحك، وعدّلها واحفظها كملف PDF قابل للبحث أو TXT. يدعم العربية.' },
+  nup: { title: 'طباعة عدة صفحات في ورقة', description: 'رتّب عدة صفحات في صفوف وأعمدة على ورقة طباعة واحدة، مع التحكم في حجم الورقة واتجاه الترتيب والحدود.' },
+  overlay: { title: 'دمج طبقات PDF', description: 'ضع صورًا أو أختامًا أو تواقيع أو قوالب متعددة الصفحات فوق ملفات PDF بدقة الميليمتر.' },
+  scanner: { title: 'الماسح الضوئي للمستندات', description: 'حوّل المستندات الورقية إلى رقمية باستخدام كاميرا جهازك، مع إزالة الظلال وضبط المحاذاة والقص التلقائي للهوامش.' },
+  pdftoword: { title: 'PDF إلى Word', description: 'حوّل ملفات PDF إلى مستندات Word قابلة للتعديل. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  pdftopowerpoint: { title: 'PDF إلى PowerPoint', description: 'حوّل ملفات PDF إلى عروض PowerPoint. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  pdftoexcel: { title: 'PDF إلى Excel', description: 'استخرج البيانات من ملفات PDF إلى جداول Excel. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  wordtopdf: { title: 'Word إلى PDF', description: 'حوّل مستندات Word إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  powerpointtopdf: { title: 'PowerPoint إلى PDF', description: 'حوّل عروض PowerPoint إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  exceltopdf: { title: 'Excel إلى PDF', description: 'حوّل جداول Excel إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  editpdf: { title: 'تحرير PDF', description: 'أضف نصوصًا وصورًا وأشكالًا وتعليقات إلى ملف PDF مباشرة في المتصفح.' },
+  htmltopdf: { title: 'HTML إلى PDF', description: 'حوّل صفحات الويب أو كود HTML إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  unlockpdf: { title: 'فك قفل PDF', description: 'أزل كلمة المرور من ملف PDF تعرف كلمة مروره.' },
+  pdftopdfa: { title: 'PDF إلى PDF/A', description: 'حوّل ملفات PDF إلى صيغة PDF/A للأرشفة طويلة الأمد. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  translatepdf: { title: 'ترجمة PDF', description: 'ترجم ملفات PDF بالذكاء الاصطناعي. (يتطلب خادمًا مستضافًا ذاتيًا ومفتاح Gemini)' },
+};
+
+const messages: Record<Lang, Partial<Record<MessageKey, string>>> = { en, ar };
+
+const STORAGE_KEY = 'pdf-lang';
+
+function detectLang(): Lang {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'en' || saved === 'ar') return saved;
+  } catch {
+    /* storage unavailable */
+  }
+  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('ar') ? 'ar' : 'en';
+}
+
+interface I18nValue {
+  lang: Lang;
+  dir: 'ltr' | 'rtl';
+  setLang: (lang: Lang) => void;
+  t: (key: MessageKey, vars?: Record<string, string | number>) => string;
+  toolText: (id: ActiveTool, fallback: { title: string; description: string }) => { title: string; description: string };
+  groupText: (name: string, shortName: string) => { name: string; short: string };
+}
+
+const I18nContext = createContext<I18nValue | null>(null);
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(detectLang);
+  const dir = LANGUAGES.find((l) => l.id === lang)!.dir;
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = dir;
+  }, [lang, dir]);
+
+  const value = useMemo<I18nValue>(() => {
+    const setLang = (next: Lang) => {
+      setLangState(next);
+      try {
+        localStorage.setItem(STORAGE_KEY, next);
+      } catch {
+        /* storage unavailable */
+      }
+    };
+    const t: I18nValue['t'] = (key, vars) => {
+      let text = messages[lang][key] ?? en[key];
+      if (vars) for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`{${k}}`, String(v));
+      return text;
+    };
+    const toolText: I18nValue['toolText'] = (id, fallback) => (lang === 'ar' && toolsAr[id]) || fallback;
+    const groupText: I18nValue['groupText'] = (name, shortName) =>
+      (lang === 'ar' && groupNamesAr[name]) || { name, short: shortName || name };
+    return { lang, dir, setLang, t, toolText, groupText };
+  }, [lang, dir]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
+export function useI18n(): I18nValue {
+  const ctx = useContext(I18nContext);
+  if (!ctx) throw new Error('useI18n must be used inside <I18nProvider>');
+  return ctx;
+}

@@ -9,3 +9,13 @@
   transition-duration: 400ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Arabic: letter-spacing and monospace fonts break letter joining */
+:root:lang(ar) .tracking-wide,
+:root:lang(ar) .tracking-wider,
+:root:lang(ar) .tracking-widest {
+  letter-spacing: 0;
+}
+:root:lang(ar) .font-mono:not(kbd):not(code) {
+  font-family: inherit;
+}

@@ -43,8 +43,10 @@ import {
   FileDigit,
   Search,
   X,
-  Filter
+  Filter,
+  Languages
 } from 'lucide-react';
+import { useI18n, LANGUAGES } from './i18n';
 import { ActiveTool } from './types';
 const MergeTool = React.lazy(() => import('./components/MergeTool'));
 const SplitTool = React.lazy(() => import('./components/SplitTool'));
@@ -542,6 +544,7 @@ const TOOL_GROUPS: ToolGroup[] = [
 ];
 
 export default function App() {
+  const { t, lang, setLang, toolText, groupText } = useI18n();
   const [activeTool, setActiveTool] = useState<ActiveTool>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -753,13 +756,14 @@ export default function App() {
   const renderToolCard = (tool: ToolDefinition) => {
     const isPinned = pinnedTools.includes(tool.id);
     const IconComponent = tool.icon;
+    const text = toolText(tool.id, tool);
     
     return (
       <div
         key={tool.id}
         onClick={() => setActiveTool(tool.id)}
         id={`card-${tool.id}`}
-        className={`flex flex-col items-start justify-between text-left p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl ${tool.colorClass} hover:shadow-lg dark:hover:bg-slate-900/60 shadow-xs transition-all duration-300 group cursor-pointer relative overflow-hidden`}
+        className={`flex flex-col items-start justify-between text-start p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl ${tool.colorClass} hover:shadow-lg dark:hover:bg-slate-900/60 shadow-xs transition-all duration-300 group cursor-pointer relative overflow-hidden`}
       >
         <div className="flex w-full justify-between items-start mb-4">
           <div className={`p-3 ${tool.iconBgClass} ${tool.iconTextClass} rounded-xl group-hover:scale-105 transition-transform`}>
@@ -772,7 +776,8 @@ export default function App() {
             }}
             id={`pin-btn-${tool.id}`}
             className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-450 transition-all duration-200 cursor-pointer shadow-2xs border border-transparent dark:border-slate-800"
-            title={isPinned ? "Unpin utility" : "Pin utility to top"}
+            title={isPinned ? t('pin.remove') : t('pin.add')}
+            aria-label={isPinned ? t('pin.remove') : t('pin.add')}
           >
             <Heart className={`w-4 h-4 transition-transform duration-200 active:scale-75 ${
               isPinned 
@@ -783,10 +788,10 @@ export default function App() {
         </div>
         <div>
           <h3 className={`text-lg font-bold text-slate-800 dark:text-slate-100 ${tool.hoverTextClass} transition-colors`}>
-            {tool.title}
+            {text.title}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-            {tool.description}
+            {text.description}
           </p>
         </div>
       </div>
@@ -801,8 +806,9 @@ export default function App() {
     // Filter tools by title, description, or id
     const matchingTools = TOOLS.filter(tool => {
       if (isSearching) {
-        const matchesTitle = tool.title.toLowerCase().includes(trimmedQuery);
-        const matchesDesc = tool.description.toLowerCase().includes(trimmedQuery);
+        const translated = toolText(tool.id, tool);
+        const matchesTitle = tool.title.toLowerCase().includes(trimmedQuery) || translated.title.toLowerCase().includes(trimmedQuery);
+        const matchesDesc = tool.description.toLowerCase().includes(trimmedQuery) || translated.description.toLowerCase().includes(trimmedQuery);
         const matchesId = tool.id.toLowerCase().includes(trimmedQuery);
         if (!matchesTitle && !matchesDesc && !matchesId) {
           return false;
@@ -829,13 +835,13 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-indigo-500/10 to-transparent pointer-events-none" />
           <div className="relative z-10 max-w-2xl space-y-4">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 text-emerald-400 font-semibold text-xs font-mono rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Local Sandbox
+              <ShieldCheck className="w-3.5 h-3.5" /> {t('hero.badge')}
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Manipulate PDFs entirely inside your browser.
+              {t('hero.title')}
             </h1>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-              A free, open-source PDF toolkit that processes your documents locally. 30+ tools run in-memory in your browser, so your files never leave your device. The few Office and translation converters are clearly marked and only work with a server you host yourself.
+              {t('hero.body')}
             </p>
           </div>
         </div>
@@ -843,7 +849,7 @@ export default function App() {
         {/* Dashboard Top Search & Filter Bar */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-xs transition-all space-y-4">
           <div className="relative flex items-center">
-            <div className="absolute left-4 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+            <div className="absolute start-4 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
               <Search className="w-5 h-5" />
             </div>
             <input
@@ -851,12 +857,12 @@ export default function App() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search 40+ PDF tools by name or description... (e.g., merge, compress, protect, ocr)"
-              className="w-full pl-12 pr-32 py-3.5 bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 focus:border-emerald-500 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-950 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm md:text-base outline-none transition-all duration-200 shadow-inner"
+              placeholder={t('search.placeholder')}
+              className="w-full ps-12 pe-32 py-3.5 bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 focus:border-emerald-500 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-950 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm md:text-base outline-none transition-all duration-200 shadow-inner"
               id="dashboard-search-input"
-              aria-label="Search PDF tools by name or description"
+              aria-label={t('search.aria')}
             />
-            <div className="absolute right-3.5 flex items-center gap-2">
+            <div className="absolute end-3.5 flex items-center gap-2">
               {searchQuery ? (
                 <button
                   onClick={() => {
@@ -864,29 +870,29 @@ export default function App() {
                     searchInputRef.current?.focus();
                   }}
                   className="px-2 py-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors text-xs font-medium flex items-center gap-1 cursor-pointer"
-                  title="Clear search (Esc)"
+                  title={t('search.clearTitle')}
                 >
                   <X className="w-4 h-4" />
-                  <span className="hidden sm:inline text-xs">Clear</span>
+                  <span className="hidden sm:inline text-xs">{t('search.clear')}</span>
                 </button>
               ) : (
                 <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 select-none">
-                  <span className="text-[10px]">Press</span>
+                  <span className="text-[10px]">{t('search.press')}</span>
                   <span className="font-semibold text-slate-600 dark:text-slate-300">/</span>
-                  <span className="text-[10px]">or</span>
+                  <span className="text-[10px]">{t('search.or')}</span>
                   <span className="font-semibold text-slate-600 dark:text-slate-300">⌘K</span>
                 </kbd>
               )}
               <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono hidden md:inline-flex items-center">
-                {isSearching ? `${matchingTools.length} found` : `${TOOLS.length} tools`}
+                {isSearching ? t('search.found', { n: matchingTools.length }) : t('search.tools', { n: TOOLS.length })}
               </span>
             </div>
           </div>
 
           {/* Quick Filter Categories */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-thin text-xs text-slate-600 dark:text-slate-400">
-            <span className="font-semibold text-slate-400 dark:text-slate-500 mr-1 flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5" /> Category:
+            <span className="font-semibold text-slate-400 dark:text-slate-500 me-1 flex items-center gap-1 shrink-0">
+              <Filter className="w-3.5 h-3.5" /> {t('filter.category')}
             </span>
             <button
               onClick={() => setSelectedCategory('all')}
@@ -896,7 +902,7 @@ export default function App() {
                   : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
               }`}
             >
-              All Tools ({TOOLS.length})
+              {t('filter.all', { n: TOOLS.length })}
             </button>
             {pinnedTools.length > 0 && (
               <button
@@ -908,7 +914,7 @@ export default function App() {
                 }`}
               >
                 <Heart className="w-3.5 h-3.5 fill-current" />
-                Pinned ({pinnedTools.length})
+                {t('filter.pinned', { n: pinnedTools.length })}
               </button>
             )}
             {TOOL_GROUPS.map((group) => {
@@ -924,7 +930,7 @@ export default function App() {
                       : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  {group.shortName || group.name} ({count})
+                  {groupText(group.name, group.shortName).short} ({count})
                 </button>
               );
             })}
@@ -940,17 +946,17 @@ export default function App() {
                   <Search className="w-7 h-7" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">
-                  No tools found
+                  {t('empty.title')}
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                   {isSearching ? (
-                    <>No PDF utilities matched "<span className="font-semibold text-slate-700 dark:text-slate-200">{searchQuery}</span>"{selectedCategory !== 'all' ? ` in ${selectedCategory}` : ''}.</>
+                    <>{t('empty.noMatch', { q: searchQuery })}</>
                   ) : (
-                    <>No tools in this category.</>
+                    <>{t('empty.noCategory')}</>
                   )}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-                  <span className="text-xs text-slate-400 dark:text-slate-500">Popular searches:</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{t('empty.popular')}</span>
                   {['Merge', 'Split', 'Compress', 'Protect', 'OCR', 'Sign', 'Watermark', 'Rotate'].map(tag => (
                     <button
                       key={tag}
@@ -971,7 +977,7 @@ export default function App() {
                   }}
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer shadow-xs inline-flex items-center gap-2"
                 >
-                  <X className="w-4 h-4" /> Reset Filters
+                  <X className="w-4 h-4" /> {t('empty.reset')}
                 </button>
               </div>
             ) : (
@@ -980,12 +986,12 @@ export default function App() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="text-sm font-bold font-mono tracking-widest text-slate-500 dark:text-slate-400 uppercase">
                       {isSearching
-                        ? `Search Results (${matchingTools.length})`
-                        : `${selectedCategory === 'pinned' ? 'Pinned Utilities' : selectedCategory} (${matchingTools.length})`}
+                        ? t('results.search', { n: matchingTools.length })
+                        : `${selectedCategory === 'pinned' ? t('results.pinned') : groupText(selectedCategory, '').name} (${matchingTools.length})`}
                     </h2>
                     {isSearching && (
                       <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
-                        matching "{searchQuery}"
+                        {t('results.matching', { q: searchQuery })}
                       </span>
                     )}
                   </div>
@@ -996,7 +1002,7 @@ export default function App() {
                     }}
                     className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
                   >
-                    Clear filters
+                    {t('results.clear')}
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full animate-fade-in">
@@ -1012,7 +1018,7 @@ export default function App() {
             {pinnedTools.length > 0 && (
               <div className="space-y-4 animate-fade-in">
                 <h3 className="text-sm font-bold font-mono tracking-widest text-rose-500 dark:text-rose-400 uppercase flex items-center gap-2">
-                  <Heart className="w-4 h-4 fill-rose-500 text-rose-500 animate-pulse" /> Pinned Utilities
+                  <Heart className="w-4 h-4 fill-rose-500 text-rose-500 animate-pulse" /> {t('results.pinned')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {TOOLS.filter(t => pinnedTools.includes(t.id)).map(renderToolCard)}
@@ -1028,7 +1034,7 @@ export default function App() {
               return (
                 <div key={group.name} className="space-y-4 flex flex-col items-start">
                   <h2 className="text-sm font-bold font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase px-1">
-                    {group.name}
+                    {groupText(group.name, group.shortName).name}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                     {groupTools.map(renderToolCard)}
@@ -1046,10 +1052,10 @@ export default function App() {
           </div>
           <div className="space-y-1 flex-1">
             <h4 className="text-base font-bold text-slate-800 dark:text-slate-100">
-              How does it stay local?
+              {t('local.title')}
             </h4>
             <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Our application integrates compiled <strong>PDF-Lib Javascript wrappers</strong> and standard canvas-based page frame painters. The moment you drop a PDF file, it is loaded directly into your browser's memory using standard <code>ArrayBuffer</code> buffers. All splits, mergers, password security changes, and rasterizations are calculated by your local browser thread and downloaded as a direct virtual download pipeline. No telemetry or server-logs are ever kept, making it 100% private and compliance-friendly.
+              {t('local.body')}
             </p>
           </div>
         </div>
@@ -1065,17 +1071,17 @@ export default function App() {
           <button
             onClick={() => setActiveTool('dashboard')}
             id="btn-nav-logo"
-            className="flex items-center gap-2 cursor-pointer text-left"
+            className="flex items-center gap-2 cursor-pointer text-start"
           >
             <div className="w-9 h-9 items-center justify-center bg-emerald-600 rounded-lg flex text-white font-black text-xl shadow-xs">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <span className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight shrink-0">
-                Local PDF Tools
+                {t('app.name')}
               </span>
               <p className="text-[9px] font-mono font-bold text-slate-400 uppercase -mt-0.5 tracking-wider">
-                100% Client-Side Privacy
+                {t('app.tagline')}
               </p>
             </div>
           </button>
@@ -1088,10 +1094,10 @@ export default function App() {
                   searchInputRef.current?.focus();
                 }}
                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer"
-                title="Focus search (/ or ⌘K)"
+                title={t('nav.focusSearch')}
               >
                 <Search className="w-3.5 h-3.5 text-slate-400" />
-                <span>Search tools</span>
+                <span>{t('nav.searchTools')}</span>
                 <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-500">
                   /
                 </kbd>
@@ -1106,13 +1112,27 @@ export default function App() {
                   }, 60);
                 }}
                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer"
-                title="Back to tools search"
+                title={t('nav.backToSearch')}
               >
                 <Search className="w-3.5 h-3.5 text-slate-400" />
-                <span>Search tools</span>
+                <span>{t('nav.searchTools')}</span>
               </button>
             )}
-            <ThemeSwitcher currentMode={themeMode} onChange={setThemeMode} />
+            <button
+              onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer"
+              title={t('nav.language')}
+              aria-label={t('nav.language')}
+              id="btn-language"
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span>{LANGUAGES.find((l) => l.id !== lang)!.label}</span>
+            </button>
+            <ThemeSwitcher
+              currentMode={themeMode}
+              onChange={setThemeMode}
+              labels={{ light: t('theme.light'), system: t('theme.system'), dark: t('theme.dark') }}
+            />
           </div>
         </div>
       </nav>
@@ -1122,10 +1142,15 @@ export default function App() {
         <React.Suspense fallback={
           <div className="flex flex-col items-center justify-center p-12 text-center my-12" role="status" aria-live="polite">
             <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-slate-500 font-medium dark:text-slate-400">Loading tool...</p>
+            <p className="text-slate-500 font-medium dark:text-slate-400">{t('loading.tool')}</p>
           </div>
         }>
-          {renderActiveTool()}
+          {activeTool === 'dashboard' || lang === 'en' ? (
+            renderActiveTool()
+          ) : (
+            // Tool screens are not translated yet: keep them left-to-right English for now
+            <div dir="ltr" lang="en">{renderActiveTool()}</div>
+          )}
         </React.Suspense>
       </main>
 

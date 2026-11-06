@@ -89,5 +89,8 @@
     "vite-plugin-pwa": "^2.0.0",
     "workbox-build": "^7.4.1",
     "workbox-window": "^7.4.1"
+  },
+  "overrides": {
+    "@types/node": "$@types/node"
   }
 }

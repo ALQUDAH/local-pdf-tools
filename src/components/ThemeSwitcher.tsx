@@ -12,25 +12,26 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 interface ThemeSwitcherProps {
   currentMode: ThemeMode;
   onChange: (mode: ThemeMode) => void;
+  labels?: Partial<Record<ThemeMode, string>>;
 }
 
-export default function ThemeSwitcher({ currentMode, onChange }: ThemeSwitcherProps) {
+export default function ThemeSwitcher({ currentMode, onChange, labels = {} }: ThemeSwitcherProps) {
   const modes: { id: ThemeMode; label: string; icon: React.ComponentType<any>; tooltip: string }[] = [
     {
       id: 'light',
-      label: 'Light',
+      label: labels.light ?? 'Light',
       icon: Sun,
       tooltip: 'Constant light-colored workspace interface'
     },
     {
       id: 'system',
-      label: 'System',
+      label: labels.system ?? 'System',
       icon: Laptop,
       tooltip: 'Synchronizes automatically with your system preference'
     },
     {
       id: 'dark',
-      label: 'Dark',
+      label: labels.dark ?? 'Dark',
       icon: Moon,
       tooltip: 'Protected eye-safe low light canvas'
     }
