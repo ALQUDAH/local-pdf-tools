@@ -33,6 +33,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
   const [success, setSuccess] = useState(false);
   const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [resultFilename, setResultFilename] = useState('');
+  const [replacedCharacters, setReplacedCharacters] = useState(false);
   // null = checking, true = companion server reachable, false = static hosting (no server)
   const [serverAvailable, setServerAvailable] = useState<boolean | null>(null);
   // Desktop app only: optional Gemini API key for Translate PDF
@@ -94,98 +95,98 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
 
   switch (toolId) {
     case 'pdftoword':
-      title = 'PDF to Word';
-      description = 'Convert PDF document to fully editable Microsoft Word Document (.docx) preserving lines and text format.';
+      title = tr("PDF to Word");
+      description = tr("Extract the text of a PDF into an editable Word document (.docx), one paragraph per line. Layout, images and fonts are not kept. Runs in your browser.");
       inputAccept = '.pdf';
-      inputLabel = 'Select a PDF File';
+      inputLabel = tr("Select a PDF File");
       apiEndpoint = '/api/convert/pdf-to-word';
       resultExt = 'docx';
       icon = <FileText className="w-8 h-8 text-blue-500" />;
       colorClass = 'blue';
       break;
     case 'pdftopowerpoint':
-      title = 'PDF to PowerPoint';
-      description = 'Convert PDF document to fully styled Microsoft PowerPoint slides (.pptx). Each page is formatted beautifully.';
+      title = tr("PDF to PowerPoint");
+      description = tr("Turn each PDF page into a PowerPoint slide (.pptx) containing that page's text. Runs in your browser.");
       inputAccept = '.pdf';
-      inputLabel = 'Select a PDF File';
+      inputLabel = tr("Select a PDF File");
       apiEndpoint = '/api/convert/pdf-to-powerpoint';
       resultExt = 'pptx';
       icon = <Presentation className="w-8 h-8 text-orange-500" />;
       colorClass = 'orange';
       break;
     case 'pdftoexcel':
-      title = 'PDF to Excel';
-      description = 'Extract tabular layout, numbers and grids from PDF files directly into Microsoft Excel spreadsheets (.xlsx).';
+      title = tr("PDF to Excel");
+      description = tr("Copy the text of a PDF into an Excel sheet (.xlsx), splitting columns at wide gaps. Works best for simple tables. Runs in your browser.");
       inputAccept = '.pdf';
-      inputLabel = 'Select a PDF File';
+      inputLabel = tr("Select a PDF File");
       apiEndpoint = '/api/convert/pdf-to-excel';
       resultExt = 'xlsx';
       icon = <FileSpreadsheet className="w-8 h-8 text-green-500" />;
       colorClass = 'green';
       break;
     case 'wordtopdf':
-      title = 'Word to PDF';
-      description = 'Convert Microsoft Word files (.docx) into accurate and high-contrast PDF documents offline.';
+      title = tr("Word to PDF");
+      description = tr("Convert the text of a Word document (.docx) into a clean PDF. Formatting and images are not kept. Runs in your browser.");
       inputAccept = '.docx';
-      inputLabel = 'Select a Word Document (.docx)';
+      inputLabel = tr("Select a Word Document (.docx)");
       apiEndpoint = '/api/convert/word-to-pdf';
       resultExt = 'pdf';
       icon = <FileText className="w-8 h-8 text-sky-500" />;
       colorClass = 'sky';
       break;
     case 'powerpointtopdf':
-      title = 'PowerPoint to PDF';
-      description = 'Convert Microsoft PowerPoint presentations (.pptx) into standard PDF slides page-by-page.';
+      title = tr("PowerPoint to PDF");
+      description = tr("Convert the text of each PowerPoint slide (.pptx) into a PDF page. Runs in your browser.");
       inputAccept = '.pptx';
-      inputLabel = 'Select a PowerPoint File (.pptx)';
+      inputLabel = tr("Select a PowerPoint File (.pptx)");
       apiEndpoint = '/api/convert/powerpoint-to-pdf';
       resultExt = 'pdf';
       icon = <Presentation className="w-8 h-8 text-rose-500" />;
       colorClass = 'rose';
       break;
     case 'exceltopdf':
-      title = 'Excel to PDF';
-      description = 'Convert Microsoft Excel spreadsheet tables (.xlsx) into highly readable styled PDF documents.';
+      title = tr("Excel to PDF");
+      description = tr("Convert the sheets of an Excel file (.xlsx) into a readable PDF, one row per line. Runs in your browser.");
       inputAccept = '.xlsx';
-      inputLabel = 'Select an Excel Spreadsheet (.xlsx)';
+      inputLabel = tr("Select an Excel Spreadsheet (.xlsx)");
       apiEndpoint = '/api/convert/excel-to-pdf';
       resultExt = 'pdf';
       icon = <FileSpreadsheet className="w-8 h-8 text-teal-500" />;
       colorClass = 'teal';
       break;
     case 'htmltopdf':
-      title = 'HTML/Website to PDF';
-      description = 'Save any public webpage URL or raw HTML code into standard formatted A4 PDF layouts.';
+      title = tr("HTML/Website to PDF");
+      description = tr("Convert HTML code or an HTML file into a text PDF in your browser. Fetching a web page by URL needs the self-hosted server.");
       inputAccept = '.html,.htm';
-      inputLabel = 'Select an HTML File (.html)';
+      inputLabel = tr("Select an HTML File (.html)");
       apiEndpoint = '/api/convert/html-to-pdf';
       resultExt = 'pdf';
       icon = <FileCode className="w-8 h-8 text-indigo-500" />;
       colorClass = 'indigo';
       break;
     case 'pdftopdfa':
-      title = 'PDF to PDF/A';
-      description = 'Convert standard PDF files to ISO standardized PDF/A documents for long-term data archiving and digital preservation.';
+      title = tr("PDF to PDF/A");
+      description = tr("Prepare a PDF for long-term archiving (PDF/A-2b): adds archival metadata and an sRGB color profile. Fully compliant only if the PDF's fonts are already embedded. Runs in your browser.");
       inputAccept = '.pdf';
-      inputLabel = 'Select a PDF File';
+      inputLabel = tr("Select a PDF File");
       apiEndpoint = '/api/convert/pdf-to-pdfa';
       resultExt = 'pdf';
       icon = <ShieldCheck className="w-8 h-8 text-slate-500" />;
       colorClass = 'slate';
       break;
     case 'translatepdf':
-      title = 'Translate PDF AI';
-      description = 'Translate your PDF documents into another language keeping logical paragraphs using AI on the server.';
+      title = tr("Translate PDF AI");
+      description = tr("Translate the text of a PDF with Google Gemini AI. Needs the self-hosted server or the desktop app with your own Gemini API key; the text is sent to Google.");
       inputAccept = '.pdf';
-      inputLabel = 'Select a PDF File';
+      inputLabel = tr("Select a PDF File");
       apiEndpoint = '/api/convert/translate-pdf';
       resultExt = 'pdf';
       icon = <Languages className="w-8 h-8 text-violet-500" />;
       colorClass = 'violet';
       break;
     default:
-      title = 'Document Converter';
-      description = 'Convert files seamlessly utilizing high fidelity fullstack libraries.';
+      title = tr("Document Converter");
+      description = tr("Convert files seamlessly utilizing high fidelity fullstack libraries.");
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,6 +197,11 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
       setResultBlob(null);
     }
   };
+
+  // Only AI translation and fetching a web page by URL need the server; everything else runs in the browser.
+  const needsServer = toolId === 'translatepdf' || (toolId === 'htmltopdf' && htmlMode === 'url');
+
+  const readFileText = (f: File) => f.text();
 
   const handleConvert = async () => {
     if (toolId !== 'htmltopdf' || htmlMode === 'file') {
@@ -208,86 +214,78 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setReplacedCharacters(false);
 
     try {
-      let response: Response;
       const originalName = file ? file.name : 'rendered_output';
       const cleanName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
       const outFilename = `${cleanName}_converted.${resultExt}`;
 
-      if (toolId === 'htmltopdf') {
-        if (htmlMode === 'url') {
-          if (!urlInput.trim()) {
-            setError(tr("Please enter a valid website address."));
-            setLoading(false);
-            return;
-          }
-          response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ urlInput: urlInput }),
-          });
-        } else if (htmlMode === 'code') {
-          if (!htmlCode.trim()) {
+      if (!needsServer) {
+        // In-browser conversion: the file never leaves the device
+        const conv = await import('../lib/officeConvert');
+        let result: { blob: Blob; replacedCharacters?: boolean };
+        if (toolId === 'htmltopdf') {
+          const html = htmlMode === 'code' ? htmlCode : await readFileText(file as File);
+          if (!html.trim()) {
             setError(tr("Please input valid HTML code snippet."));
-            setLoading(false);
             return;
           }
-          response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ htmlInput: htmlCode }),
-          });
+          result = await conv.htmlToPdf(html);
         } else {
-          // File Mode
-          if (!file) {
-            setError(tr("Please select an HTML file to print."));
-            setLoading(false);
-            return;
+          const data = await (file as File).arrayBuffer();
+          switch (toolId) {
+            case 'pdftoword': result = await conv.pdfToWord(data); break;
+            case 'pdftopowerpoint': result = await conv.pdfToPowerPoint(data); break;
+            case 'pdftoexcel': result = await conv.pdfToExcel(data); break;
+            case 'wordtopdf': result = await conv.wordToPdf(data); break;
+            case 'powerpointtopdf': result = await conv.powerPointToPdf(data); break;
+            case 'exceltopdf': result = await conv.excelToPdf(data); break;
+            case 'pdftopdfa': result = await conv.pdfToPdfA(data, originalName); break;
+            default: throw new Error('Unsupported conversion');
           }
-          const reader = new FileReader();
-          const p = new Promise<string>((resolve) => {
-            reader.onload = () => resolve(reader.result as string);
-            reader.readAsText(file);
-          });
-          const text = await p;
-          response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ htmlInput: text }),
-          });
         }
-      } else {
-        // Standard File Form Upload
-        const formData = new FormData();
-        formData.append('file', file as File);
-        
-        if (toolId === 'translatepdf') {
-          formData.append('targetLang', targetLang);
-        }
+        setResultBlob(result.blob);
+        setReplacedCharacters(!!result.replacedCharacters);
+        setResultFilename(toolId === 'pdftopdfa' ? `${cleanName}_pdfa.pdf` : outFilename);
+        setSuccess(true);
+        return;
+      }
 
+      let response: Response;
+      if (toolId === 'htmltopdf') {
+        if (!urlInput.trim()) {
+          setError(tr("Please enter a valid website address."));
+          return;
+        }
         response = await fetch(apiEndpoint, {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urlInput: urlInput }),
         });
+      } else {
+        const formData = new FormData();
+        formData.append('file', file as File);
+        formData.append('targetLang', targetLang);
+        response = await fetch(apiEndpoint, { method: 'POST', body: formData });
       }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Server error occurred during conversion process.');
+        throw new Error(errorData.error || tr("Conversion failed."));
       }
 
-      const resBlob = await response.blob();
-      setResultBlob(resBlob);
+      setResultBlob(await response.blob());
       setResultFilename(outFilename);
       setSuccess(true);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Something went wrong. Please make sure the server is listening locally.');
+      setError(err?.message ? `${tr("Conversion failed.")} ${err.message}` : tr("Conversion failed."));
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleDownload = () => {
     if (!resultBlob) return;
@@ -313,12 +311,12 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
           <span>{tr("Back to Dashboard")}</span>
         </button>
         <div className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 rounded-full font-semibold">
-          <Server className="w-3.5 h-3.5" />
-          <span>{tr("Self-Hosted Server Tool")}</span>
+          {needsServer ? <Server className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+          <span>{needsServer ? tr("Self-Hosted Server Tool") : tr("100% Client-Side")}</span>
         </div>
       </div>
 
-      {serverAvailable === false && (
+      {needsServer && serverAvailable === false && (
         <div role="alert" className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-200">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div className="space-y-1">
@@ -530,7 +528,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
         {!success && (
           <button
             onClick={handleConvert}
-            disabled={loading || serverAvailable === false}
+            disabled={loading || (needsServer && serverAvailable === false)}
             className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white shadow-md transition disabled:opacity-50 cursor-pointer ${
               colorClass === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
               colorClass === 'orange' ? 'bg-orange-600 hover:bg-orange-700' :
@@ -566,6 +564,11 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 truncate max-w-lg mx-auto">
               {tr("Ready to download:")} {resultFilename}
             </p>
+            {replacedCharacters && (
+              <p role="status" className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 rounded-xl px-3 py-2 mb-6 max-w-lg mx-auto">
+                {tr("Some characters (for example Arabic or Chinese) can't be shown by this basic text conversion and were replaced.")}
+              </p>
+            )}
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => {

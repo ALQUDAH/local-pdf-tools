@@ -13,6 +13,7 @@ import mammoth from "mammoth";
 import JSZip from "jszip";
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
+import { preparePdfA } from "./src/lib/pdfa";
 
 // Initialize express app
 const app = express();
@@ -552,32 +553,15 @@ app.post("/api/convert/pdf-to-pdfa", upload.single("file"), async (req, res) => 
     if (!req.file) {
       return res.status(400).json({ error: "Missing source document" });
     }
-    
-    const pdfDoc = await PDFDocument.load(req.file.buffer);
-    
-    // Set ISO PDF/A compliance metadata header
-    const xmpMetadata = `<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>
-<x:xmpmeta xmlns:x="adobe:ns:meta/">
- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="" xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">
-   <pdfaid:part>2</pdfaid:part>
-   <pdfaid:conformance>B</pdfaid:conformance>
-  </rdf:Description>
- </rdf:RDF>
-</x:xmpmeta>
-<?xpacket end="w"?>`;
-
-    pdfDoc.setTitle(`${safeBaseName(req.file.originalname)} (ISO PDF/A Compliant)`);
-    pdfDoc.setSubject("Archived Target ISO-19005 series standard compliance");
-    
-    const pdfBytes = await pdfDoc.save();
-    
+    // Same implementation as the browser app: PDF/A-2b metadata, sRGB output intent and file ID.
+    // Full conformance also requires all fonts to be embedded in the source PDF.
+    const pdfBytes = await preparePdfA(new Uint8Array(req.file.buffer), req.file.originalname);
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${safeBaseName(req.file.originalname)}_pdfa.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
-    console.error("PDF/A compilation error:", error);
-    res.status(500).json({ error: error.message || "Failed to make document PDF/A compliant" });
+    console.error("PDF/A error:", error);
+    res.status(500).json({ error: error.message || "Failed to prepare PDF/A document" });
   }
 });
 

@@ -390,7 +390,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'pdftoword',
     title: 'PDF to Word',
-    description: 'Convert PDF files into easy to edit DOC and DOCX documents. (Note: Requires Server API processing, not purely client-side).',
+    description: "Extract the text of a PDF into an editable Word document. Runs in your browser.",
     icon: FileText,
     colorClass: 'hover:border-blue-500 dark:hover:border-blue-500',
     iconBgClass: 'bg-blue-500/10',
@@ -400,7 +400,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'pdftopowerpoint',
     title: 'PDF to PowerPoint',
-    description: 'Turn your PDF files into easy to edit PPT and PPTX slideshows. (Note: Requires Server API processing, not purely client-side).',
+    description: "Turn each PDF page into a PowerPoint slide with its text. Runs in your browser.",
     icon: MonitorPlay,
     colorClass: 'hover:border-orange-500 dark:hover:border-orange-500',
     iconBgClass: 'bg-orange-500/10',
@@ -410,7 +410,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'pdftoexcel',
     title: 'PDF to Excel',
-    description: 'Pull data straight from PDFs into Excel spreadsheets in a few short seconds. (Note: Requires Server API processing, not purely client-side).',
+    description: "Copy text and simple tables from a PDF into an Excel spreadsheet. Runs in your browser.",
     icon: FileSpreadsheet,
     colorClass: 'hover:border-emerald-500 dark:hover:border-emerald-500',
     iconBgClass: 'bg-emerald-500/10',
@@ -420,7 +420,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'wordtopdf',
     title: 'Word to PDF',
-    description: 'Make DOC and DOCX files easy to read by converting them to PDF. (Note: Requires Server API processing, not purely client-side).',
+    description: "Convert the text of a Word document (.docx) into a PDF. Runs in your browser.",
     icon: FileText,
     colorClass: 'hover:border-blue-500 dark:hover:border-blue-500',
     iconBgClass: 'bg-blue-500/10',
@@ -430,7 +430,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'powerpointtopdf',
     title: 'PowerPoint to PDF',
-    description: 'Make PPT and PPTX slideshows easy to view by converting them to PDF. (Note: Requires Server API processing, not purely client-side).',
+    description: "Convert the text of PowerPoint slides (.pptx) into PDF pages. Runs in your browser.",
     icon: MonitorPlay,
     colorClass: 'hover:border-orange-500 dark:hover:border-orange-500',
     iconBgClass: 'bg-orange-500/10',
@@ -440,7 +440,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'exceltopdf',
     title: 'Excel to PDF',
-    description: 'Make EXCEL spreadsheets easy to read by converting them to PDF. (Note: Requires Server API processing, not purely client-side).',
+    description: "Convert Excel sheets (.xlsx) into a readable PDF. Runs in your browser.",
     icon: FileSpreadsheet,
     colorClass: 'hover:border-emerald-500 dark:hover:border-emerald-500',
     iconBgClass: 'bg-emerald-500/10',
@@ -460,7 +460,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'htmltopdf',
     title: 'HTML to PDF',
-    description: 'Convert webpages in HTML to PDF. Copy and paste the URL of the page you want and convert it. (Note: Requires Server API processing).',
+    description: "Convert HTML code or files to PDF in your browser. Converting a web page by URL needs the self-hosted server.",
     icon: Globe,
     colorClass: 'hover:border-indigo-500 dark:hover:border-indigo-500',
     iconBgClass: 'bg-indigo-500/10',
@@ -480,7 +480,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'pdftopdfa',
     title: 'PDF to PDF/A',
-    description: 'Transform your PDF to PDF/A, the ISO-standardized version of PDF for long-term archiving. (Note: True PDF/A conversion requires Server API compliance validation).',
+    description: "Prepare a PDF for long-term archiving (PDF/A-2b metadata and color profile). Runs in your browser.",
     icon: FileDigit,
     colorClass: 'hover:border-gray-500 dark:hover:border-gray-500',
     iconBgClass: 'bg-gray-500/10',
@@ -490,7 +490,7 @@ const TOOLS: ToolDefinition[] = [
   {
     id: 'translatepdf',
     title: 'Translate PDF',
-    description: 'Easily translate PDF files keeping fonts and layout intact. (Note: Requires external Translate Server API processing).',
+    description: "Translate the text of a PDF with AI (Google Gemini). Needs the self-hosted server or desktop app and your own API key.",
     icon: Globe,
     colorClass: 'hover:border-blue-500 dark:hover:border-blue-500',
     iconBgClass: 'bg-blue-500/10',
@@ -532,12 +532,12 @@ const TOOL_GROUPS: ToolGroup[] = [
     tools: ['protect', 'unlockpdf', 'redact', 'sign', 'watermark', 'overlay', 'repair']
   },
   {
-    name: "Server API Required (Convert From PDF)",
+    name: "Convert from PDF",
     shortName: "PDF to Office",
     tools: ['pdftoword', 'pdftopowerpoint', 'pdftoexcel']
   },
   {
-    name: "Server API Required (Convert To PDF)",
+    name: "Convert to PDF",
     shortName: "Office to PDF",
     tools: ['wordtopdf', 'powerpointtopdf', 'exceltopdf', 'htmltopdf']
   }

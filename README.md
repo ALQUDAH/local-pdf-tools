@@ -4,7 +4,7 @@
 
 # Local PDF Tools
 
-**30+ PDF tools that run entirely in your browser. Your files never leave your device.**
+**40 PDF tools, 38 of which run entirely in your browser. Your files never leave your device.**
 
 Merge, split, compress, OCR, sign, redact, edit, watermark and more. Free, open source, no sign-up, no uploads, no watermarks, no limits.
 
@@ -30,7 +30,7 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 - 🔒 **Private by design.** Your documents never leave your device, so it's safe for sensitive and confidential files.
 - ⚡ **Fast.** No upload or download wait. Big files are limited only by your machine.
 - 💸 **Free forever.** No accounts, no ads, no watermarks, no "3 tasks per day" limits.
-- 🧰 **30+ tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
+- 🧰 **40 tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
 - 💻 **Desktop app for Windows, macOS and Linux**, with all 40 tools working fully offline.
 - 📲 **Installable web app.** Install it from your browser and it works offline after the first visit.
 - 🌍 **English and Arabic** across the whole app, with a full right-to-left layout. [Add your language](CONTRIBUTING.md#translating)!
@@ -47,14 +47,15 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 | **Convert & optimize** | Compress · PDF → images · Images → PDF · Batch converter · Text & Markdown extractor · Grayscale / monochrome |
 | **Scan & analyze** | OCR (18 languages incl. Arabic, Chinese, Japanese; searchable PDF output) · Camera document scanner · Visual diff / compare two PDFs · Metadata editor |
 | **Security** | Password-protect (standard AES-256) · Unlock · Permanent redaction · Signatures (draw, type, upload) · Watermarks · Template overlay · Repair corrupted PDFs |
-| **Office & web** *(self-hosted server only)* | PDF ↔ Word · PDF ↔ PowerPoint · PDF ↔ Excel · HTML/URL → PDF · PDF/A · AI translation |
+| **Office & archiving** | PDF ↔ Word · PDF ↔ PowerPoint · PDF ↔ Excel · HTML → PDF · PDF/A-2b preparation (text-based Office conversions) |
+| **Server features** *(self-hosted or desktop)* | AI translation (your own Gemini key) · Convert a web page by URL |
 
 ### Privacy model: what runs where
 
 | | Where it runs | Notes |
 |---|---|---|
-| **Browser tools** (31 of 40) | 100% in your browser | Files are never transmitted. Works on the static demo. |
-| **Office / HTML / PDF/A / Translate** (9 of 40) | On the Node.js server **you** run, or inside the desktop app | Clearly labeled "Self-Hosted Server Tool". On the static demo they're disabled and nothing is sent. Translate calls Google Gemini only if you configure an API key. |
+| **Browser tools** (38 of 40, including Office conversions and PDF/A) | 100% in your browser | Files are never transmitted. Works on the static demo and offline. |
+| **AI Translate** and **web page by URL** (2 of 40) | On the Node.js server **you** run, or inside the desktop app | Clearly labeled. On the static demo they're disabled and nothing is sent. Translate sends the document's text to Google Gemini, only with your own API key. |
 | **Desktop app** (40 of 40) | On your computer | The app runs its own server on `127.0.0.1` only. Nothing is reachable from your network. |
 
 A few browser tools download open-source **assets** (never your documents) the first time you use them: OCR language models and fonts for non-Latin searchable PDFs (jsDelivr), and handwriting-style signature fonts (Google Fonts). The OCR engine itself and the PDF engine are bundled with the app. Self-hosters can serve the OCR assets themselves too; see [Configuration](#configuration).
@@ -198,7 +199,8 @@ tests/                 # Playwright browser tests
 - [x] Desktop app for Windows, macOS and Linux
 - [x] Arabic and right-to-left layout
 - [ ] More languages (French, Spanish, Turkish, ...): [help translate](CONTRIBUTING.md#translating)
-- [ ] Move Office conversions into the browser (WASM) so all tools work without a server
+- [x] Office conversions and PDF/A in the browser
+- [ ] Layout-preserving Office conversions (images, tables, fonts)
 - [ ] Drag-and-drop tool chaining ("workflows")
 - [ ] Code-signed desktop installers
 - [ ] Browser tests for every tool

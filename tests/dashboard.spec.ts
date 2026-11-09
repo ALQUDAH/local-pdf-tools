@@ -12,7 +12,7 @@ test('dashboard lists all tools and search filters them', async ({ page }) => {
 
 test('server-backed tools explain they need a server on static hosting', async ({ page }) => {
   await page.goto('/');
-  await page.getByText('PDF to Word', { exact: true }).first().click();
+  await page.locator('#card-translatepdf').click();
   await expect(page.getByRole('alert')).toContainText('companion server');
   await expect(page.getByRole('button', { name: /Start conversion/i })).toBeDisabled();
 });

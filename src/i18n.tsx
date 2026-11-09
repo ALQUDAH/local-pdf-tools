@@ -29,7 +29,7 @@ const en = {
   'hero.badge': '100% Secure Local Sandbox',
   'hero.title': 'Manipulate PDFs entirely inside your browser.',
   'hero.body':
-    'A free, open-source PDF toolkit that processes your documents locally. 30+ tools run in-memory in your browser, so your files never leave your device. The few Office and translation converters are clearly marked and only work with a server you host yourself.',
+    'A free, open-source PDF toolkit that processes your documents locally. 38 of 40 tools, including Office conversions, run in your browser, so your files never leave your device. Only AI translation and converting web pages by URL use a server you host yourself.',
   'hero.titleDesktop': 'Manipulate PDFs entirely on your computer.',
   'hero.bodyDesktop':
     'A free, open-source PDF toolkit that works offline. All 40 tools, including the Office converters, run on this computer, so your files never leave your device.',
@@ -77,7 +77,7 @@ const ar: Partial<Record<MessageKey, string>> = {
   'hero.badge': 'آمن 100% وعلى جهازك',
   'hero.title': 'عدّل ملفات PDF بالكامل داخل متصفحك.',
   'hero.body':
-    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. أكثر من 30 أداة تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. أدوات تحويل Office والترجمة القليلة مُعلَّمة بوضوح، ولا تعمل إلا مع خادم تستضيفه بنفسك.',
+    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. 38 أداة من أصل 40، بما فيها تحويل ملفات Office، تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. فقط الترجمة بالذكاء الاصطناعي وتحويل صفحات الويب عبر رابط تستخدم خادمًا تستضيفه بنفسك.',
   'hero.titleDesktop': 'عدّل ملفات PDF بالكامل على جهازك.',
   'hero.bodyDesktop':
     'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعمل دون إنترنت. جميع الأدوات الأربعين، بما فيها تحويل ملفات Office، تعمل على هذا الجهاز، فلا تغادر ملفاتك جهازك أبدًا.',
@@ -116,8 +116,8 @@ const groupNamesAr: Record<string, { name: string; short: string }> = {
   'Convert & Optimize': { name: 'التحويل والتحسين', short: 'تحويل' },
   'Analysis & Extraction': { name: 'التحليل والاستخراج', short: 'تحليل و OCR' },
   'Security & Protection': { name: 'الأمان والحماية', short: 'أمان' },
-  'Server API Required (Convert From PDF)': { name: 'تتطلب خادمًا (تحويل من PDF)', short: 'PDF إلى Office' },
-  'Server API Required (Convert To PDF)': { name: 'تتطلب خادمًا (تحويل إلى PDF)', short: 'Office إلى PDF' },
+  'Convert from PDF': { name: 'التحويل من PDF', short: 'PDF إلى Office' },
+  'Convert to PDF': { name: 'التحويل إلى PDF', short: 'Office إلى PDF' },
 };
 
 const toolsAr: Partial<Record<ActiveTool, { title: string; description: string }>> = {
@@ -150,17 +150,17 @@ const toolsAr: Partial<Record<ActiveTool, { title: string; description: string }
   nup: { title: 'طباعة عدة صفحات في ورقة', description: 'رتّب عدة صفحات في صفوف وأعمدة على ورقة طباعة واحدة، مع التحكم في حجم الورقة واتجاه الترتيب والحدود.' },
   overlay: { title: 'دمج طبقات PDF', description: 'ضع صورًا أو أختامًا أو تواقيع أو قوالب متعددة الصفحات فوق ملفات PDF بدقة الميليمتر.' },
   scanner: { title: 'الماسح الضوئي للمستندات', description: 'حوّل المستندات الورقية إلى رقمية باستخدام كاميرا جهازك، مع إزالة الظلال وضبط المحاذاة والقص التلقائي للهوامش.' },
-  pdftoword: { title: 'PDF إلى Word', description: 'حوّل ملفات PDF إلى مستندات Word قابلة للتعديل. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  pdftopowerpoint: { title: 'PDF إلى PowerPoint', description: 'حوّل ملفات PDF إلى عروض PowerPoint. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  pdftoexcel: { title: 'PDF إلى Excel', description: 'استخرج البيانات من ملفات PDF إلى جداول Excel. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  wordtopdf: { title: 'Word إلى PDF', description: 'حوّل مستندات Word إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  powerpointtopdf: { title: 'PowerPoint إلى PDF', description: 'حوّل عروض PowerPoint إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  exceltopdf: { title: 'Excel إلى PDF', description: 'حوّل جداول Excel إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  pdftoword: { title: 'PDF إلى Word', description: 'استخرج نص ملف PDF إلى مستند Word قابل للتعديل. يعمل في متصفحك.' },
+  pdftopowerpoint: { title: 'PDF إلى PowerPoint', description: 'حوّل كل صفحة PDF إلى شريحة PowerPoint بنصها. يعمل في متصفحك.' },
+  pdftoexcel: { title: 'PDF إلى Excel', description: 'انسخ النصوص والجداول البسيطة من PDF إلى جدول Excel. يعمل في متصفحك.' },
+  wordtopdf: { title: 'Word إلى PDF', description: 'حوّل نص مستند Word (.docx) إلى PDF. يعمل في متصفحك.' },
+  powerpointtopdf: { title: 'PowerPoint إلى PDF', description: 'حوّل نص شرائح PowerPoint (.pptx) إلى صفحات PDF. يعمل في متصفحك.' },
+  exceltopdf: { title: 'Excel إلى PDF', description: 'حوّل أوراق Excel (.xlsx) إلى PDF سهل القراءة. يعمل في متصفحك.' },
   editpdf: { title: 'تحرير PDF', description: 'أضف نصوصًا وصورًا وأشكالًا وتعليقات إلى ملف PDF مباشرة في المتصفح.' },
-  htmltopdf: { title: 'HTML إلى PDF', description: 'حوّل صفحات الويب أو كود HTML إلى PDF. (يتطلب خادمًا مستضافًا ذاتيًا)' },
+  htmltopdf: { title: 'HTML إلى PDF', description: 'حوّل كود HTML أو ملفاته إلى PDF في متصفحك. تحويل صفحة ويب عبر رابط يتطلب خادمًا مستضافًا ذاتيًا.' },
   unlockpdf: { title: 'فك قفل PDF', description: 'أزل كلمة المرور من ملف PDF تعرف كلمة مروره.' },
-  pdftopdfa: { title: 'PDF إلى PDF/A', description: 'حوّل ملفات PDF إلى صيغة PDF/A للأرشفة طويلة الأمد. (يتطلب خادمًا مستضافًا ذاتيًا)' },
-  translatepdf: { title: 'ترجمة PDF', description: 'ترجم ملفات PDF بالذكاء الاصطناعي. (يتطلب خادمًا مستضافًا ذاتيًا ومفتاح Gemini)' },
+  pdftopdfa: { title: 'PDF إلى PDF/A', description: 'جهّز ملف PDF للأرشفة طويلة الأمد (بيانات PDF/A-2b وملف الألوان). يعمل في متصفحك.' },
+  translatepdf: { title: 'ترجمة PDF', description: 'ترجم نص ملف PDF بالذكاء الاصطناعي (Google Gemini). يتطلب خادمًا مستضافًا ذاتيًا أو تطبيق سطح المكتب ومفتاح API خاصًا بك.' },
 };
 
 const messages: Record<Lang, Partial<Record<MessageKey, string>>> = { en, ar };
