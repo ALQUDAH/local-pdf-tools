@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef, DragEvent, ChangeEvent } from 'react';
+import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
 import { UploadCloud, File, AlertTriangle } from 'lucide-react';
 
 import { tr } from '../i18n';
+import { takePendingFile } from '../lib/handoff';
 interface DropzoneProps {
   onFilesSelected: (files: File[]) => void;
   multiple?: boolean;
@@ -27,6 +28,13 @@ export default function Dropzone({
   const [isDragActive, setIsDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Tool chaining: load the PDF handed over from the previous tool
+  useEffect(() => {
+    const file = takePendingFile(accept);
+    if (file) onFilesSelected([file]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDrag = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();

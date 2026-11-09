@@ -30,6 +30,7 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 - 🔒 **Private by design.** Your documents never leave your device, so it's safe for sensitive and confidential files.
 - ⚡ **Fast.** No upload or download wait. Big files are limited only by your machine.
 - 💸 **Free forever.** No accounts, no ads, no watermarks, no "3 tasks per day" limits.
+- 🔗 **Chain tools.** Merge, then compress, then protect, without downloading and re-uploading in between.
 - 🧰 **40 tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
 - 💻 **Desktop app for Windows, macOS and Linux**, with all 40 tools working fully offline.
 - 📲 **Installable web app.** Install it from your browser and it works offline after the first visit.
@@ -201,7 +202,8 @@ tests/                 # Playwright browser tests
 - [ ] More languages (French, Spanish, Turkish, ...): [help translate](CONTRIBUTING.md#translating)
 - [x] Office conversions and PDF/A in the browser
 - [ ] Layout-preserving Office conversions (images, tables, fonts)
-- [ ] Drag-and-drop tool chaining ("workflows")
+- [x] Tool chaining ("Continue with…")
+- [ ] Saved, reusable workflows and batch runs
 - [ ] Code-signed desktop installers
 - [ ] Browser tests for every tool
 

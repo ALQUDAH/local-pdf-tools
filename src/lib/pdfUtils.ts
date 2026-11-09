@@ -6,6 +6,7 @@
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import './pdfjs';
+import { recordResult } from './handoff';
 
 
 /**
@@ -328,6 +329,7 @@ export function downloadFile(data: Uint8Array | string, fileName: string, mimeTy
     blob = new Blob([data], { type: mimeType });
     const url = URL.createObjectURL(blob);
     triggerDownload(url, fileName);
+    recordResult(blob, fileName); // lets the user continue with this PDF in another tool
   }
 }
 

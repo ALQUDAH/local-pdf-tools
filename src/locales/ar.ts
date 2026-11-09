@@ -1118,6 +1118,11 @@ const ar: Record<string, string> = {
   "Document Converter": "محوّل المستندات",
   "Convert files seamlessly utilizing high fidelity fullstack libraries.": "حوّل الملفات بسهولة.",
   "Some characters (for example Arabic or Chinese) can't be shown by this basic text conversion and were replaced.": "بعض الأحرف (مثل العربية أو الصينية) لا يمكن عرضها في هذا التحويل النصي البسيط وتم استبدالها.",
+  "Continue with another tool": "المتابعة بأداة أخرى",
+  "is ready. Continue with:": "جاهز. تابع باستخدام:",
+  "More tools": "أدوات أخرى",
+  "Dismiss": "إغلاق",
+  "The file stays on your device and is passed to the next tool in memory.": "يبقى الملف على جهازك ويُنقل إلى الأداة التالية داخل الذاكرة.",
 };
 
 export default ar;

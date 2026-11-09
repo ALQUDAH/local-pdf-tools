@@ -81,6 +81,8 @@ const RepairTool = React.lazy(() => import('./components/RepairTool'));
 const ResizeTool = React.lazy(() => import('./components/ResizeTool'));
 const MarginTool = React.lazy(() => import('./components/MarginTool'));
 import PerformanceDashboard from './components/PerformanceDashboard';
+import ContinueBar from './components/ContinueBar';
+import { clearPendingFile } from './lib/handoff';
 import NotSupportedClientSideTool from './components/NotSupportedClientSideTool';
 const ConvertTool = React.lazy(() => import('./components/ConvertTool'));
 const EditPdfTool = React.lazy(() => import('./components/EditPdfTool'));
@@ -548,6 +550,10 @@ export default function App() {
   // Running inside the desktop app (Electron): all tools, including server ones, work locally
   const isDesktop = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent);
   const [activeTool, setActiveTool] = useState<ActiveTool>('dashboard');
+  // A handed-off file is only for the tool chosen right after; drop it when going back home
+  useEffect(() => {
+    if (activeTool === 'dashboard') clearPendingFile();
+  }, [activeTool]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1150,6 +1156,19 @@ export default function App() {
           {renderActiveTool()}
         </React.Suspense>
       </main>
+
+      {/* Tool chaining: continue with the last result */}
+      <ContinueBar
+        activeTool={activeTool}
+        toolTitle={(id) => {
+          const def = TOOLS.find((tool) => tool.id === id);
+          return def ? toolText(id, def).title : id;
+        }}
+        onContinue={(tool) => {
+          setActiveTool(tool);
+          window.scrollTo({ top: 0 });
+        }}
+      />
 
       {/* Floating Performance Dashboard */}
       <PerformanceDashboard />

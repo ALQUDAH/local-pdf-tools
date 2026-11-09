@@ -6,7 +6,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 - **Office conversions now run in the browser:** PDF ↔ Word, PDF ↔ PowerPoint, PDF ↔ Excel and HTML → PDF work on the static site and offline, with no server. 38 of 40 tools are now fully client-side; only AI translation and converting a web page by URL use the server.
-- Browser tests for every conversion (34 tests in total).
+- **Tool chaining:** after a tool saves a PDF, a "Continue with…" bar offers 24 tools that can take it next (e.g. Merge → Compress → Protect). The file is passed in memory, with no download/upload round trip.
+- Browser tests for every conversion and for tool chaining (36 tests in total).
 
 ### Changed
 - The server now runs on Express 5.

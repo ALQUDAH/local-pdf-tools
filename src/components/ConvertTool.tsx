@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { tr } from '../i18n';
+import { recordResult } from '../lib/handoff';
 interface ConvertToolProps {
   toolId: string;
   onBack: () => void;
@@ -293,6 +294,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
     const a = document.createElement('a');
     a.href = url;
     a.download = resultFilename;
+    recordResult(resultBlob, resultFilename);
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
