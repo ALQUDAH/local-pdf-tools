@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-11-09
+
+### Added
+- **Desktop app:** Translate PDF now has a setting for your own Gemini API key. It is stored only on your computer (owner-only file in the app's data folder), and the screen explains that translating sends the document's text to Google.
+
+### Changed
+- Desktop app home page now says the tools run on your computer, and that all 40 tools (including the Office converters) work offline.
+- Updated lucide-react (1.x), motion (14), dotenv (18) and the GitHub Actions artifact upload action.
+
+### Fixed
+- `npm install <package>` failed because of the `@types/node` override syntax.
+
+### Security
+- The desktop settings endpoint only exists inside the desktop app and only accepts requests from the app itself (127.0.0.1 host check plus a header cross-site requests can't send).
+
 ## [1.2.0] - 2026-11-06
 
 ### Added
