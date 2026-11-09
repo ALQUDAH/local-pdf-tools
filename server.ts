@@ -743,7 +743,7 @@ export async function startServer(options: StartOptions = {}): Promise<{ port: n
     // Production Mode: Serve Compiled dist static files
     const distPath = options.distPath ?? path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
+    app.get("/{*splat}", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }

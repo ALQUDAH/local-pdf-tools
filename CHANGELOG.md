@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - **Office conversions now run in the browser:** PDF ↔ Word, PDF ↔ PowerPoint, PDF ↔ Excel and HTML → PDF work on the static site and offline, with no server. 38 of 40 tools are now fully client-side; only AI translation and converting a web page by URL use the server.
 - Browser tests for every conversion (34 tests in total).
 
+### Changed
+- The server now runs on Express 5.
+
 ### Fixed
 - **PDF to PDF/A was misleading:** it only renamed the document title to "(ISO PDF/A Compliant)". It now embeds PDF/A-2b identification and matching XMP metadata, an sRGB output intent (color profile generated in code) and a file ID, in both the browser and the server API. The tool explains that full conformance also needs embedded fonts.
 - Converter descriptions no longer promise layout or formatting that the text-based conversions don't keep, and Translate no longer claims to keep fonts and layout.
