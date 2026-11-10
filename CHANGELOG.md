@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.4.0] - 2026-11-10
 
 ### Added
 - **Office conversions now run in the browser:** PDF ↔ Word, PDF ↔ PowerPoint, PDF ↔ Excel and HTML → PDF work on the static site and offline, with no server. 38 of 40 tools are now fully client-side; only AI translation and converting a web page by URL use the server.

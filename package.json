@@ -1,6 +1,6 @@
 {
   "name": "local-pdf-tools",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Free, open-source, privacy-first PDF toolkit. 30+ tools (merge, split, compress, OCR, sign, redact, edit...) that run entirely in your browser.",
   "private": true,
   "type": "module",
