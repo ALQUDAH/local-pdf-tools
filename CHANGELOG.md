@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.5.0] - 2026-11-10
 
 ### Added
 - **Workflows:** run several tools in a row as a guided sequence. Each step opens with the previous result loaded, a progress strip shows where you are, and the bar offers the next step. Three presets (Merge, compress & protect; Finalize a document; Clean up a scan), and you can create your own, saved in your browser only.
