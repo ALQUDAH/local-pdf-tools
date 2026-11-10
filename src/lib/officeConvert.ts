@@ -91,7 +91,7 @@ async function paragraphsToPdf(paragraphs: string[], title?: string): Promise<Co
     }
     y -= 8;
   }
-  return { blob: new Blob([await pdf.save()], { type: MIME.pdf }), replacedCharacters: safe.replaced };
+  return { blob: new Blob([(await pdf.save()) as BlobPart], { type: MIME.pdf }), replacedCharacters: safe.replaced };
 }
 
 /** Extracts the text of every page, one string per page with line breaks kept. */
@@ -233,7 +233,7 @@ export async function powerPointToPdf(data: ArrayBuffer): Promise<ConversionResu
       y -= 20;
     }
   }
-  return { blob: new Blob([await pdf.save()], { type: MIME.pdf }), replacedCharacters: safe.replaced };
+  return { blob: new Blob([(await pdf.save()) as BlobPart], { type: MIME.pdf }), replacedCharacters: safe.replaced };
 }
 
 export async function excelToPdf(data: ArrayBuffer): Promise<ConversionResult> {
@@ -269,7 +269,7 @@ export async function excelToPdf(data: ArrayBuffer): Promise<ConversionResult> {
       y -= 20;
     });
   });
-  return { blob: new Blob([await pdf.save()], { type: MIME.pdf }), replacedCharacters: safe.replaced };
+  return { blob: new Blob([(await pdf.save()) as BlobPart], { type: MIME.pdf }), replacedCharacters: safe.replaced };
 }
 
 /** HTML code or file to PDF. Keeps headings, paragraphs and list items as text. */
@@ -307,11 +307,11 @@ export async function htmlToPdf(html: string): Promise<ConversionResult> {
     }
     y -= heading ? 8 : 5;
   }
-  return { blob: new Blob([await pdf.save()], { type: MIME.pdf }), replacedCharacters: safe.replaced };
+  return { blob: new Blob([(await pdf.save()) as BlobPart], { type: MIME.pdf }), replacedCharacters: safe.replaced };
 }
 
 // PDF/A lives in its own module so the Node server can reuse it
 export async function pdfToPdfA(data: ArrayBuffer, fileName: string): Promise<ConversionResult> {
   const { preparePdfA } = await import('./pdfa');
-  return { blob: new Blob([await preparePdfA(data, fileName)], { type: MIME.pdf }) };
+  return { blob: new Blob([(await preparePdfA(data, fileName)) as BlobPart], { type: MIME.pdf }) };
 }

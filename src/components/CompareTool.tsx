@@ -247,7 +247,7 @@ export default function CompareTool({ onBack }: CompareToolProps) {
       } else if (diffMode === 'pixel-diff') {
         // Compute visual pixel variance subtraction
         const imgDataA = ctxA.getImageData(0, 0, targetWidth, targetHeight);
-        const imgDataB = ctxB.getContext('2d')?.getImageData(0, 0, targetWidth, targetHeight);
+        const imgDataB = ctxB.getImageData(0, 0, targetWidth, targetHeight);
         
         if (imgDataA && imgDataB) {
           const pixelsA = imgDataA.data;

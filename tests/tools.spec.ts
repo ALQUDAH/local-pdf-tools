@@ -115,3 +115,24 @@ test('OCR recognizes text using the self-hosted Tesseract engine', async ({ page
   expect(engine.length).toBeGreaterThan(0);
   expect(new Set(engine)).toEqual(new Set([new URL(page.url()).host]));
 });
+
+test('Compare: every view mode renders, including pixel difference', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  // The tool catches rendering errors and logs them, so watch the console too
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text());
+  });
+  const external = trackExternalRequests(page);
+  await page.goto('/');
+  await page.locator('#card-compare').click();
+  const inputs = page.locator('input[type=file]');
+  await inputs.nth(0).setInputFiles(threePages);
+  await inputs.nth(1).setInputFiles(onePage);
+  for (const mode of ['Sliding Wipe Curtain', 'Crossfade Alpha Blend', 'Visual Pixel Difference', 'Side-by-Side Split']) {
+    await page.getByText(mode, { exact: true }).click();
+    await page.waitForTimeout(800);
+  }
+  expect(errors).toEqual([]);
+  expect(external).toEqual([]);
+});

@@ -16,3 +16,18 @@ test('server-backed tools explain they need a server on static hosting', async (
   await expect(page.getByRole('alert')).toContainText('companion server');
   await expect(page.getByRole('button', { name: /Start conversion/i })).toBeDisabled();
 });
+
+test('performance metrics panel floats in the corner when opened', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Show Performance Metrics' }).click();
+  const panel = page.getByText('Performance Metrics', { exact: true }).locator('xpath=ancestor::div[contains(@class,"fixed")][1]');
+  await expect(panel).toBeVisible();
+  expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe('fixed');
+  // Stays in view while the page scrolls
+  await page.mouse.wheel(0, 3000);
+  await page.waitForTimeout(300);
+  const box = await panel.boundingBox();
+  const viewport = page.viewportSize()!;
+  expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
+  expect(box!.y).toBeGreaterThan(viewport.height / 2);
+});

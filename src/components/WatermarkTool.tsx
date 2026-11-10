@@ -404,7 +404,6 @@ export default function WatermarkTool({ onBack }: WatermarkToolProps) {
                       style={getWatermarkPreviewStyle()}
                       onMouseDown={(e) => {
                         e.preventDefault();
-                        if (layout === 'grid') return;
                         setIsDragging(true);
                         setDragStart({ clientX: e.clientX, clientY: e.clientY });
                         if (layout !== 'custom') {

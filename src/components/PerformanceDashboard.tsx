@@ -41,7 +41,7 @@ export default function PerformanceDashboard() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/50 p-4 rounded-xl shadow-2xl z-[100] text-slate-200 w-64 animate-fade-in relative pointer-events-auto">
+    <div className="fixed bottom-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/50 p-4 rounded-xl shadow-2xl z-[100] text-slate-200 w-64 animate-fade-in pointer-events-auto">
       <button 
         onClick={() => setIsOpen(false)}
         className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 transition-colors"

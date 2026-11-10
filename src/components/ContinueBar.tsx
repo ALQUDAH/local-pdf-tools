@@ -41,7 +41,7 @@ export default function ContinueBar({ activeTool, toolTitle, onContinue }: Conti
     <div
       role="region"
       aria-label={tr("Continue with another tool")}
-      className="fixed bottom-4 inset-x-4 md:inset-x-auto md:start-1/2 md:-translate-x-1/2 rtl:md:translate-x-1/2 z-40 max-w-3xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900 shadow-xl rounded-2xl p-3 md:p-4 animate-fade-in"
+      className="fixed bottom-20 md:bottom-4 inset-x-4 md:inset-x-auto md:start-1/2 md:-translate-x-1/2 rtl:md:translate-x-1/2 z-40 max-w-3xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900 shadow-xl rounded-2xl p-3 md:p-4 animate-fade-in"
       id="continue-bar"
     >
       <div className="flex flex-wrap items-center gap-2">

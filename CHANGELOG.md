@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- **Compare tool:** "Visual Pixel Difference" mode never worked (it crashed with "getContext is not a function").
+- **Performance Metrics** panel now floats in the corner when opened, instead of dropping into the page.
+- On phones, the "Continue with…" bar no longer sits under the Performance Metrics button.
+
+### Changed
+- Upgraded to TypeScript 7 and added React's type definitions. The type check now actually covers React components (before, they were silently typed as `any`), which is how the Compare bug was found.
+
 ## [1.4.0] - 2026-11-10
 
 ### Added

@@ -253,7 +253,7 @@ export default function BatchConverterTool({ onBack }: BatchConverterToolProps) 
         });
 
         const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
         results.push({
           name: `${baseName}.pdf`,
           blob,

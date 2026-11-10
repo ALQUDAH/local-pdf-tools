@@ -259,7 +259,7 @@ export default function EditPdfTool({ onBack }: EditPdfToolProps) {
       }
 
       const modBytes = await pdfDoc.save();
-      const blob = new Blob([modBytes], { type: 'application/pdf' });
+      const blob = new Blob([modBytes as BlobPart], { type: 'application/pdf' });
       const dlUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = dlUrl;

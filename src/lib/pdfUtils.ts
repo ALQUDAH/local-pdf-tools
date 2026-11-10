@@ -246,7 +246,7 @@ async function deriveAesKey(password: string, salt: Uint8Array): Promise<CryptoK
   return await window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt as BufferSource,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -326,7 +326,7 @@ export function downloadFile(data: Uint8Array | string, fileName: string, mimeTy
       });
     return;
   } else {
-    blob = new Blob([data], { type: mimeType });
+    blob = new Blob([data as BlobPart], { type: mimeType });
     const url = URL.createObjectURL(blob);
     triggerDownload(url, fileName);
     recordResult(blob, fileName); // lets the user continue with this PDF in another tool
