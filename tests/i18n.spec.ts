@@ -7,7 +7,7 @@ test.describe('Arabic', () => {
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
-    await expect(page.getByText('دمج PDF', { exact: true })).toBeVisible();
+    await expect(page.locator('#card-merge')).toContainText('دمج PDF');
   });
 
   test('search works with Arabic and English terms', async ({ page }) => {

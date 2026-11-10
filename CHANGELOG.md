@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- **Workflows:** run several tools in a row as a guided sequence. Each step opens with the previous result loaded, a progress strip shows where you are, and the bar offers the next step. Three presets (Merge, compress & protect; Finalize a document; Clean up a scan), and you can create your own, saved in your browser only.
+
 ### Fixed
 - **Compare tool:** "Visual Pixel Difference" mode never worked (it crashed with "getContext is not a function").
 - **Performance Metrics** panel now floats in the corner when opened, instead of dropping into the page.

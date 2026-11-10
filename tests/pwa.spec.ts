@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { makePdf, runAndDownload, loadDownloadedPdf } from './helpers';
+import { makePdf, runAndDownload, loadDownloadedPdf, toolCard } from './helpers';
 
 test('app is installable and works offline after the first visit', async ({ page, context }) => {
   await page.goto('/');
@@ -23,7 +23,7 @@ test('app is installable and works offline after the first visit', async ({ page
   await expect(page.getByText('40 tools').first()).toBeVisible();
 
   // A browser tool still works with no network at all
-  await page.getByText('Merge PDF', { exact: true }).first().click();
+  await toolCard(page, 'Merge PDF').click();
   await page.locator('input[type=file]').first().setInputFiles([await makePdf(2), await makePdf(1)]);
   const pdf = await loadDownloadedPdf(await runAndDownload(page, /^Merge 2 PDFs/));
   expect(pdf.getPageCount()).toBe(3);

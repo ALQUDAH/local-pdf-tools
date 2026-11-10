@@ -29,9 +29,14 @@ export function trackExternalRequests(page: Page): string[] {
   return external;
 }
 
+/** The dashboard card for a tool (tool names also appear in workflow step labels). */
+export function toolCard(page: Page, title: string) {
+  return page.locator('[id^="card-"]').filter({ has: page.getByRole('heading', { name: title, exact: true }) }).first();
+}
+
 export async function openTool(page: Page, title: string) {
   await page.goto('/');
-  await page.getByText(title, { exact: true }).first().click();
+  await toolCard(page, title).click();
   await expect(page.getByText('Back to Dashboard')).toBeVisible();
 }
 

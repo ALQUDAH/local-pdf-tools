@@ -82,6 +82,9 @@ const ResizeTool = React.lazy(() => import('./components/ResizeTool'));
 const MarginTool = React.lazy(() => import('./components/MarginTool'));
 import PerformanceDashboard from './components/PerformanceDashboard';
 import ContinueBar from './components/ContinueBar';
+import WorkflowsPanel from './components/WorkflowsPanel';
+import WorkflowProgress from './components/WorkflowProgress';
+import { stopWorkflow } from './lib/workflows';
 import { clearPendingFile } from './lib/handoff';
 import NotSupportedClientSideTool from './components/NotSupportedClientSideTool';
 const ConvertTool = React.lazy(() => import('./components/ConvertTool'));
@@ -547,12 +550,19 @@ const TOOL_GROUPS: ToolGroup[] = [
 
 export default function App() {
   const { t, lang, setLang, toolText, groupText } = useI18n();
+  const toolTitle = (id: ActiveTool) => {
+    const def = TOOLS.find((tool) => tool.id === id);
+    return def ? toolText(id, def).title : id;
+  };
   // Running inside the desktop app (Electron): all tools, including server ones, work locally
   const isDesktop = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent);
   const [activeTool, setActiveTool] = useState<ActiveTool>('dashboard');
   // A handed-off file is only for the tool chosen right after; drop it when going back home
   useEffect(() => {
-    if (activeTool === 'dashboard') clearPendingFile();
+    if (activeTool === 'dashboard') {
+      clearPendingFile();
+      stopWorkflow();
+    }
   }, [activeTool]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -1022,6 +1032,14 @@ export default function App() {
         ) : (
           /* Default Dashboard View (All Categories) */
           <div className="space-y-12">
+            <WorkflowsPanel
+              toolTitle={toolTitle}
+              onStart={(tool) => {
+                setActiveTool(tool);
+                window.scrollTo({ top: 0 });
+              }}
+            />
+
             {/* Pinned Utilities Section */}
             {pinnedTools.length > 0 && (
               <div className="space-y-4 animate-fade-in">
@@ -1153,6 +1171,7 @@ export default function App() {
             <p className="text-slate-500 font-medium dark:text-slate-400">{t('loading.tool')}</p>
           </div>
         }>
+          {activeTool !== 'dashboard' && <WorkflowProgress toolTitle={toolTitle} />}
           {renderActiveTool()}
         </React.Suspense>
       </main>
@@ -1160,10 +1179,7 @@ export default function App() {
       {/* Tool chaining: continue with the last result */}
       <ContinueBar
         activeTool={activeTool}
-        toolTitle={(id) => {
-          const def = TOOLS.find((tool) => tool.id === id);
-          return def ? toolText(id, def).title : id;
-        }}
+        toolTitle={toolTitle}
         onContinue={(tool) => {
           setActiveTool(tool);
           window.scrollTo({ top: 0 });

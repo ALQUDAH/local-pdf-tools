@@ -8,6 +8,7 @@ import { ArrowRight, CheckCircle, ChevronDown, X } from 'lucide-react';
 import type { ActiveTool } from '../types';
 import { tr } from '../i18n';
 import { clearLastResult, continueWithLastResult, useLastResult } from '../lib/handoff';
+import { advanceWorkflow, stopWorkflow, useActiveWorkflow } from '../lib/workflows';
 
 // Tools whose first step is uploading a PDF, so they can take the previous result directly.
 export const CHAINABLE_TOOLS: ActiveTool[] = [
@@ -25,8 +26,67 @@ interface ContinueBarProps {
 
 export default function ContinueBar({ activeTool, toolTitle, onContinue }: ContinueBarProps) {
   const result = useLastResult();
+  const workflow = useActiveWorkflow();
   const [showAll, setShowAll] = useState(false);
   if (!result || activeTool === 'dashboard') return null;
+
+  // Guided workflow: offer exactly the next step
+  if (workflow) {
+    const { steps, name, preset } = workflow.workflow;
+    const title = preset ? tr(name) : name;
+    const isLast = workflow.step >= steps.length - 1;
+    const next = steps[workflow.step + 1];
+    return (
+      <div
+        role="region"
+        aria-label={tr("Workflow")}
+        className="fixed bottom-20 md:bottom-4 inset-x-4 md:inset-x-auto md:start-1/2 md:-translate-x-1/2 rtl:md:translate-x-1/2 z-40 max-w-3xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900 shadow-xl rounded-2xl p-3 md:p-4 animate-fade-in"
+        id="continue-bar"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+          {isLast ? (
+            <>
+              <p className="text-sm text-slate-700 dark:text-slate-200 me-1">
+                {tr("Workflow complete: {0}", title)}
+              </p>
+              <button
+                onClick={() => {
+                  stopWorkflow();
+                  clearLastResult();
+                }}
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+              >
+                {tr("Done")}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-slate-700 dark:text-slate-200 me-1">
+                {tr("Step {0} of {1} done.", workflow.step + 1, steps.length)}
+              </p>
+              <button
+                onClick={() => {
+                  if (!continueWithLastResult()) return;
+                  const tool = advanceWorkflow();
+                  if (tool) onContinue(tool);
+                }}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+              >
+                {tr("Next: {0}", toolTitle(next))} <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => stopWorkflow()}
+                className="ms-auto px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
+              >
+                {tr("Stop workflow")}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const go = (tool: ActiveTool) => {
     if (continueWithLastResult()) {
