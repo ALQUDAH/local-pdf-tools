@@ -1,0 +1,9 @@
+services:
+  local-pdf-tools:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Optional: enables the AI "Translate PDF" tool
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    restart: unless-stopped

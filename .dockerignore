@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.github
+docs
+.env
+.env.*
+!.env.example
+*.log
+desktop/web
+desktop/node_modules
+desktop/server.mjs
+release
+test-results

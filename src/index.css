@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+/* Smooth theme transition classes */
+.theme-transition,
+.theme-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, text-decoration-color, box-shadow;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Arabic: letter-spacing and monospace fonts break letter joining */
+:root:lang(ar) .tracking-wide,
+:root:lang(ar) .tracking-wider,
+:root:lang(ar) .tracking-widest {
+  letter-spacing: 0;
+}
+:root:lang(ar) .font-mono:not(kbd):not(code) {
+  font-family: inherit;
+}
+
+/* Right-to-left: mirror direction icons (back/next arrows, chevrons) */
+[dir='rtl'] .lucide-arrow-left,
+[dir='rtl'] .lucide-arrow-right,
+[dir='rtl'] .lucide-chevron-left,
+[dir='rtl'] .lucide-chevron-right,
+[dir='rtl'] .lucide-chevrons-left,
+[dir='rtl'] .lucide-chevrons-right {
+  transform: scaleX(-1);
+}
+/* Sliders map to page geometry (left/right margins, X offsets), so keep them left-to-right */
+[dir='rtl'] input[type='range'] {
+  direction: ltr;
+}
