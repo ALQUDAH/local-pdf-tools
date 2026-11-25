@@ -3,8 +3,6 @@ import express from "express";
 import path from "path";
 import multer from "multer";
 import { PDFParse } from "pdf-parse";
-import dns from "dns/promises";
-import net from "net";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import exceljs from "exceljs";
@@ -14,11 +12,22 @@ import JSZip from "jszip";
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import { preparePdfA } from "./src/lib/pdfa";
+import { sanitizeForWinAnsi } from "./src/lib/winAnsi";
+import { fetchPublicUrl, BlockedUrlError } from "./server/publicFetch";
+import { extractTextBlocks } from "./server/htmlBlocks";
 
 // Initialize express app
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || "0.0.0.0";
+// Local-only by default; Docker sets HOST=0.0.0.0 inside the container
+const HOST = process.env.HOST || "127.0.0.1";
+
+// Upper bound for submitted or fetched HTML (characters / bytes)
+const MAX_HTML_CHARS = 2 * 1024 * 1024;
+// Web pages can be larger than pasted HTML (long articles reach ~3 MB); parsing is linear
+const MAX_FETCHED_HTML_BYTES = 10 * 1024 * 1024;
+// Upper bound for generated pages, so a huge input can't keep the server busy drawing
+const MAX_HTML_PDF_PAGES = 300;
 
 // Header-safe base filename (Content-Disposition only accepts a limited charset)
 function safeBaseName(name: string): string {
@@ -36,47 +45,15 @@ async function extractPdfText(buffer: Buffer): Promise<{ text: string; pages: st
   }
 }
 
-// Reject URLs that point at loopback / private / link-local networks (SSRF guard)
-function isPrivateAddress(ip: string): boolean {
-  if (net.isIPv4(ip)) {
-    const [a, b] = ip.split(".").map(Number);
-    return a === 10 || a === 127 || a === 0 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      (a === 100 && b >= 64 && b <= 127) ||
-      a >= 224;
-  }
-  const lower = ip.toLowerCase();
-  if (lower.startsWith("::ffff:")) return isPrivateAddress(lower.slice(7));
-  return lower === "::1" || lower === "::" || lower.startsWith("fc") || lower.startsWith("fd") || lower.startsWith("fe80");
-}
-
-async function assertPublicUrl(raw: string): Promise<URL> {
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    throw new Error("Invalid URL");
-  }
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new Error("Only http(s) URLs are allowed");
-  }
-  const addresses = await dns.lookup(url.hostname, { all: true });
-  if (addresses.length === 0 || addresses.some((a) => isPrivateAddress(a.address))) {
-    throw new Error("URLs pointing to private or local networks are not allowed");
-  }
-  return url;
-}
-
 // Configure multer file upload
 const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
 // Configure JSON and text body parsers
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+// Only the HTML -> PDF route takes JSON/urlencoded bodies; file uploads go through multer
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Helper: Wrap text to page width
 function wrapText(text: string, width: number, fontSize: number, font: any): string[] {
@@ -452,27 +429,23 @@ app.post("/api/convert/excel-to-pdf", upload.single("file"), async (req, res) =>
 app.post("/api/convert/html-to-pdf", async (req, res) => {
   try {
     const { htmlInput, urlInput } = req.body;
-    let html = htmlInput || "";
-    
+    let html = typeof htmlInput === "string" ? htmlInput : "";
+    if (html.length > MAX_HTML_CHARS) {
+      return res.status(413).json({ error: "HTML is too large (limit 2 MB)" });
+    }
+
     if (urlInput) {
-      let safeUrl: URL;
       try {
-        safeUrl = await assertPublicUrl(String(urlInput));
+        const page = await fetchPublicUrl(String(urlInput), { maxBytes: MAX_FETCHED_HTML_BYTES });
+        html = page.ok ? page.body : `<h1>Request failed with status ${page.status}</h1>`;
       } catch (err: any) {
-        return res.status(400).json({ error: err.message || "URL not allowed" });
-      }
-      try {
-        const fetchRes = await fetch(safeUrl, { redirect: "error", signal: AbortSignal.timeout(15000) });
-        if (fetchRes.ok) {
-          html = await fetchRes.text();
-        } else {
-          html = `<h1>Request failed with status ${fetchRes.status}</h1><p>${safeUrl.href}</p>`;
+        if (err instanceof BlockedUrlError) {
+          return res.status(400).json({ error: err.message });
         }
-      } catch (err) {
-        html = `<h1>Network Connection Failed</h1><p>Failed to contact: ${safeUrl.href}</p>`;
+        html = `<h1>Network Connection Failed</h1><p>Could not fetch the page.</p>`;
       }
     }
-    
+
     if (!html.trim()) {
       return res.status(400).json({ error: "Missing HTML text body or Web Address value" });
     }
@@ -486,30 +459,39 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
     const margin = 50;
     let y = height - margin;
     
-    // Tag parsing
-    const regex = /<(h1|h2|p|li)[^>]*>([\s\S]*?)<\/\1>/gi;
-    let match;
-    let found = false;
-    
-    while ((match = regex.exec(html)) !== null) {
-      found = true;
-      const tag = match[1].toLowerCase();
-      const rawText = match[2].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-      if (!rawText) continue;
-      
+    // Linear-time HTML tokenizer (no regular expressions over untrusted input)
+    const { blocks, plainText } = extractTextBlocks(html);
+    const found = blocks.length > 0;
+
+    let truncated = false;
+    let replacedCharacters = false;
+    const winAnsi = (text: string) => {
+      const out = sanitizeForWinAnsi(text);
+      if (out !== text) replacedCharacters = true;
+      return out;
+    };
+    const addPage = () => {
+      if (pdfDoc.getPageCount() >= MAX_HTML_PDF_PAGES) {
+        truncated = true;
+        return false;
+      }
+      page = pdfDoc.addPage([595.27, 841.89]);
+      y = height - margin;
+      return true;
+    };
+
+    for (const { tag, text: rawText } of blocks) {
+      if (truncated) break;
       const isHeading = tag === "h1" || tag === "h2";
       const fontSize = isHeading ? (tag === "h1" ? 18 : 14) : 10;
       const currentFont = isHeading ? fontBold : font;
       const color = isHeading ? rgb(0.1, 0.15, 0.35) : rgb(0.2, 0.2, 0.2);
-      
-      const lines = wrapText(rawText, width - 100, fontSize, currentFont);
-      
+
+      const lines = wrapText(winAnsi(rawText), width - 100, fontSize, currentFont);
+
       for (const line of lines) {
-        if (y < margin + 25) {
-          page = pdfDoc.addPage([595.27, 841.89]);
-          y = height - margin;
-        }
-        
+        if (y < margin + 25 && !addPage()) break;
+
         page.drawText(line, {
           x: tag === "li" ? margin + 15 : margin,
           y: y,
@@ -521,25 +503,28 @@ app.post("/api/convert/html-to-pdf", async (req, res) => {
       }
       y -= 12;
     }
-    
+
     if (!found) {
       // Plain text render
-      const textToRender = html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+      const textToRender = winAnsi(plainText.slice(0, 1_000_000));
       const lines = wrapText(textToRender, width - 100, 11, font);
       for (const line of lines) {
-        if (y < margin + 25) {
-          page = pdfDoc.addPage([595.27, 841.89]);
-          y = height - margin;
-        }
+        if (y < margin + 25 && !addPage()) break;
         page.drawText(line, { x: margin, y: y, size: 11, font, color: rgb(0.2, 0.2, 0.2) });
         y -= 16;
       }
     }
     
+    if (truncated) {
+      page.drawText(`[Output truncated at ${MAX_HTML_PDF_PAGES} pages]`, { x: margin, y: margin, size: 9, font, color: rgb(0.6, 0.1, 0.1) });
+    }
+
     const pdfBytes = await pdfDoc.save();
     
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=\"web_print_output.pdf\"");
+    // Tells the app to show its "some characters were replaced" notice
+    if (replacedCharacters) res.setHeader("X-Characters-Replaced", "true");
     res.send(Buffer.from(pdfBytes));
   } catch (error: any) {
     console.error("HTML to PDF conversion error:", error);

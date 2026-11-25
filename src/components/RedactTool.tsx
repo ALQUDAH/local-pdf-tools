@@ -252,7 +252,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
   const handleBurnRedaction = async () => {
     if (!file) return;
     setLoading(true);
-    setStatusText(tr("Burning solid blackout vectors into PDF structures..."));
+    setStatusText(tr("Drawing redaction boxes..."));
 
     try {
       const pdfDoc = await PDFDocument.load(new Uint8Array(file.arrayBuffer), { ignoreEncryption: true });
@@ -283,7 +283,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         });
       });
 
-      setStatusText(tr("Rasterizing to flatten text payloads permanently..."));
+      setStatusText(tr("Converting redacted pages to images so the text underneath is removed..."));
       const intermediateBytes = await pdfDoc.save();
 
       const pagesWithRedactions = new Set<number>();
@@ -296,7 +296,8 @@ export default function RedactTool({ onBack }: RedactToolProps) {
         // so we fiercely clone the bytes before passing it.
         const clone1 = new Uint8Array(intermediateBytes.length);
         clone1.set(intermediateBytes);
-        const pdfJsDoc = await pdfjsLib.getDocument({ data: clone1 }).promise;
+        const pdfJsTask = pdfjsLib.getDocument({ data: clone1 });
+        const pdfJsDoc = await pdfJsTask.promise;
 
         const clone2 = new Uint8Array(intermediateBytes.length);
         clone2.set(intermediateBytes);
@@ -306,35 +307,71 @@ export default function RedactTool({ onBack }: RedactToolProps) {
 
         for (const pageIdx of sortedPages) {
           const pdfPage = await pdfJsDoc.getPage(pageIdx + 1);
-          
+
           const originalViewport = pdfPage.getViewport({ scale: 1.0 });
-          const viewport = pdfPage.getViewport({ scale: 2.5 });
+          // Render sharp, but stay inside browser canvas limits (Safari: ~16.7 MP, 4096-16384 px sides)
+          const scale = Math.max(
+            0.5,
+            Math.min(
+              2.5,
+              Math.sqrt(16_000_000 / (originalViewport.width * originalViewport.height)),
+              8000 / Math.max(originalViewport.width, originalViewport.height)
+            )
+          );
+          const viewport = pdfPage.getViewport({ scale });
 
           const canvas = document.createElement('canvas');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
           const ctx = canvas.getContext('2d');
-          if (ctx) {
-            await pdfPage.render({ canvasContext: ctx, viewport, canvas }).promise;
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const imgBytes = Uint8Array.from(atob(imgData.split(',')[1]), c => c.charCodeAt(0));
-            const embeddedImg = await finalPdfDoc.embedJpg(imgBytes);
-
-            finalPdfDoc.removePage(pageIdx);
-            const newPage = finalPdfDoc.insertPage(pageIdx, [originalViewport.width, originalViewport.height]);
-            newPage.drawImage(embeddedImg, {
-              x: 0,
-              y: 0,
-              width: originalViewport.width,
-              height: originalViewport.height,
-            });
+          // Fail safe: if a page can't be rasterized, its text would survive under the boxes
+          if (!ctx) {
+            throw new Error(tr("Your browser could not prepare page {0} for permanent redaction (not enough memory or the page is too large). Nothing was saved.", pageIdx + 1));
           }
+          await pdfPage.render({ canvasContext: ctx, viewport, canvas }).promise;
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          if (!imgData.startsWith('data:image/jpeg') || imgData.length < 200) {
+            throw new Error(tr("Your browser could not prepare page {0} for permanent redaction (not enough memory or the page is too large). Nothing was saved.", pageIdx + 1));
+          }
+          const imgBytes = Uint8Array.from(atob(imgData.split(',')[1]), c => c.charCodeAt(0));
+          const embeddedImg = await finalPdfDoc.embedJpg(imgBytes);
+          // Release the large canvas buffer early
+          canvas.width = 0;
+          canvas.height = 0;
+
+          finalPdfDoc.removePage(pageIdx);
+          const newPage = finalPdfDoc.insertPage(pageIdx, [originalViewport.width, originalViewport.height]);
+          newPage.drawImage(embeddedImg, {
+            x: 0,
+            y: 0,
+            width: originalViewport.width,
+            height: originalViewport.height,
+          });
         }
-        
+        await pdfJsTask.destroy();
+
         finalSavedBytes = await finalPdfDoc.save();
+
+        // Verify before saving: every redacted page must now contain no text at all
+        setStatusText(tr("Verifying that no text remains under the redactions..."));
+        const checkTask = pdfjsLib.getDocument({ data: finalSavedBytes.slice() });
+        const check = await checkTask.promise;
+        try {
+          if (check.numPages !== pages.length) {
+            throw new Error(tr("Redaction check failed: the page count changed. Nothing was saved."));
+          }
+          for (const pageIdx of sortedPages) {
+            const content = await (await check.getPage(pageIdx + 1)).getTextContent();
+            const leftover = content.items.some((item) => 'str' in item && item.str.trim().length > 0);
+            if (leftover) {
+              throw new Error(tr("Redaction check failed: text is still present on page {0}. Nothing was saved.", pageIdx + 1));
+            }
+          }
+        } finally {
+          await checkTask.destroy();
+        }
       }
 
-      setStatusText(tr("Encrypting compliance hashes..."));
       const cleanName = file.name.replace('.pdf', '') + '_redacted.pdf';
 
       downloadFile(finalSavedBytes, cleanName, 'application/pdf');
@@ -342,7 +379,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
     } catch (err: any) {
       console.error("Error during redact:", err);
       // We also display the specific error in standard user UI
-      alert(tr("Could not overlay solid redaction blocks: {0}", err.message || 'Unknown error'));
+      alert(tr("Redaction failed: {0}", err.message || 'Unknown error'));
     } finally {
       setLoading(false);
       setStatusText('');
@@ -622,7 +659,7 @@ export default function RedactTool({ onBack }: RedactToolProps) {
               <div>
                 <span className="font-extrabold text-slate-700 dark:text-slate-205">{tr("Permanent Vector Redaction Protocol:")}</span>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  {tr("Unlike simple HTML highlighter annotations or CSS blackout blocks that text-scrapers or highlight-copy readers can easily read underneath, this tool directly integrates vector shapes flat into the page structural description. Once generated, the text layers located under these black masks are inaccessible, ensuring maximum legal compliance.")}
+                  {tr("Black boxes alone can be removed or read underneath. This tool turns every page that has a redaction into an image, so all of that page's original text is removed, not just covered. Before the file is saved, it is checked: if any text remains on a redacted page, nothing is saved. Text on redacted pages is no longer selectable; other pages are unchanged.")}
                 </p>
               </div>
             </div>

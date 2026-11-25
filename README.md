@@ -155,7 +155,7 @@ All optional, and only used by the Node server. See [`.env.example`](.env.exampl
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
-| `HOST` | `0.0.0.0` | Interface to bind |
+| `HOST` | `127.0.0.1` | Interface to bind. Local-only by default; set `0.0.0.0` to serve other devices (the Docker image does this inside the container) |
 | `GEMINI_API_KEY` | (none) | Enables the AI **Translate PDF** tool |
 | `GEMINI_MODEL` | `gemini-3.5-flash` | Gemini model used for translation |
 

@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.5.1] - 2026-11-25
+
+### Security
+- **Redaction is now fail-safe and verified.** If a page could not be converted to an image (for example a very large page or low memory in Safari/Firefox), the old code skipped it silently and still saved the file, leaving the text under the black boxes recoverable. Now that is an error and nothing is saved; the image size adapts to browser limits; and before saving, every redacted page is checked to contain no text. The misleading "Encrypting compliance hashes" step and the inaccurate description were corrected.
+- **HTML → PDF by URL: DNS-rebinding protection.** The private-network check now runs inside the connection's own DNS lookup, so the address that was checked is the address that is connected to. Up to 5 redirects are now followed, each hop validated the same way (previously any redirect failed). Credentials in URLs and non-HTTP schemes are refused, and fetched pages are capped at 10 MB.
+- **HTML → PDF: no more regular-expression denial of service.** HTML is parsed with a linear-time tokenizer (htmlparser2) instead of a regular expression whose work grew with the square of the input. Submitted HTML is capped at 2 MB, the JSON body limit lowered to 5 MB, and output capped at 300 pages. HTML entities are now decoded, script contents no longer leak into the PDF, and characters the PDF fonts can't draw are replaced with a notice instead of failing the conversion.
+- **The server listens on 127.0.0.1 by default** instead of all network interfaces. Set `HOST=0.0.0.0` to serve other devices; the Docker image does this inside the container.
+
 ## [1.5.0] - 2026-11-10
 
 ### Added

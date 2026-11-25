@@ -277,6 +277,7 @@ export default function ConvertTool({ toolId, onBack }: ConvertToolProps) {
       }
 
       setResultBlob(await response.blob());
+      setReplacedCharacters(response.headers.get('X-Characters-Replaced') === 'true');
       setResultFilename(outFilename);
       setSuccess(true);
     } catch (err: any) {
