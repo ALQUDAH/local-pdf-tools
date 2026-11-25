@@ -51,11 +51,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.v.outputs.version }}
         run: |
-          gh release create "v$VERSION" \
-            --target "$GITHUB_SHA" \
-            --title "v$VERSION" \
-            --notes-file release-notes.md \
-            --latest
+          # Re-running for an existing release (e.g. after a failed installer build) reuses it
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; attaching installers to it."
+            gh release edit "v$VERSION" --notes-file release-notes.md
+          else
+            gh release create "v$VERSION" \
+              --target "$GITHUB_SHA" \
+              --title "v$VERSION" \
+              --notes-file release-notes.md \
+              --latest
+          fi
 
   desktop:
     needs: release

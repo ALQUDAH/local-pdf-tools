@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 - **Batch processing:** drop any number of PDFs, build a list of steps (compress, rotate, watermark, page numbers, resize, margins, flatten, remove metadata, repair, PDF/A, password-protect), and get every file back processed, individually or as one ZIP. Optionally merge all files first. Runs entirely in the browser, uses the same code as the single-file tools, skips password-protected inputs with a clear message, and remembers your last steps (never the password).
 
+### Fixed
+- Clean installs (`npm ci`) no longer break when a new `@types/node` patch is published: the version is now pinned exactly.
+
 ## [1.5.1] - 2026-11-25
 
 ### Security
