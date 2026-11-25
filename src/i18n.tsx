@@ -29,10 +29,10 @@ const en = {
   'hero.badge': '100% Secure Local Sandbox',
   'hero.title': 'Manipulate PDFs entirely inside your browser.',
   'hero.body':
-    'A free, open-source PDF toolkit that processes your documents locally. 38 of 40 tools, including Office conversions, run in your browser, so your files never leave your device. Only AI translation and converting web pages by URL use a server you host yourself.',
+    'A free, open-source PDF toolkit that processes your documents locally. 39 of 41 tools, including Office conversions, run in your browser, so your files never leave your device. Only AI translation and converting web pages by URL use a server you host yourself.',
   'hero.titleDesktop': 'Manipulate PDFs entirely on your computer.',
   'hero.bodyDesktop':
-    'A free, open-source PDF toolkit that works offline. All 40 tools, including the Office converters, run on this computer, so your files never leave your device.',
+    'A free, open-source PDF toolkit that works offline. All 41 tools, including the Office converters, run on this computer, so your files never leave your device.',
   'search.placeholder': 'Search 40+ PDF tools by name or description... (e.g., merge, compress, protect, ocr)',
   'search.aria': 'Search PDF tools by name or description',
   'search.clear': 'Clear',
@@ -77,10 +77,10 @@ const ar: Partial<Record<MessageKey, string>> = {
   'hero.badge': 'آمن 100% وعلى جهازك',
   'hero.title': 'عدّل ملفات PDF بالكامل داخل متصفحك.',
   'hero.body':
-    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. 38 أداة من أصل 40، بما فيها تحويل ملفات Office، تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. فقط الترجمة بالذكاء الاصطناعي وتحويل صفحات الويب عبر رابط تستخدم خادمًا تستضيفه بنفسك.',
+    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعالج مستنداتك محليًا. 39 أداة من أصل 41، بما فيها تحويل ملفات Office، تعمل داخل متصفحك، فلا تغادر ملفاتك جهازك أبدًا. فقط الترجمة بالذكاء الاصطناعي وتحويل صفحات الويب عبر رابط تستخدم خادمًا تستضيفه بنفسك.',
   'hero.titleDesktop': 'عدّل ملفات PDF بالكامل على جهازك.',
   'hero.bodyDesktop':
-    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعمل دون إنترنت. جميع الأدوات الأربعين، بما فيها تحويل ملفات Office، تعمل على هذا الجهاز، فلا تغادر ملفاتك جهازك أبدًا.',
+    'مجموعة أدوات PDF مجانية ومفتوحة المصدر تعمل دون إنترنت. جميع الأدوات الـ41، بما فيها تحويل ملفات Office، تعمل على هذا الجهاز، فلا تغادر ملفاتك جهازك أبدًا.',
   'search.placeholder': 'ابحث في أكثر من 40 أداة PDF بالاسم أو الوصف... (مثل: دمج، ضغط، حماية، OCR)',
   'search.aria': 'ابحث في أدوات PDF بالاسم أو الوصف',
   'search.clear': 'مسح',
@@ -132,6 +132,7 @@ const toolsAr: Partial<Record<ActiveTool, { title: string; description: string }
   compare: { title: 'مقارنة مرئية وفروقات', description: 'قارن ملفي PDF جنبًا إلى جنب. يبرز تعديلات الفقرات وتغيّرات التخطيط والمراجعات، دون اتصال بالإنترنت.' },
   grayscale: { title: 'تدرّج رمادي وأحادي اللون', description: 'وفّر حبر الطابعة: حوّل ألوان المستند إلى الرمادي أو طبّق فلاتر تباين عالٍ مثل آلات النسخ.' },
   extractor: { title: 'استخراج النص والتخطيط', description: 'استخرج محتوى PDF صفحة بصفحة مع الحفاظ على تباعد النص، أو حوّله إلى Markdown أو JSON منظم.' },
+  batchprocess: { title: 'المعالجة الدفعية', description: 'طبّق الخطوات نفسها (الضغط، العلامة المائية، ترقيم الصفحات، كلمة المرور وغيرها) على عدة ملفات PDF دفعة واحدة، ونزّلها كلها في ملف ZIP.' },
   batchconverter: { title: 'المحوّل الدفعي', description: 'حوّل عدة ملفات دفعة واحدة: ارفع أي مزيج من ملفات PDF أو الصور، واختر صيغة الإخراج (PDF أو JPG أو PNG)، ونزّلها في ملف ZIP واحد.' },
   formfiller: { title: 'تعبئة النماذج التفاعلية', description: 'يكتشف حقول النماذج التفاعلية تلقائيًا: اكتب الإجابات، وحدّد مربعات الاختيار والقوائم المنسدلة، أو أضف أختامًا مخصصة.' },
   merge: { title: 'دمج PDF', description: 'اجمع عدة مستندات وأعد ترتيب صفحاتها في ملف PDF واحد.' },

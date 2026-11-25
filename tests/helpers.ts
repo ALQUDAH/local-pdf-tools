@@ -87,7 +87,11 @@ export async function makeEncryptedPdf(password: string): Promise<string> {
 
 /** Decrypts a downloaded PDF with the given password; null if the password is wrong. */
 export async function decryptDownload(download: Download, password: string): Promise<PDFDocument | null> {
-  const bytes = fs.readFileSync((await download.path())!);
+  return decryptBytes(fs.readFileSync((await download.path())!), password);
+}
+
+/** Decrypts PDF bytes with the given password; null if the password is wrong. */
+export async function decryptBytes(bytes: Uint8Array, password: string): Promise<PDFDocument | null> {
   const out = await qpdf([`--password=${password}`, '--decrypt'], bytes);
   return out ? PDFDocument.load(out) : null;
 }

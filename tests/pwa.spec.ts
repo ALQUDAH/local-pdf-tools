@@ -20,7 +20,7 @@ test('app is installable and works offline after the first visit', async ({ page
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByText('40 tools').first()).toBeVisible();
+  await expect(page.getByText('41 tools').first()).toBeVisible();
 
   // A browser tool still works with no network at all
   await toolCard(page, 'Merge PDF').click();

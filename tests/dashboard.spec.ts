@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('dashboard lists all tools and search filters them', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Local PDF Tools/);
-  await expect(page.getByText('40 tools').first()).toBeVisible();
+  await expect(page.getByText('41 tools').first()).toBeVisible();
 
   await page.getByPlaceholder(/Search 40\+ PDF tools/).fill('merge');
   await expect(page.getByText('Merge PDF', { exact: true }).first()).toBeVisible();

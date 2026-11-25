@@ -54,7 +54,8 @@ export type ActiveTool =
   | 'htmltopdf'
   | 'unlockpdf'
   | 'pdftopdfa'
-  | 'translatepdf';
+  | 'translatepdf'
+  | 'batchprocess';
 
 export interface SplitRange {
   start: number;

@@ -26,6 +26,7 @@ import {
   FileSearch,
   Grid,
   Layers,
+  ListChecks,
   Camera,
   Heart,
   GitCompare,
@@ -67,6 +68,7 @@ const FormFillerTool = React.lazy(() => import('./components/FormFillerTool'));
 
 const ScannedDocumentTool = React.lazy(() => import('./components/ScannedDocumentTool'));
 const BatchConverterTool = React.lazy(() => import('./components/BatchConverterTool'));
+const BatchProcessTool = React.lazy(() => import('./components/BatchProcessTool'));
 const ExtractorTool = React.lazy(() => import('./components/ExtractorTool'));
 const CompareTool = React.lazy(() => import('./components/CompareTool'));
 const GrayscaleTool = React.lazy(() => import('./components/GrayscaleTool'));
@@ -211,6 +213,16 @@ const TOOLS: ToolDefinition[] = [
     iconBgClass: 'bg-orange-500/10',
     iconTextClass: 'text-orange-600 dark:text-orange-400',
     hoverTextClass: 'group-hover:text-orange-600 dark:group-hover:text-orange-400'
+  },
+  {
+    id: 'batchprocess',
+    title: 'Batch Processing',
+    description: 'Run the same steps (compress, watermark, page numbers, password and more) on many PDFs at once and download them all as a ZIP.',
+    icon: ListChecks,
+    colorClass: 'hover:border-emerald-500 dark:hover:border-emerald-500',
+    iconBgClass: 'bg-emerald-500/10',
+    iconTextClass: 'text-emerald-600 dark:text-emerald-400',
+    hoverTextClass: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
   },
   {
     id: 'batchconverter',
@@ -524,7 +536,7 @@ const TOOL_GROUPS: ToolGroup[] = [
   {
     name: "Convert & Optimize",
     shortName: "Convert",
-    tools: ['imagestopdf', 'images', 'compress', 'batchconverter', 'extractor', 'grayscale', 'pdftopdfa']
+    tools: ['imagestopdf', 'images', 'compress', 'batchprocess', 'batchconverter', 'extractor', 'grayscale', 'pdftopdfa']
   },
   {
     name: "Analysis & Extraction",
@@ -728,6 +740,8 @@ export default function App() {
         return <ScannedDocumentTool onBack={() => setActiveTool('dashboard')} />;
       case 'formfiller':
         return <FormFillerTool onBack={() => setActiveTool('dashboard')} />;
+      case 'batchprocess':
+        return <BatchProcessTool onBack={() => setActiveTool('dashboard')} />;
       case 'batchconverter':
         return <BatchConverterTool onBack={() => setActiveTool('dashboard')} />;
       case 'extractor':

@@ -1,6 +1,6 @@
 // Local PDF Tools desktop app.
 // Runs the bundled web app and its local server on 127.0.0.1 inside an Electron window,
-// so all 40 tools (including Office conversions) work offline. Nothing is uploaded.
+// so all 41 tools (including Office conversions) work offline. Nothing is uploaded.
 import { app, BrowserWindow, dialog, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

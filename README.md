@@ -4,7 +4,7 @@
 
 # Local PDF Tools
 
-**40 PDF tools, 38 of which run entirely in your browser. Your files never leave your device.**
+**41 PDF tools, 39 of which run entirely in your browser. Your files never leave your device.**
 
 Merge, split, compress, OCR, sign, redact, edit, watermark and more. Free, open source, no sign-up, no uploads, no watermarks, no limits.
 
@@ -31,8 +31,8 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 - ⚡ **Fast.** No upload or download wait. Big files are limited only by your machine.
 - 💸 **Free forever.** No accounts, no ads, no watermarks, no "3 tasks per day" limits.
 - 🔗 **Chain tools and save workflows.** Merge, then compress, then protect, without downloading and re-uploading in between. Save a sequence as a workflow and rerun it any time.
-- 🧰 **40 tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
-- 💻 **Desktop app for Windows, macOS and Linux**, with all 40 tools working fully offline.
+- 🧰 **41 tools in one place**, with instant search (`/` or `⌘K`), pinned favorites and dark mode.
+- 💻 **Desktop app for Windows, macOS and Linux**, with all 41 tools working fully offline.
 - 📲 **Installable web app.** Install it from your browser and it works offline after the first visit.
 - 🌍 **English and Arabic** across the whole app, with a full right-to-left layout. [Add your language](CONTRIBUTING.md#translating)!
 - 🏠 **Self-hostable.** Run it on your laptop, your intranet, or as a static site on any CDN.
@@ -45,7 +45,7 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 |---|---|
 | **Organize** | Merge · Split · Organize / reorder pages · Rotate · Crop & trim margins · Resize pages (A4/Letter/Legal) · Add margins · N-up print layout |
 | **Edit** | In-browser PDF editor · Add page numbers · Bates numbering & legal stamps · Form builder · Form filler · Flatten forms & annotations |
-| **Convert & optimize** | Compress · PDF → images · Images → PDF · Batch converter · Text & Markdown extractor · Grayscale / monochrome |
+| **Convert & optimize** | Compress · Batch processing (run the same steps on many PDFs, ZIP output) · PDF → images · Images → PDF · Batch converter · Text & Markdown extractor · Grayscale / monochrome |
 | **Scan & analyze** | OCR (18 languages incl. Arabic, Chinese, Japanese; searchable PDF output) · Camera document scanner · Visual diff / compare two PDFs · Metadata editor |
 | **Security** | Password-protect (standard AES-256) · Unlock · Permanent redaction · Signatures (draw, type, upload) · Watermarks · Template overlay · Repair corrupted PDFs |
 | **Office & archiving** | PDF ↔ Word · PDF ↔ PowerPoint · PDF ↔ Excel · HTML → PDF · PDF/A-2b preparation (text-based Office conversions) |
@@ -55,9 +55,9 @@ Local PDF Tools does the work **inside your browser** with WebAssembly and JavaS
 
 | | Where it runs | Notes |
 |---|---|---|
-| **Browser tools** (38 of 40, including Office conversions and PDF/A) | 100% in your browser | Files are never transmitted. Works on the static demo and offline. |
-| **AI Translate** and **web page by URL** (2 of 40) | On the Node.js server **you** run, or inside the desktop app | Clearly labeled. On the static demo they're disabled and nothing is sent. Translate sends the document's text to Google Gemini, only with your own API key. |
-| **Desktop app** (40 of 40) | On your computer | The app runs its own server on `127.0.0.1` only. Nothing is reachable from your network. |
+| **Browser tools** (39 of 41, including Office conversions and PDF/A) | 100% in your browser | Files are never transmitted. Works on the static demo and offline. |
+| **AI Translate** and **web page by URL** (2 of 41) | On the Node.js server **you** run, or inside the desktop app | Clearly labeled. On the static demo they're disabled and nothing is sent. Translate sends the document's text to Google Gemini, only with your own API key. |
+| **Desktop app** (41 of 41) | On your computer | The app runs its own server on `127.0.0.1` only. Nothing is reachable from your network. |
 
 A few browser tools download open-source **assets** (never your documents) the first time you use them: OCR language models and fonts for non-Latin searchable PDFs (jsDelivr), and handwriting-style signature fonts (Google Fonts). The OCR engine itself and the PDF engine are bundled with the app. Self-hosters can serve the OCR assets themselves too; see [Configuration](#configuration).
 
@@ -80,7 +80,7 @@ Download the installer for your system from the [**latest release**](https://git
 | macOS, Intel | `Local-PDF-Tools-x.y.z-mac-x64.dmg` |
 | Linux | `Local-PDF-Tools-x.y.z-linux-x86_64.AppImage` or `.deb` |
 
-All 40 tools work offline in the desktop app, including the Office converters. Install and go. (The optional AI **Translate PDF** tool asks for your own free Gemini API key and sends the document's text to Google only when you use it.)
+All 41 tools work offline in the desktop app, including the Office converters. Install and go. (The optional AI **Translate PDF** tool asks for your own free Gemini API key and sends the document's text to Google only when you use it.)
 
 > The installers are not code-signed yet, so your system may warn you the first time:
 > - **Windows:** "Windows protected your PC" → **More info** → **Run anyway**.
@@ -98,7 +98,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>. All 40 tools are available, including the server-backed Office converters.
+Open <http://localhost:3000>. All 41 tools are available, including the server-backed Office converters.
 
 ## 🏠 Self-hosting
 
@@ -110,7 +110,7 @@ npm run desktop        # run it
 npm run desktop:dist   # build an installer for your OS into release/
 ```
 
-### Option 1: Docker (full app, all 40 tools)
+### Option 1: Docker (full app, all 41 tools)
 
 ```bash
 docker build -t local-pdf-tools .

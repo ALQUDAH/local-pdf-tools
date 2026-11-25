@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] - 2026-11-25
+
+### Added
+- **Batch processing:** drop any number of PDFs, build a list of steps (compress, rotate, watermark, page numbers, resize, margins, flatten, remove metadata, repair, PDF/A, password-protect), and get every file back processed, individually or as one ZIP. Optionally merge all files first. Runs entirely in the browser, uses the same code as the single-file tools, skips password-protected inputs with a clear message, and remembers your last steps (never the password).
+
 ## [1.5.1] - 2026-11-25
 
 ### Security
